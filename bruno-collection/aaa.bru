@@ -1,0 +1,28 @@
+meta {
+  name: aaa
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://onellm.dev/api
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer oa-93647458886594318673
+}
+
+body:json {
+  {
+    "model": "GPT-4.1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Tell me a joke about computers."
+      }
+    ],
+    "max_tokens": 50
+  }
+}

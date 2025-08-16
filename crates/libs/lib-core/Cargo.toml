@@ -1,0 +1,29 @@
+[package]
+name = "lib-core"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+lib-utils = { path = "../../libs/lib-utils" }
+lib-auth = { path = "../../libs/lib-auth" }
+lib-proc-macros = { path = "../../libs/lib-proc-macros" }
+
+sqlx = { workspace = true }
+serde = { workspace = true }
+redis = { workspace = true }
+serde_json = { workspace = true }
+miette = { workspace = true }
+reqwest = { workspace = true }
+secrecy = { workspace = true }
+axum = { workspace = true }
+tracing = { workspace = true }
+
+
+uuid = { workspace = true }
+thiserror = { workspace = true }
+tokio = "1.45.0"
+sea-query = "0.32.6"
+
+[lints]
+workspace = true

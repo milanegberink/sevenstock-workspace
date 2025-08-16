@@ -1,0 +1,21 @@
+[package]
+name = "lib-auth"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+jsonwebtoken = "9.3.1"
+lib-utils = { path = "../../libs/lib-utils" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+axum = { workspace = true }
+miette = { workspace = true }
+secrecy = { workspace = true }
+argon2 = { version = "0.5.3", features = ["std"] }
+serde_with = "3.14.0"
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[lints]
+workspace = true

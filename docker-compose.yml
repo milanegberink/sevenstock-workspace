@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:18beta3
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sevenstock
+
+  valkey:
+    image: valkey/valkey:latest
+    restart: always
+    ports:
+      - "6379:6379"

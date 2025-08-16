@@ -1,0 +1,27 @@
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/libs/lib-auth",
+    "crates/libs/lib-core",
+    "crates/libs/lib-web",
+    "crates/libs/lib-utils",
+    "crates/libs/lib-proc-macros",
+    "crates/services/web-server",
+    "crates/libs/lib-proc-macros",
+]
+
+[workspace.dependencies]
+sqlx = { version = "0.8.5", features = ["postgres", "uuid", "runtime-tokio"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+uuid = { version = "1.16.0", features = ["serde", "v7"] }
+axum = "0.8.4"
+redis = { version = "0.31.0", features = ["aio", "tokio-comp"] }
+miette = { version = "7.6.0", features = ["fancy"] }
+reqwest = "0.12.20"
+secrecy = { version = "0.10.3", features = ["serde"] }
+thiserror = "2.0.12"
+tracing = "0.1.41"
