@@ -11,12 +11,9 @@ pub async fn mw_rate_limiter(
     req: Request<Body>,
     next: Next,
 ) -> Result<Response> {
-    let x = format!("rate_limit:{}");
-    mm.redis().get(x);
     if let Some(ctx) = req.extensions().get::<CtxW>() {
-        println!("Got ctx: {:?}", ctx);
-    } else {
-        println!("No ctx found!");
+        let redis_key = format!("rate_limit:{}", ctx.0.sub());
+        let x: u16 = mm.redis().get(redis_key).await.unwrap();
     }
 
     Ok(next.run(req).await)
