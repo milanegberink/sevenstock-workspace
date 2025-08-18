@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use crate::config::auth_config;
 use jsonwebtoken::{DecodingKey, EncodingKey, TokenData, decode, encode, get_current_timestamp};
 mod error;
@@ -27,25 +29,63 @@ pub const TEMP_2FA_TOKEN: Token = Token {
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Default)]
-struct Claims {
-    sub: Uuid,
+pub struct Claims<U> {
+    sub: U,
     ident: Option<String>,
     avatar: Option<String>,
     exp: u64,
     iat: u64,
 }
 
-pub struct TokenBuilder {
-    token: Token,
-    claims: Claims,
+impl Claims<Sub> {
+    pub fn sub(self) -> Uuid {
+        self.sub.0
+    }
 }
 
-impl TokenBuilder {
-    pub fn sub(mut self, sub: Uuid) -> Self {
-        self.claims.sub = sub;
-        self
-    }
+pub struct TokenBuilder<U> {
+    token: Token,
+    claims: Claims<U>,
+    _state: PhantomData<U>,
+}
 
+#[derive(Default, Clone)]
+pub struct NoSub;
+
+#[derive(Default, Clone, Serialize, Deserialize)]
+pub struct Sub(Uuid);
+
+impl TokenBuilder<NoSub> {
+    pub fn access() -> Self {
+        Self {
+            token: ACCESS_TOKEN,
+            claims: Claims::default(),
+            _state: PhantomData,
+        }
+    }
+    pub fn refresh() -> Self {
+        Self {
+            token: REFRESH_TOKEN,
+            claims: Claims::default(),
+            _state: PhantomData,
+        }
+    }
+    pub fn sub(self, sub: Uuid) -> TokenBuilder<Sub> {
+        TokenBuilder {
+            token: self.token,
+            claims: Claims {
+                sub: Sub(sub),
+                ident: self.claims.ident,
+                avatar: self.claims.avatar,
+                exp: self.claims.exp,
+                iat: self.claims.iat,
+            },
+            _state: PhantomData,
+        }
+    }
+}
+
+impl TokenBuilder<Sub> {
     pub fn ident<S: Into<String>>(mut self, ident: S) -> Self {
         self.claims.ident = Some(ident.into());
         self
@@ -55,28 +95,9 @@ impl TokenBuilder {
         self.claims.avatar = Some(avatar.into());
         self
     }
-}
-
-impl TokenBuilder {
-    pub fn access() -> Self {
-        Self {
-            token: ACCESS_TOKEN,
-            claims: Claims::default(),
-        }
-    }
-    pub fn refresh() -> Self {
-        Self {
-            token: REFRESH_TOKEN,
-            claims: Claims::default(),
-        }
-    }
     pub fn build(self) -> Result<String> {
         let config = auth_config();
         let current_timestamp = get_current_timestamp();
-
-        if self.claims.sub.is_nil() {
-            return Err(Error::TokenEncodeFail("Sub field is nil"));
-        }
 
         let claims = Claims {
             sub: self.claims.sub,
@@ -104,12 +125,13 @@ pub struct Token {
 }
 
 impl Token {
-    fn verify(&self, token: &str) -> Result<TokenData<Claims>> {
+    pub fn verify(&self, token: &str) -> Result<Claims<Sub>> {
         let config = auth_config();
 
-        let claims = decode::<Claims>(token, &(self.decoding_key)(), config.jwt_ctx().validation())
-            .map_err(|_| Error::InvalidToken)?;
+        let token_data =
+            decode::<Claims<Sub>>(token, (self.decoding_key)(), config.jwt_ctx().validation())
+                .map_err(|_| Error::InvalidToken)?;
 
-        Ok(claims)
+        Ok(token_data.claims)
     }
 }

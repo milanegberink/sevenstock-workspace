@@ -11,7 +11,10 @@ use lib_core::model::ModelManager;
 use tracing::{Level, info};
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 mod error;
-use lib_web::middleware::mw_auth::mw_ctx_require;
+use lib_web::middleware::{
+    mw_auth::{mw_ctx_require, mw_ctx_resolver},
+    mw_rate_limiter::{self, mw_rate_limiter},
+};
 use tower_http::trace::TraceLayer;
 use tracing_appender::rolling;
 
@@ -35,20 +38,20 @@ async fn main() -> Result<()> {
 
     let mm = ModelManager::new().await?;
 
+    let temp_routes = Router::new().merge(routes_login::routes());
+
     let app = Router::new()
-        .with_state(mm)
-        .merge(routes_login::routes())
+        .nest("/api", temp_routes)
         .layer(TraceLayer::new_for_http())
-        .layer(middleware::from_fn(mw_ctx_require));
+        .layer(middleware::from_fn(mw_rate_limiter))
+        .layer(middleware::from_fn(mw_ctx_require))
+        .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));
 
     let addr = format!("0.0.0.0:{}", PORT);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 
-    info!(
-        "Server started on address: {}",
-        listener.local_addr().unwrap()
-    );
+    info!("{:<12} - {:?}\n", "LISTENING", listener.local_addr());
 
     axum::serve(listener, app).await.unwrap();
 

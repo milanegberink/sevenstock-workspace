@@ -4,13 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-axum-extra = "0.10.1"
+axum-extra = { version = "0.10.1", features = ["cookie", "typed-header"] }
 lib-auth = { path = "../../libs/lib-auth" }
 lib-core = { path = "../../libs/lib-core" }
 axum = { workspace = true }
 tracing = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
+redis = { workspace = true }
 
 
 [lints]
