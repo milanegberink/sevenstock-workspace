@@ -1,6 +1,7 @@
 pub mod error;
 pub mod repositories;
 
+use crate::aws::Aws;
 use redis::aio::MultiplexedConnection;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use tracing::info;
@@ -16,6 +17,7 @@ pub struct ModelManager {
     db: Db,
     redis: MultiplexedConnection,
     http_client: reqwest::Client,
+    aws: Aws,
 }
 
 impl ModelManager {
@@ -45,6 +47,7 @@ impl ModelManager {
             db,
             redis,
             http_client,
+            aws: Aws::new().await,
         })
     }
 
@@ -56,5 +59,8 @@ impl ModelManager {
     }
     pub fn http_client(&self) -> &reqwest::Client {
         &self.http_client
+    }
+    pub fn aws(&self) -> &Aws {
+        &self.aws
     }
 }

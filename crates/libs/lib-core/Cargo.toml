@@ -24,6 +24,9 @@ uuid = { workspace = true }
 thiserror = { workspace = true }
 tokio = "1.45.0"
 sea-query = "0.32.6"
+aws-config = "1.8.5"
+aws-sdk-s3 = "1.103.0"
+aws-sdk-secretsmanager = "1.85.0"
 
 [lints]
 workspace = true
