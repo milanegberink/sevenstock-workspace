@@ -1,7 +1,8 @@
+pub mod aws;
 pub mod error;
 pub mod repositories;
 
-use crate::aws::Aws;
+use aws::Aws;
 use redis::aio::MultiplexedConnection;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use tracing::info;
@@ -22,33 +23,41 @@ pub struct ModelManager {
 
 impl ModelManager {
     pub async fn new() -> Result<Self> {
-        let config = config::core_config();
+        #[cfg(debug_assertions)]
+        {
+            let config = config::core_config();
 
-        let db = PgPoolOptions::new().connect(config.db_url()).await?;
+            let db = PgPoolOptions::new().connect(config.db_url()).await?;
 
-        let pg_version = sqlx::query!("SELECT version()")
-            .fetch_one(&db)
-            .await?
-            .version
-            .unwrap();
+            let pg_version = sqlx::query!("SELECT version()")
+                .fetch_one(&db)
+                .await?
+                .version
+                .unwrap();
 
-        info!(
-            "Connected to database with Postgres version: {} ",
-            pg_version
-        );
+            info!(
+                "Connected to database with Postgres version: {} ",
+                pg_version
+            );
 
-        let client = redis::Client::open(config.redis_url())?;
+            let client = redis::Client::open(config.redis_url())?;
 
-        let redis = client.get_multiplexed_tokio_connection().await?;
+            let redis = client.get_multiplexed_tokio_connection().await?;
 
-        let http_client = reqwest::Client::new();
+            let http_client = reqwest::Client::new();
 
-        Ok(Self {
-            db,
-            redis,
-            http_client,
-            aws: Aws::new().await,
-        })
+            Ok(Self {
+                db,
+                redis,
+                http_client,
+                aws: Aws::new().await,
+            })
+        }
+
+        #[cfg(not(debug_assertions))]
+        {
+            todo!()
+        }
     }
 
     pub(in crate::model) fn db(&self) -> &Db {

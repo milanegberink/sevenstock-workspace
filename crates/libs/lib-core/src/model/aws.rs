@@ -1,4 +1,5 @@
 use aws_config::BehaviorVersion;
+use aws_sdk_elasticache::Client as CacheClient;
 use aws_sdk_s3::Client as S3Client;
 use aws_sdk_secretsmanager::Client as SecretsClient;
 
@@ -6,6 +7,7 @@ use aws_sdk_secretsmanager::Client as SecretsClient;
 pub struct Aws {
     s3: S3Client,
     secrets: SecretsClient,
+    cache: CacheClient,
 }
 
 impl Aws {
@@ -15,13 +17,20 @@ impl Aws {
         Self {
             s3: S3Client::new(&config),
             secrets: SecretsClient::new(&config),
+            cache: CacheClient::new(&config),
         }
     }
 }
 
 impl Aws {
-    pub fn s3(&self) -> &S3Client {
+    pub async fn s3(&self) -> &S3Client {
         &self.s3
+    }
+    pub fn secrets(&self) -> &SecretsClient {
+        &self.secrets
+    }
+    pub fn cache(&self) -> &CacheClient {
+        &self.cache
     }
 }
 
@@ -33,9 +42,15 @@ pub enum Bucket {
 impl Bucket {
     pub fn name(&self) -> &'static str {
         match self {
-            Self::Public => "images",
-            Self::Private => "private",
+            Self::Public => "john-burger-test-bucket",
+            Self::Private => "john-burger-test-bucket",
         }
+    }
+}
+
+impl Bucket {
+    fn put(&self) {
+        let x = Self::name(&self);
     }
 }
 

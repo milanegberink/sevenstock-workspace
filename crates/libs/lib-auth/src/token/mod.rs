@@ -1,7 +1,11 @@
 use std::marker::PhantomData;
+pub mod config;
+pub mod secrets;
 
 use crate::config::auth_config;
-use jsonwebtoken::{DecodingKey, EncodingKey, TokenData, decode, encode, get_current_timestamp};
+use jsonwebtoken::{
+    DecodingKey, EncodingKey, TokenData, decode, decode_header, encode, get_current_timestamp,
+};
 mod error;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;

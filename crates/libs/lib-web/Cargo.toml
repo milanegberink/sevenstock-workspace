@@ -12,6 +12,9 @@ tracing = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
 redis = { workspace = true }
+aws-sdk-secretsmanager = { workspace = true }
+aws-sdk-s3 = { workspace = true }
+aws-sdk-elasticache = { workspace = true }
 
 
 [lints]

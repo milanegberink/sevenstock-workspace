@@ -12,10 +12,18 @@ uuid = { workspace = true }
 axum = { workspace = true }
 miette = { workspace = true }
 secrecy = { workspace = true }
+tokio = { workspace = true }
 argon2 = { version = "0.5.3", features = ["std"] }
 serde_with = "3.14.0"
 thiserror = { workspace = true }
 tracing = { workspace = true }
+aws-config = { workspace = true }
+aws-sdk-secretsmanager = { workspace = true }
+ed25519-dalek = { version = "2.1.1", features = ["pem", "pkcs8", "rand_core"] }
+pem = "3.0.5"
+pkcs8 = "0.10.2"
+rand = "0.8.5"
+
 
 [lints]
 workspace = true

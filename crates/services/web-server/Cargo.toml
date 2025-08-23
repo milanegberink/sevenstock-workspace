@@ -12,7 +12,7 @@ lib-web = { path = "../../libs/lib-web" }
 
 tracing = { workspace = true }
 axum = { workspace = true }
-tokio = { version = "1.45.0", features = ["full"] }
+tokio = { workspace = true }
 uuid = { workspace = true }
 redis = { workspace = true }
 secrecy = { workspace = true }

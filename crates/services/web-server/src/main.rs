@@ -38,7 +38,7 @@ async fn main() -> Result<()> {
 
     let mm = ModelManager::new().await?;
 
-    let temp_routes = Router::new().merge(routes_login::routes());
+    let temp_routes = Router::new().merge(routes_login::routes(mm.clone()));
 
     let app = Router::new()
         .nest("/api", temp_routes)

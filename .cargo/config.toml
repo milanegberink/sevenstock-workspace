@@ -1,8 +1,5 @@
 [env]
 
-ACCESS_TOKEN_SECRETS_DIR = ".keys/access-secrets"
-REFRESH_TOKEN_SECRETS_DIR = ".keys/refresh-secrets"
-MFA_TOKEN_SECRETS_DIR = ".keys/mfa-secrets"
 DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/sevenstock"
 REDIS_URL = "redis://127.0.0.1"
 RUST_LOG = "debug"

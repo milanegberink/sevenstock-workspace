@@ -1,2 +1,12 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+	const req = new Request('https://jsonplaceholder.typicode.com/todos/1');
+
+	async function test() {
+		let res = await fetch(req);
+		let x = await res.json();
+	}
+</script>
+
+<button onclick={test}>Click me</button>
+
+<a href="/test">test</a>

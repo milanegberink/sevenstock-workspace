@@ -1,3 +1,7 @@
+use aws_sdk_secretsmanager::{
+    error::SdkError,
+    operation::{create_secret::CreateSecretError, get_secret_value::GetSecretValueError},
+};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -24,6 +28,9 @@ pub enum Error {
 
     #[error(transparent)]
     Pwd(#[from] pwd::Error),
+
+    #[error(transparent)]
+    GetSecretError(#[from] SdkError<GetSecretValueError>),
 }
 
 impl IntoResponse for Error {

@@ -1,8 +1,8 @@
 use argon2::Argon2;
+use aws_sdk_secretsmanager::Client;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
-use std::fs;
-use std::path::Path;
-use std::sync::OnceLock;
+use std::{collections::HashMap, sync::OnceLock};
+use tokio::sync::RwLock;
 
 pub fn auth_config() -> &'static AuthConfig {
     static INSTANCE: OnceLock<AuthConfig> = OnceLock::new();
@@ -11,13 +11,13 @@ pub fn auth_config() -> &'static AuthConfig {
 }
 
 pub struct KeyPairs {
-    access: KeyPair,
-    refresh: KeyPair,
-    auth_2fa: KeyPair,
+    access: RotatingKeys,
+    refresh: RotatingKeys,
+    auth_2fa: RotatingKeys,
 }
 
 pub struct AuthConfig {
-    keys: KeyPairs,
+    keys: RwLock<KeyPairs>,
     argon2: Argon2<'static>,
     jwt_ctx: JwtContext,
 }
@@ -47,9 +47,12 @@ impl AuthConfig {
 }
 
 pub struct KeyPair {
+    kid: KeyId,
     encoding: EncodingKey,
     decoding: DecodingKey,
 }
+
+pub struct KeyId(String);
 
 impl KeyPair {
     pub fn encoding(&self) -> &EncodingKey {
@@ -60,21 +63,32 @@ impl KeyPair {
     }
 }
 
-impl KeyPair {
-    fn new(path: impl AsRef<Path>) -> Self {
-        let path = path.as_ref();
+struct RotatingKeys {
+    primary: KeyPair,
+    secondary: DecodingKey,
+}
 
-        let encoding_key_path = path.join("private-key.pem");
-        let decoding_key_path = path.join("public-key.pem");
-
-        let encoding_key_bytes = fs::read(encoding_key_path).unwrap();
-        let decoding_key_bytes = fs::read(decoding_key_path).unwrap();
-
-        Self {
-            encoding: EncodingKey::from_ed_pem(&encoding_key_bytes).unwrap(),
-            decoding: DecodingKey::from_ed_pem(&decoding_key_bytes).unwrap(),
-        }
+impl RotatingKeys {
+    pub fn new() {
+        let mut valid_keys = HashMap::new();
+        valid_keys.insert("x", "y");
     }
+}
+
+impl KeyPair {
+    async fn defaults(secrets_manager: &Client) -> Self {
+        secrets_manager
+            .get_secret_value()
+            .secret_id("current:x")
+            .send()
+            .await
+            .unwrap();
+
+        Self {}
+    }
+    // fn rotate(secrets_manager: &Client) -> Self {
+    //     secrets_manager.de
+    // }
 }
 
 pub struct JwtContext {
@@ -113,5 +127,8 @@ impl AuthConfig {
             argon2: Argon2::default(),
             jwt_ctx: JwtContext::new(),
         }
+    }
+    fn defaults() -> Self {
+        todo!();
     }
 }

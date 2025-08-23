@@ -13,3 +13,7 @@ pub struct User {
     pub id: Uuid,
     pub username: String,
 }
+
+pub struct UserForCreate {
+    username: String,
+}

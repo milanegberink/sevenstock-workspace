@@ -17,11 +17,8 @@ use thiserror::Error;
 use tracing::debug;
 use uuid::Uuid;
 
-// ctx: Result<CtxW>,
-
 pub async fn mw_ctx_require(
-    auth_header: Option<TypedHeader<Authorization<Bearer>>>,
-    jar: CookieJar,
+    token: TypedHeader<Authorization<Bearer>>,
     ctx: Result<CtxW>,
     req: Request<Body>,
     next: Next,
@@ -48,9 +45,9 @@ pub async fn mw_ctx_resolver(
 }
 
 async fn ctx_resolve(mm: ModelManager) -> CtxExtResult {
-    let claims = ACCESS_TOKEN.verify("eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJzdWIiOiIwMTk4YmNhMC0xMzVmLTdkYjItOWFmOC1lZjBlNmRhOTk4YjIiLCJleHAiOjE3NTU1MTIxNjQsImlhdCI6MTc1NTUxMTI2NH0.xVwCM9MPKWW4cdVX0LfckwMouw8dcNj0o4VWp1M12EgTakRasO1hHZr-myCTI5d9xbvPbipiaFhwdBtLU7xoDg").expect("meow");
+    // let claims = ACCESS_TOKEN.verify("eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJzdWIiOiIwMTk4YmNhMC0xMzVmLTdkYjItOWFmOC1lZjBlNmRhOTk4YjIiLCJleHAiOjE3NTU1MTIxNjQsImlhdCI6MTc1NTUxMTI2NH0.xVwCM9MPKWW4cdVX0LfckwMouw8dcNj0o4VWp1M12EgTakRasO1hHZr-myCTI5d9xbvPbipiaFhwdBtLU7xoDg").expect("meow");
 
-    Ctx::new(claims.sub())
+    Ctx::new(Uuid::now_v7())
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }
