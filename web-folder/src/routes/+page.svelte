@@ -1,9 +1,6 @@
 <script>
-	const req = new Request('https://jsonplaceholder.typicode.com/todos/1');
-
 	async function test() {
-		let res = await fetch(req);
-		let x = await res.json();
+		await fetch(`/test`);
 	}
 </script>
 

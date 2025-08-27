@@ -3,6 +3,7 @@ pub mod error;
 pub mod repositories;
 
 use aws::Aws;
+use lib_grpc::AuthClient;
 use redis::aio::MultiplexedConnection;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use tracing::info;
@@ -19,6 +20,19 @@ pub struct ModelManager {
     redis: MultiplexedConnection,
     http_client: reqwest::Client,
     aws: Aws,
+    services: Services,
+}
+
+pub struct Services {
+    auth: lib_grpc::AuthClient,
+}
+
+impl Services {
+    pub async fn new() -> Self {
+        Self {
+            auth: AuthClient::connect("http://[::1]:50051").await.unwrap(),
+        }
+    }
 }
 
 impl ModelManager {

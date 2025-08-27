@@ -11,6 +11,7 @@ members = [
     "crates/libs/lib-proc-macros",
     "crates/services/web-server",
     "crates/libs/lib-proc-macros",
+    "crates/libs/lib-grpc",
 ]
 
 [workspace.dependencies]
@@ -30,3 +31,4 @@ aws-sdk-secretsmanager = "1.85.0"
 aws-sdk-s3 = "1.103.0"
 aws-sdk-elasticache = "1.87.0"
 tokio = { version = "1.45.0", features = ["full"] }
+tonic = "0.14.1"

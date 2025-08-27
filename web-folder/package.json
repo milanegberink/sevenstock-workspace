@@ -40,6 +40,8 @@
 		]
 	},
 	"dependencies": {
+		"@grpc/grpc-js": "^1.13.4",
+		"@grpc/proto-loader": "^0.8.0",
 		"jose": "^6.0.13"
 	}
 }

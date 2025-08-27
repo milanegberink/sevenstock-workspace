@@ -8,6 +8,8 @@ edition = "2024"
 lib-utils = { path = "../../libs/lib-utils" }
 lib-auth = { path = "../../libs/lib-auth" }
 lib-proc-macros = { path = "../../libs/lib-proc-macros" }
+lib-grpc = { path = "../../libs/lib-grpc" }
+
 
 sqlx = { workspace = true }
 serde = { workspace = true }

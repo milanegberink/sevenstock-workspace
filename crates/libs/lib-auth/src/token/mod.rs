@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
-pub mod config;
+mod config;
 pub mod secrets;
 
 use crate::config::auth_config;
 use jsonwebtoken::{
-    DecodingKey, EncodingKey, TokenData, decode, decode_header, encode, get_current_timestamp,
+    DecodingKey, EncodingKey, decode, decode_header, encode, get_current_timestamp,
 };
 mod error;
 use serde::{Deserialize, Serialize};
@@ -74,6 +74,7 @@ impl TokenBuilder<NoSub> {
             _state: PhantomData,
         }
     }
+
     pub fn sub(self, sub: Uuid) -> TokenBuilder<Sub> {
         TokenBuilder {
             token: self.token,

@@ -17,12 +17,7 @@ use thiserror::Error;
 use tracing::debug;
 use uuid::Uuid;
 
-pub async fn mw_ctx_require(
-    token: TypedHeader<Authorization<Bearer>>,
-    ctx: Result<CtxW>,
-    req: Request<Body>,
-    next: Next,
-) -> Result<Response> {
+pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
     debug!("{:<12} - mw_ctx_require - {ctx:?}", "MIDDLEWARE");
 
     ctx?;
@@ -32,21 +27,20 @@ pub async fn mw_ctx_require(
 
 pub async fn mw_ctx_resolver(
     State(mm): State<ModelManager>,
+    token: TypedHeader<Authorization<Bearer>>,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
     debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
-    let ctx_ext_result = ctx_resolve(mm).await;
+    let ctx_ext_result = ctx_resolve(mm, &token).await;
 
     req.extensions_mut().insert(ctx_ext_result);
 
     next.run(req).await
 }
 
-async fn ctx_resolve(mm: ModelManager) -> CtxExtResult {
-    // let claims = ACCESS_TOKEN.verify("eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJzdWIiOiIwMTk4YmNhMC0xMzVmLTdkYjItOWFmOC1lZjBlNmRhOTk4YjIiLCJleHAiOjE3NTU1MTIxNjQsImlhdCI6MTc1NTUxMTI2NH0.xVwCM9MPKWW4cdVX0LfckwMouw8dcNj0o4VWp1M12EgTakRasO1hHZr-myCTI5d9xbvPbipiaFhwdBtLU7xoDg").expect("meow");
-
+async fn ctx_resolve(mm: ModelManager, token: &str) -> CtxExtResult {
     Ctx::new(Uuid::now_v7())
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))

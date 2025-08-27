@@ -1,0 +1,16 @@
+[package]
+name = "lib-grpc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+thiserror.workspace = true
+tonic.workspace = true
+tonic-prost = "0.14.1"
+
+[build-dependencies]
+tonic-prost-build = "0.14.1"
+
+[lints]
+workspace = true
