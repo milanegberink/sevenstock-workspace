@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 lib-utils = { path = "../../libs/lib-utils" }
 lib-core = { path = "../../libs/lib-core" }
-lib-auth = { path = "../../libs/lib-auth" }
 lib-web = { path = "../../libs/lib-web" }
 
 

@@ -27,7 +27,6 @@ thiserror = { workspace = true }
 tokio = "1.45.0"
 sea-query = "0.32.6"
 aws-config = { workspace = true }
-aws-sdk-secretsmanager = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 aws-sdk-elasticache = { workspace = true }
 

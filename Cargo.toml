@@ -12,6 +12,7 @@ members = [
     "crates/services/web-server",
     "crates/libs/lib-proc-macros",
     "crates/libs/lib-grpc",
+    "crates/services/auth-server", "crates/services/aws-lambdas",
 ]
 
 [workspace.dependencies]

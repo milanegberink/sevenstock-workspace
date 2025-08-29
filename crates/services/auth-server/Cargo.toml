@@ -1,0 +1,17 @@
+[package]
+name = "auth-server"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tokio.workspace = true
+lib-grpc = { path = "../../libs/lib-grpc" }
+lib-auth = { path = "../../libs/lib-auth" }
+serde.workspace = true
+serde_json.workspace = true
+
+
+tonic.workspace = true
+
+[lints]
+workspace = true

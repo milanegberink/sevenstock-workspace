@@ -1,6 +1,3 @@
-use aws_sdk_secretsmanager::{
-    config::http::HttpResponse, error::SdkError, operation::create_secret::CreateSecretError,
-};
 use thiserror::Error;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -9,12 +6,22 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     #[error("Failed to encode token: {0}")]
     TokenEncodeFail(&'static str),
+
     #[error("MEOW MEOW")]
     InvalidToken,
 
-    #[error(transparent)]
-    SecretsError(#[from] SdkError<CreateSecretError, HttpResponse>),
+    #[error("Failed to get secret string from retrieved secret")]
+    SecretStringFromSecret,
 
     #[error(transparent)]
     Pkcs8Error(#[from] pkcs8::Error),
+
+    #[error(transparent)]
+    Pkcs8Error2(#[from] pkcs8::spki::Error),
+
+    #[error("This is actually really fucking bad, if this happens youre fucked.")]
+    PrimaryKeyNotFound,
+
+    #[error(transparent)]
+    SerializationError(#[from] serde_json::Error),
 }

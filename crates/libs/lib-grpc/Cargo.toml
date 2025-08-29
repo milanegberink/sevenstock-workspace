@@ -4,10 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+lib-auth = { path = "../../libs/lib-auth" }
 tokio.workspace = true
 thiserror.workspace = true
 tonic.workspace = true
 tonic-prost = "0.14.1"
+uuid.workspace = true
+aws-sdk-secretsmanager.workspace = true
+prost = "0.14.1"
+
 
 [build-dependencies]
 tonic-prost-build = "0.14.1"

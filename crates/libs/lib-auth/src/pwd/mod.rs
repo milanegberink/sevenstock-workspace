@@ -1,35 +1,35 @@
-mod error;
-use secrecy::{ExposeSecret, SecretString};
+// mod error;
+// use secrecy::{ExposeSecret, SecretString};
 
-use crate::config::auth_config;
+// use crate::config::auth_config;
 
-use argon2::password_hash::{
-    PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng,
-};
+// use argon2::password_hash::{
+//     PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng,
+// };
 
-pub use self::error::{Error, Result};
+// pub use self::error::{Error, Result};
 
-pub fn hash_password(password: SecretString) -> Result<String> {
-    let argon2 = auth_config().argon2();
+// pub fn hash_password(password: SecretString) -> Result<String> {
+//     let argon2 = auth_config().argon2();
 
-    let salt = SaltString::generate(&mut OsRng);
+//     let salt = SaltString::generate(&mut OsRng);
 
-    let hash = argon2
-        .hash_password(password.expose_secret().as_bytes(), &salt)
-        .map_err(|_| Error::PasswordHashFail)?
-        .to_string();
+//     let hash = argon2
+//         .hash_password(password.expose_secret().as_bytes(), &salt)
+//         .map_err(|_| Error::PasswordHashFail)?
+//         .to_string();
 
-    Ok(hash)
-}
+//     Ok(hash)
+// }
 
-pub fn verify_password(pw_hash: SecretString, password: SecretString) -> Result<()> {
-    let argon2 = auth_config().argon2();
-    let parsed_hash =
-        PasswordHash::new(pw_hash.expose_secret()).map_err(|_| Error::PasswordHashFail)?;
+// pub fn verify_password(pw_hash: SecretString, password: SecretString) -> Result<()> {
+//     let argon2 = auth_config().argon2();
+//     let parsed_hash =
+//         PasswordHash::new(pw_hash.expose_secret()).map_err(|_| Error::PasswordHashFail)?;
 
-    let ver_res = argon2
-        .verify_password(password.expose_secret().as_bytes(), &parsed_hash)
-        .map_err(|_| Error::PasswordHashFail);
+//     let ver_res = argon2
+//         .verify_password(password.expose_secret().as_bytes(), &parsed_hash)
+//         .map_err(|_| Error::PasswordHashFail);
 
-    ver_res
-}
+//     ver_res
+// }
