@@ -1,15 +1,30 @@
-// use std::marker::PhantomData;
-pub mod rotating_keys;
-// pub mod secrets;
+use std::marker::PhantomData;
+pub mod config;
+pub mod jwks;
 
-// use crate::config::auth_config;
-// use jsonwebtoken::{
-//     DecodingKey, EncodingKey, decode, decode_header, encode, get_current_timestamp,
-// };
+use jsonwebtoken::{
+    DecodingKey, EncodingKey, decode, decode_header, encode, get_current_timestamp,
+};
 mod error;
-// use serde::{Deserialize, Serialize};
-// use serde_with::skip_serializing_none;
-// use uuid::Uuid;
+use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
+use uuid::Uuid;
+
+#[derive(Serialize, Deserialize, Clone, Hash, Eq, PartialEq)]
+#[serde(transparent)]
+pub struct KeyId(Uuid);
+
+impl KeyId {
+    fn new() -> Self {
+        Self(Uuid::now_v7())
+    }
+}
+
+impl From<Uuid> for KeyId {
+    fn from(id: Uuid) -> Self {
+        KeyId(id)
+    }
+}
 
 pub use self::error::{Error, Result};
 
@@ -130,8 +145,12 @@ pub use self::error::{Error, Result};
 // }
 
 // impl Token {
-//     pub fn verify(&self, token: &str) -> Result<Claims<Sub>> {
+//     pub fn verify(&self, token: &str, kid: &KeyId) -> Result<Claims<Sub>> {
 //         let config = auth_config();
+
+//         let header = decode_header(token).map_err(|_| Error::InvalidToken)?;
+
+//         header.kid
 
 //         let token_data =
 //             decode::<Claims<Sub>>(token, (self.decoding_key)(), config.jwt_ctx().validation())

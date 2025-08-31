@@ -1,17 +1,13 @@
-use lib_auth::token::rotating_keys::{self, RotatingSecrets, SecretManager};
+use lib_auth::token::jwks::{self, PrivateJwk, SecretConfig, test};
 use lib_grpc::{AuthServer, AuthService};
-use serde::Serialize;
 use tonic::transport::Server;
+mod config;
 
 #[tokio::main]
 async fn main() {
     let addr = "[::1]:50051".parse().unwrap();
 
-    let mut x = SecretManager::new();
-    x.rotate();
-    let test = serde_json::to_string_pretty(&x).unwrap();
-
-    println!("{}", test);
+    test();
 
     let auth_service = AuthService::default();
 

@@ -1,3 +1,5 @@
+use aws_sdk_secretsmanager::{error::SdkError, operation::get_secret_value::GetSecretValueError};
+use axum::body::HttpBody;
 use thiserror::Error;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -24,4 +26,7 @@ pub enum Error {
 
     #[error(transparent)]
     SerializationError(#[from] serde_json::Error),
+
+    #[error(transparent)]
+    AwsNoSecretFoundWithId(#[from] SdkError<GetSecretValueError>),
 }

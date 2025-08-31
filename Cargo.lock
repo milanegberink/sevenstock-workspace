@@ -2226,6 +2226,7 @@ name = "lib-auth"
 version = "0.1.0"
 dependencies = [
  "argon2",
+ "aws-sdk-secretsmanager",
  "axum",
  "ed25519-dalek",
  "jsonwebtoken",

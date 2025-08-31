@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 tokio.workspace = true
 lib-grpc = { path = "../../libs/lib-grpc" }
-lib-auth = { path = "../../libs/lib-auth" }
+lib-auth = { path = "../../libs/lib-auth", features = ["rotate"] }
 serde.workspace = true
 serde_json.workspace = true
 

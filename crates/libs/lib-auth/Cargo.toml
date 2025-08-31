@@ -22,7 +22,11 @@ pem = "3.0.5"
 pkcs8 = "0.10.2"
 rand = "0.8.5"
 zeroize = { version = "1.8.1", features = ["serde"] }
+aws-sdk-secretsmanager.workspace = true
 
 
 [lints]
 workspace = true
+
+[features]
+rotate = []
