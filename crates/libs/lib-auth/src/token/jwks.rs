@@ -11,7 +11,6 @@ use jsonwebtoken::{
 use lib_utils::b64::b64u_encode;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 pub use jsonwebtoken::jwk::{Jwk, JwkSet};
 

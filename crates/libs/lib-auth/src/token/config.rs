@@ -1,25 +1,38 @@
 use std::collections::HashMap;
 
-use crate::token::{Error, KeyId, Result};
+use crate::token::{Error, KeyId, Result, jwks::PrivateJwk};
 
-use ed25519_dalek::ed25519::signature::digest::Key;
 use jsonwebtoken::{
-    Algorithm, DecodingKey, Header,
+    Algorithm, DecodingKey, EncodingKey, Header,
     jwk::{Jwk, JwkSet},
 };
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::token::jwks::KeyPurpose;
 
-type KeyStore = HashMap<KeyPurpose, JwkSet>;
+#[derive(Serialize, Deserialize)]
+pub struct KeyStore<T>(HashMap<KeyPurpose, T>);
 
-pub struct TokenConfig {
-    access: HashMap<KeyId, DecodingKey>,
-    refresh: HashMap<KeyId, DecodingKey>,
+pub struct PublicKeyConfig(HashMap<KeyPurpose, HashMap<KeyId, DecodingKey>>);
+
+#[derive(Serialize, Deserialize)]
+pub struct PrivateKeyConfig(HashMap<KeyId, PrivateJwk>);
+
+impl From<KeyStore<JwkSet>> for PublicKeyConfig {
+    fn from(ks: KeyStore<JwkSet>) -> Self {
+        Self {}
+    }
+}
+
+impl From<KeyStore<PrivateJwk>> for PrivateKeyConfig {
+    fn from(ks: KeyStore<PrivateJwk>) -> Self {
+        Self {}
+    }
 }
 
 impl TokenConfig {
-    pub fn from_key_store(key_store: &KeyStore) -> Result<Self> {
+    pub fn from_key_store(key_store: &KeyStore<JwkSet>) -> Result<Self> {
         let mut access = HashMap::new();
         let mut refresh = HashMap::new();
         let mut two_factor = HashMap::new();
