@@ -1,5 +1,6 @@
 use std::{collections::HashMap, hash::Hash};
 
+use aws_sdk_secretsmanager::Client;
 use ed25519_dalek::{SigningKey, VerifyingKey};
 use jsonwebtoken::{
     Algorithm,
@@ -12,39 +13,11 @@ use lib_utils::b64::b64u_encode;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
-pub use jsonwebtoken::jwk::{Jwk, JwkSet};
+pub use jsonwebtoken::jwk::Jwk;
 
 use crate::token::KeyId;
 
 const ALGORITHM: Algorithm = Algorithm::EdDSA;
-
-#[derive(Serialize, Deserialize)]
-pub struct SecretConfig {
-    #[serde(flatten)]
-    jwks: HashMap<KeyPurpose, PrivateJwk>,
-}
-
-impl Into<String> for SecretConfig {
-    fn into(self) -> String {
-        serde_json::to_string(&self).unwrap()
-    }
-}
-
-impl SecretConfig {
-    pub fn new() -> Self {
-        let mut jwks = HashMap::new();
-
-        for purpose in [
-            KeyPurpose::Access,
-            KeyPurpose::Refresh,
-            KeyPurpose::TwoFactor,
-        ] {
-            jwks.insert(purpose, PrivateJwk::new());
-        }
-
-        Self { jwks }
-    }
-}
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "snake_case")]
@@ -55,10 +28,32 @@ pub enum KeyPurpose {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct PublicJwk {
+    #[serde(flatten)]
+    jwk: Jwk,
+    purpose: KeyPurpose,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct PrivateJwk {
     #[serde(flatten)]
-    public_jwk: Jwk,
+    public_jwk: PublicJwk,
     d: String,
+}
+
+#[derive(Serialize, Deserialize)]
+struct JwkSet<T> {
+    set: Vec<T>,
+}
+
+pub type PrivateJwkSet = JwkSet<PrivateJwk>;
+
+pub type PublicJwkSet = JwkSet<PublicJwk>;
+
+impl PrivateJwkSet {}
+
+impl From<Client> for PrivateJwkSet {
+    fn from(client: Client) -> Self {}
 }
 
 impl PrivateJwk {
