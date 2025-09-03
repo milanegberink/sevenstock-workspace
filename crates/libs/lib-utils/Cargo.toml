@@ -8,7 +8,7 @@ workspace = true
 
 [dependencies]
 base64 = "0.22.1"
+der = "0.7.10"
 ed25519-dalek = { version = "2.1.1", features = ["pem", "pkcs8", "rand_core"] }
 pem = "3.0.5"
-pkcs8 = "0.10.2"
 rand = "0.8.5"

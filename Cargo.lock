@@ -2242,7 +2242,6 @@ dependencies = [
  "lib-utils",
  "miette",
  "pem",
- "pkcs8 0.10.2",
  "rand 0.8.5",
  "secrecy",
  "serde",
@@ -2310,9 +2309,9 @@ name = "lib-utils"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
+ "der 0.7.10",
  "ed25519-dalek",
  "pem",
- "pkcs8 0.10.2",
  "rand 0.8.5",
 ]
 

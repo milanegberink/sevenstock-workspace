@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use uuid::Uuid;
 
-#[derive(Serialize, Deserialize, Clone, Hash, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Hash, Eq, PartialEq)]
 #[serde(transparent)]
 pub struct KeyId(Uuid);
 
@@ -20,9 +20,11 @@ impl KeyId {
     }
 }
 
-impl From<Uuid> for KeyId {
-    fn from(id: Uuid) -> Self {
-        KeyId(id)
+impl TryFrom<String> for KeyId {
+    type Error = Error;
+    fn try_from(id: String) -> Result<Self> {
+        let uuid = Uuid::parse_str(&id).unwrap();
+        Ok(KeyId(uuid))
     }
 }
 

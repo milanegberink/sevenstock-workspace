@@ -15,12 +15,6 @@ pub enum Error {
     #[error("Failed to get secret string from retrieved secret")]
     SecretStringFromSecret,
 
-    #[error(transparent)]
-    Pkcs8Error(#[from] pkcs8::Error),
-
-    #[error(transparent)]
-    Pkcs8Error2(#[from] pkcs8::spki::Error),
-
     #[error("This is actually really fucking bad, if this happens youre fucked.")]
     PrimaryKeyNotFound,
 

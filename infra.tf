@@ -20,5 +20,6 @@ resource "aws_secretsmanager_secret" "john-burger-secrets" {
 }
 
 resource "aws_elasticache_cluster" "john-burger-cache" {
-  name = "john-burger-cache"
+  cluster_id = "john-burger-cache"
+  engine     = "valkey"
 }
