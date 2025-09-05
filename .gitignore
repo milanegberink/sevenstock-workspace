@@ -4,3 +4,4 @@ target/
 .keys
 .logs
 *terraform*
+node_modules
