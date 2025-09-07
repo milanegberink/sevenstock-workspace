@@ -23,4 +23,7 @@ pub enum Error {
 
     #[error(transparent)]
     AwsNoSecretFoundWithId(#[from] SdkError<GetSecretValueError>),
+
+    #[error("Invalid token")]
+    InvalidJwkSet,
 }

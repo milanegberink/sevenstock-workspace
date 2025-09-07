@@ -7,7 +7,7 @@ use lib_utils::b64::{b64u_decode_der, b64u_encode};
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
-use crate::token::{Error, Result, TokenPurpose};
+use crate::token::{Error, Result, TokenType};
 
 pub use jsonwebtoken::EncodingKey;
 
@@ -22,11 +22,11 @@ pub type PrivateJwkSet = JwkSet<PrivateJwk>;
 
 pub type PublicJwkSet = JwkSet<PublicJwk>;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct JwkMetadata {
     #[serde(rename = "use")]
     pub public_key_use: PublicKeyUse,
-    pub purpose: TokenPurpose,
+    pub token_type: TokenType,
     pub kid: KeyId,
     pub x: String,
     alg: Algorithm,
@@ -34,14 +34,14 @@ pub struct JwkMetadata {
     crv: EllipticCurve,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PrivateJwk {
     #[serde(flatten)]
     pub public: PublicJwk,
     pub d: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PublicJwk {
     #[serde(flatten)]
     pub metadata: JwkMetadata,
@@ -67,7 +67,7 @@ impl TryFrom<PrivateJwk> for EncodingKey {
 }
 
 impl PrivateJwk {
-    pub fn new(purpose: TokenPurpose) -> Self {
+    pub fn new(token_type: TokenType) -> Self {
         let (signing_key, verifying_key) = generate_key_pair();
 
         let d = b64u_encode(signing_key.as_bytes());
@@ -80,7 +80,7 @@ impl PrivateJwk {
             kty: OctetKeyPairType::OctetKeyPair,
             crv: EllipticCurve::Ed25519,
             x,
-            purpose,
+            token_type,
         };
 
         let public = PublicJwk { metadata };
