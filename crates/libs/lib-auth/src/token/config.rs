@@ -13,18 +13,25 @@ use crate::token::{
 };
 
 static PUBLIC_INSTANCE: OnceLock<PublicTokenConfig> = OnceLock::new();
+
+#[cfg(feature = "private")]
 static PRIVATE_INSTANCE: OnceLock<PrivateTokenConfig> = OnceLock::new();
 
 pub fn init_public_config(set: PublicJwkSet) -> Result<()> {
-    let public_config = set.try_into().map_err(|_| Error::InvalidJwkSet)?;
-    PUBLIC_INSTANCE.set(public_config);
+    let public_config = PublicTokenConfig::try_from(set)?;
+    PUBLIC_INSTANCE
+        .set(public_config)
+        .map_err(|_| Error::AlreadyInitialized)?;
 
     Ok(())
 }
 
+#[cfg(feature = "private")]
 pub fn init_private_config(set: PrivateJwkSet) -> Result<()> {
-    let private_config = set.try_into().map_err(|_| Error::InvalidJwkSet)?;
-    PRIVATE_INSTANCE.set(private_config);
+    let private_config = PrivateTokenConfig::try_from(set)?;
+    PRIVATE_INSTANCE
+        .set(private_config)
+        .map_err(|_| Error::AlreadyInitialized)?;
 
     Ok(())
 }
@@ -33,6 +40,7 @@ pub fn public_config() -> &'static PublicTokenConfig {
     PUBLIC_INSTANCE.get().expect("No public config initialised")
 }
 
+#[cfg(feature = "private")]
 pub fn private_config() -> &'static PrivateTokenConfig {
     PRIVATE_INSTANCE
         .get()
@@ -74,10 +82,10 @@ pub struct JwtHeader {
 }
 
 impl JwtHeader {
-    pub fn header(&self) -> &Header {
+    pub(crate) fn header(&self) -> &Header {
         &self.header
     }
-    pub fn encoding_key(&self) -> &EncodingKey {
+    pub(crate) fn encoding_key(&self) -> &EncodingKey {
         &self.encoding_key
     }
 }

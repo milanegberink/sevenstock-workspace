@@ -1,14 +1,9 @@
-use aws_sdk_secretsmanager::{error::SdkError, operation::get_secret_value::GetSecretValueError};
-use axum::body::HttpBody;
 use thiserror::Error;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
 pub enum Error {
-    #[error("Failed to encode token: {0}")]
-    TokenEncodeFail(&'static str),
-
     #[error("MEOW MEOW")]
     InvalidToken,
 
@@ -21,9 +16,12 @@ pub enum Error {
     #[error(transparent)]
     SerializationError(#[from] serde_json::Error),
 
-    #[error(transparent)]
-    AwsNoSecretFoundWithId(#[from] SdkError<GetSecretValueError>),
-
     #[error("Invalid token")]
     InvalidJwkSet,
+
+    #[error("Config was already initialized")]
+    AlreadyInitialized,
+
+    #[error(transparent)]
+    TokenEncodeFail(#[from] jsonwebtoken::errors::Error),
 }

@@ -18,14 +18,12 @@ serde_with = "3.14.0"
 thiserror = { workspace = true }
 tracing = { workspace = true }
 ed25519-dalek = { version = "2.1.1", features = ["pem", "pkcs8", "rand_core"] }
-pem = "3.0.5"
 rand = "0.8.5"
-zeroize = { version = "1.8.1", features = ["serde"] }
-aws-sdk-secretsmanager.workspace = true
+pkcs8 = "0.10.2"
 
 
 [lints]
 workspace = true
 
 [features]
-rotate = []
+private = []

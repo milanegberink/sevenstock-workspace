@@ -9,7 +9,7 @@ aws_lambda_events = { version = "0.15.1", default-features = false, features = [
 ] }
 lambda_runtime = "0.13.0"
 tokio = { version = "1", features = ["macros"] }
-lib-auth = { path = "../../libs/lib-auth", features = ["rotate"] }
+lib-auth = { path = "../../libs/lib-auth", features = ["private"] }
 serde.workspace = true
 serde_json.workspace = true
 aws-config.workspace = true

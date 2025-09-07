@@ -117,12 +117,15 @@ checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 name = "auth-server"
 version = "0.1.0"
 dependencies = [
+ "jsonwebtoken",
  "lib-auth",
  "lib-grpc",
+ "lib-utils",
  "serde",
  "serde_json",
  "tokio",
  "tonic",
+ "uuid",
 ]
 
 [[package]]
@@ -2235,13 +2238,12 @@ name = "lib-auth"
 version = "0.1.0"
 dependencies = [
  "argon2",
- "aws-sdk-secretsmanager",
  "axum",
  "ed25519-dalek",
  "jsonwebtoken",
  "lib-utils",
  "miette",
- "pem",
+ "pkcs8 0.10.2",
  "rand 0.8.5",
  "secrecy",
  "serde",
@@ -2251,7 +2253,6 @@ dependencies = [
  "tokio",
  "tracing",
  "uuid",
- "zeroize",
 ]
 
 [[package]]
@@ -2309,10 +2310,6 @@ name = "lib-utils"
 version = "0.1.0"
 dependencies = [
  "base64 0.22.1",
- "der 0.7.10",
- "ed25519-dalek",
- "pem",
- "rand 0.8.5",
 ]
 
 [[package]]
@@ -5125,9 +5122,6 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "zerotrie"

@@ -3,7 +3,8 @@ use jsonwebtoken::{
     Algorithm,
     jwk::{EllipticCurve, OctetKeyPairType, PublicKeyUse},
 };
-use lib_utils::b64::{b64u_decode_der, b64u_encode};
+use lib_utils::b64::{b64u_decode, b64u_encode};
+use pkcs8::EncodePrivateKey;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
@@ -58,9 +59,13 @@ impl TryFrom<PrivateJwk> for EncodingKey {
     fn try_from(jwk: PrivateJwk) -> Result<Self> {
         let secret = jwk.d;
 
-        let der = b64u_decode_der(&secret).unwrap();
+        let bytes: [u8; 32] = b64u_decode(&secret).unwrap().try_into().unwrap();
 
-        let encoding_key = EncodingKey::from_ed_der(&der);
+        let der = ed25519_dalek::SigningKey::from_bytes(&bytes)
+            .to_pkcs8_der()
+            .unwrap();
+
+        let encoding_key = EncodingKey::from_ed_der(der.as_bytes());
 
         Ok(encoding_key)
     }

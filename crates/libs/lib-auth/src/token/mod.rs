@@ -4,11 +4,12 @@ pub mod jwks;
 
 use jsonwebtoken::{decode, decode_header, encode, get_current_timestamp};
 mod error;
+use crate::token::config::private_config;
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use uuid::Uuid;
 
-use crate::token::config::{Identifier, private_config, public_config};
+use crate::token::config::{Identifier, public_config};
 
 pub use self::error::{Error, Result};
 
@@ -87,6 +88,7 @@ impl Claims<Sub> {
     }
 }
 
+#[cfg(feature = "private")]
 pub struct TokenBuilder<U> {
     token_type: TokenType,
     claims: Claims<U>,
@@ -99,6 +101,7 @@ pub struct NoSub;
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Sub(Uuid);
 
+#[cfg(feature = "private")]
 impl TokenBuilder<NoSub> {
     pub fn access() -> Self {
         Self {
@@ -130,6 +133,7 @@ impl TokenBuilder<NoSub> {
     }
 }
 
+#[cfg(feature = "private")]
 impl TokenBuilder<Sub> {
     pub fn ident<S: Into<String>>(mut self, ident: S) -> Self {
         self.claims.ident = Some(ident.into());
@@ -158,8 +162,7 @@ impl TokenBuilder<Sub> {
 
         let encoding_key = fix_this_name.encoding_key();
 
-        let token = encode(header, &claims, encoding_key)
-            .map_err(|_| Error::TokenEncodeFail("Failed to encode token"))?;
+        let token = encode(header, &claims, encoding_key)?;
 
         Ok(token)
     }
