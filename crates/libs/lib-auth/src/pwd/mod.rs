@@ -1,36 +1,37 @@
-// mod error;
-// mod config;
-// use secrecy::{ExposeSecret, SecretString};
+mod config;
+mod error;
 
-// use crate::config::auth_config;
+use secrecy::{ExposeSecret, SecretString};
 
-// use argon2::password_hash::{
-//     PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng,
-// };
+use crate::pwd::config::pwd_config;
 
-// pub use self::error::{Error, Result};
+use argon2::password_hash::{
+    PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng,
+};
 
-// pub fn hash_password(password: SecretString) -> Result<String> {
-//     let argon2 = auth_config().argon2();
+pub use self::error::{Error, Result};
 
-//     let salt = SaltString::generate(&mut OsRng);
+pub fn hash_password(password: SecretString) -> Result<String> {
+    let argon2 = pwd_config().argon2();
 
-//     let hash = argon2
-//         .hash_password(password.expose_secret().as_bytes(), &salt)
-//         .map_err(|_| Error::PasswordHashFail)?
-//         .to_string();
+    let salt = SaltString::generate(&mut OsRng);
 
-//     Ok(hash)
-// }
+    let hash = argon2
+        .hash_password(password.expose_secret().as_bytes(), &salt)
+        .map_err(|_| Error::PasswordHashFail)?
+        .to_string();
 
-// pub fn verify_password(pw_hash: SecretString, password: SecretString) -> Result<()> {
-//     let argon2 = auth_config().argon2();
-//     let parsed_hash =
-//         PasswordHash::new(pw_hash.expose_secret()).map_err(|_| Error::PasswordHashFail)?;
+    Ok(hash)
+}
 
-//     let ver_res = argon2
-//         .verify_password(password.expose_secret().as_bytes(), &parsed_hash)
-//         .map_err(|_| Error::PasswordHashFail);
+pub fn verify_password(pw_hash: SecretString, password: SecretString) -> Result<()> {
+    let argon2 = pwd_config().argon2();
+    let parsed_hash =
+        PasswordHash::new(pw_hash.expose_secret()).map_err(|_| Error::PasswordHashFail)?;
 
-//     ver_res
-// }
+    let ver_res = argon2
+        .verify_password(password.expose_secret().as_bytes(), &parsed_hash)
+        .map_err(|_| Error::PasswordHashFail);
+
+    ver_res
+}

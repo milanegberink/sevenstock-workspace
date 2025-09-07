@@ -1,1 +1,5 @@
-<h1>Hello from svelte</h1>
+<script>
+	let { value = $bindable() } = $props();
+</script>
+
+<input bind:value />

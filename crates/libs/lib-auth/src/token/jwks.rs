@@ -1,47 +1,21 @@
-use std::{collections::HashMap, hash::Hash};
-
 use ed25519_dalek::{SigningKey, VerifyingKey};
 use jsonwebtoken::{
-    Algorithm, DecodingKey,
+    Algorithm,
     jwk::{EllipticCurve, OctetKeyPairType, PublicKeyUse},
 };
 use lib_utils::b64::{b64u_decode_der, b64u_encode};
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
 
-use crate::token::{Error, Result};
+use crate::token::{Error, Result, TokenPurpose};
 
 pub use jsonwebtoken::EncodingKey;
 
 use crate::token::KeyId;
 
-const ALGORITHM: Algorithm = Algorithm::EdDSA;
-
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone)]
-#[serde(rename_all = "snake_case")]
-pub enum KeyPurpose {
-    Access,
-    Refresh,
-    TwoFactor,
-}
-
-impl KeyPurpose {
-    pub fn find(&self, kid: KeyId) -> T {
-        let id: Identifier = (kid, self.clone());
-    }
-}
-
-struct Store<T>(HashMap<Identifier, T>);
-
-pub type Identifier = (KeyId, KeyPurpose);
-
-pub type PublicStore = Store<DecodingKey>;
-
-pub type PrivateStore = Store<(EncodingKey, DecodingKey)>;
-
 #[derive(Serialize, Deserialize)]
-struct JwkSet<T> {
-    keys: Vec<T>,
+pub struct JwkSet<T> {
+    pub keys: Vec<T>,
 }
 
 pub type PrivateJwkSet = JwkSet<PrivateJwk>;
@@ -51,26 +25,26 @@ pub type PublicJwkSet = JwkSet<PublicJwk>;
 #[derive(Serialize, Deserialize)]
 pub struct JwkMetadata {
     #[serde(rename = "use")]
-    public_key_use: PublicKeyUse,
+    pub public_key_use: PublicKeyUse,
+    pub purpose: TokenPurpose,
+    pub kid: KeyId,
+    pub x: String,
     alg: Algorithm,
-    kid: KeyId,
     kty: OctetKeyPairType,
     crv: EllipticCurve,
-    purpose: KeyPurpose,
-    x: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct PrivateJwk {
     #[serde(flatten)]
-    public: PublicJwk,
-    d: String,
+    pub public: PublicJwk,
+    pub d: String,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct PublicJwk {
     #[serde(flatten)]
-    metadata: JwkMetadata,
+    pub metadata: JwkMetadata,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -92,44 +66,8 @@ impl TryFrom<PrivateJwk> for EncodingKey {
     }
 }
 
-impl TryFrom<PublicJwkSet> for PublicStore {
-    type Error = Error;
-    fn try_from(set: PublicJwkSet) -> Result<Self> {
-        let mut keys = HashMap::new();
-        for jwk in set.keys {
-            let purpose = jwk.metadata.purpose;
-
-            let decoding_key = DecodingKey::from_ed_components(&jwk.metadata.x).unwrap();
-
-            let kid: KeyId = jwk.metadata.kid;
-
-            keys.insert((kid, purpose), decoding_key);
-        }
-
-        Ok(Self(keys))
-    }
-}
-
-impl TryFrom<PrivateJwkSet> for PrivateStore {
-    type Error = Error;
-    fn try_from(set: PrivateJwkSet) -> Result<Self> {
-        let mut keys = HashMap::new();
-        for jwk in set.keys {
-            let purpose = jwk.public.metadata.purpose;
-            let decoding_key = DecodingKey::from_ed_components(&jwk.d).unwrap();
-
-            let kid: KeyId = jwk.public.metadata.kid;
-
-            let encoding_key = EncodingKey::try_from(jwk).unwrap();
-
-            keys.insert((kid, purpose), (encoding_key, decoding_key));
-        }
-
-        Ok(Self(keys))
-    }
-}
 impl PrivateJwk {
-    pub fn new(purpose: KeyPurpose) -> Self {
+    pub fn new(purpose: TokenPurpose) -> Self {
         let (signing_key, verifying_key) = generate_key_pair();
 
         let d = b64u_encode(signing_key.as_bytes());
