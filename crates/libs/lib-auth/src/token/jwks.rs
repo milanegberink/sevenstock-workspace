@@ -85,7 +85,7 @@ impl PrivateJwk {
             kty: OctetKeyPairType::OctetKeyPair,
             crv: EllipticCurve::Ed25519,
             x,
-            token_type,
+            token_type: token_type,
         };
 
         let public = PublicJwk { metadata };

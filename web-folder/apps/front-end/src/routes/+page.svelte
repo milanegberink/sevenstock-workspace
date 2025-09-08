@@ -1,11 +1,9 @@
 <script>
-	import { Input, Form } from 'lib-components';
+	import { Qr } from 'lib-components';
 
 	let x = $state();
 </script>
 
-<Form>
-	<Input bind:value={x} />
-</Form>
+<Qr class="h-96 w-96" url="https://youtube.com" />
 
 <h1>{x}</h1>

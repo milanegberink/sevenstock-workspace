@@ -12,13 +12,13 @@ use crate::token::{
     jwks::{PrivateJwkSet, PublicJwkSet},
 };
 
-static PUBLIC_INSTANCE: OnceLock<PublicTokenConfig> = OnceLock::new();
+static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 
 #[cfg(feature = "private")]
-static PRIVATE_INSTANCE: OnceLock<PrivateTokenConfig> = OnceLock::new();
+static PRIVATE_INSTANCE: OnceLock<SigningConfig> = OnceLock::new();
 
-pub fn init_public_config(set: PublicJwkSet) -> Result<()> {
-    let public_config = PublicTokenConfig::try_from(set)?;
+pub fn init_verifying_config(set: PublicJwkSet) -> Result<()> {
+    let public_config = VerifyingConfig::try_from(set)?;
     PUBLIC_INSTANCE
         .set(public_config)
         .map_err(|_| Error::AlreadyInitialized)?;
@@ -27,8 +27,8 @@ pub fn init_public_config(set: PublicJwkSet) -> Result<()> {
 }
 
 #[cfg(feature = "private")]
-pub fn init_private_config(set: PrivateJwkSet) -> Result<()> {
-    let private_config = PrivateTokenConfig::try_from(set)?;
+pub fn init_signing_config(set: PrivateJwkSet) -> Result<()> {
+    let private_config = SigningConfig::try_from(set)?;
     PRIVATE_INSTANCE
         .set(private_config)
         .map_err(|_| Error::AlreadyInitialized)?;
@@ -36,23 +36,23 @@ pub fn init_private_config(set: PrivateJwkSet) -> Result<()> {
     Ok(())
 }
 
-pub fn public_config() -> &'static PublicTokenConfig {
+pub fn verifying_config() -> &'static VerifyingConfig {
     PUBLIC_INSTANCE.get().expect("No public config initialised")
 }
 
 #[cfg(feature = "private")]
-pub fn private_config() -> &'static PrivateTokenConfig {
+pub fn signing_config() -> &'static SigningConfig {
     PRIVATE_INSTANCE
         .get()
         .expect("No private config initialised")
 }
 
-pub struct PublicTokenConfig {
+pub struct VerifyingConfig {
     validation: Validation,
     keys: RwLock<HashMap<Identifier, Arc<DecodingKey>>>,
 }
 
-impl PublicTokenConfig {
+impl VerifyingConfig {
     pub async fn get(&self, id: &Identifier) -> Option<Arc<DecodingKey>> {
         let map = self.keys.read().await;
         map.get(id).cloned()
@@ -62,18 +62,18 @@ impl PublicTokenConfig {
     }
 }
 
-impl PrivateTokenConfig {
+impl SigningConfig {
     pub async fn get(&self, token_type: TokenType) -> Option<Arc<JwtHeader>> {
-        let map = self.private.read().await;
+        let map = self.signing.read().await;
         map.get(&token_type).cloned()
     }
 }
 
 pub type Identifier = (KeyId, TokenType);
 
-pub struct PrivateTokenConfig {
-    public: PublicTokenConfig,
-    private: RwLock<HashMap<TokenType, Arc<JwtHeader>>>,
+pub struct SigningConfig {
+    verifying: VerifyingConfig,
+    signing: RwLock<HashMap<TokenType, Arc<JwtHeader>>>,
 }
 
 pub struct JwtHeader {
@@ -90,7 +90,7 @@ impl JwtHeader {
     }
 }
 
-impl TryFrom<PublicJwkSet> for PublicTokenConfig {
+impl TryFrom<PublicJwkSet> for VerifyingConfig {
     type Error = Error;
     fn try_from(set: PublicJwkSet) -> Result<Self> {
         let mut keys = HashMap::new();
@@ -123,7 +123,7 @@ impl From<PrivateJwkSet> for PublicJwkSet {
     }
 }
 
-impl TryFrom<PrivateJwkSet> for PrivateTokenConfig {
+impl TryFrom<PrivateJwkSet> for SigningConfig {
     type Error = Error;
     fn try_from(set: PrivateJwkSet) -> Result<Self> {
         let mut keys = HashMap::new();
@@ -148,11 +148,11 @@ impl TryFrom<PrivateJwkSet> for PrivateTokenConfig {
 
         let public_set = PublicJwkSet::from(set);
 
-        let public_config = PublicTokenConfig::try_from(public_set)?;
+        let public_config = VerifyingConfig::try_from(public_set)?;
 
         Ok(Self {
-            private: RwLock::new(keys),
-            public: public_config,
+            signing: RwLock::new(keys),
+            verifying: public_config,
         })
     }
 }

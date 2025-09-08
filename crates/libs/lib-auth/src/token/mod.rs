@@ -4,12 +4,10 @@ pub mod jwks;
 
 use jsonwebtoken::{decode, decode_header, encode, get_current_timestamp};
 mod error;
-use crate::token::config::private_config;
+use crate::token::config::{Identifier, signing_config, verifying_config};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use uuid::Uuid;
-
-use crate::token::config::{Identifier, public_config};
 
 pub use self::error::{Error, Result};
 
@@ -37,7 +35,7 @@ impl TokenType {
 
 impl TokenType {
     pub async fn verify(&self, token: &str) -> Result<Claims<Sub>> {
-        let config = public_config();
+        let config = verifying_config();
 
         let header = decode_header(token).map_err(|_| Error::InvalidToken)?;
 
@@ -144,8 +142,8 @@ impl TokenBuilder<Sub> {
         self.claims.avatar = Some(avatar.into());
         self
     }
-    pub async fn build(self) -> Result<String> {
-        let config = private_config();
+    pub async fn build_async(self) -> Result<String> {
+        let config = signing_config();
         let current_timestamp = get_current_timestamp();
 
         let claims = Claims {
@@ -156,11 +154,11 @@ impl TokenBuilder<Sub> {
             iat: current_timestamp,
         };
 
-        let fix_this_name = config.get(self.token_type).await.unwrap();
+        let jwt_header = config.get(self.token_type).await.unwrap();
 
-        let header = fix_this_name.header();
+        let header = jwt_header.header();
 
-        let encoding_key = fix_this_name.encoding_key();
+        let encoding_key = jwt_header.encoding_key();
 
         let token = encode(header, &claims, encoding_key)?;
 
