@@ -5,3 +5,14 @@ export const userForLogin = z.object({
 	password: z.string().min(8, 'Password should be 8 charecters minimum.'),
 	email: z.email()
 });
+
+export const user = z.object({
+	email: z.email(),
+	ident: z.string(),
+	avatar: z.url().optional(),
+	org: z.string().optional()
+});
+
+export type UserForLogin = z.infer<typeof userForLogin>;
+
+export type User = z.infer<typeof user>;

@@ -1,1 +1,2 @@
-export * from './user';
+export * from './user.js';
+export * from './token_claims.js';

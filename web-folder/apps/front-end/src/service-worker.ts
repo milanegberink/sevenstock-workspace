@@ -1,22 +1,26 @@
-import { decodeJwt, jwtVerify } from 'jose';
+/// <reference lib="webworker" />
 
-let token = null;
+import { decodeJwt } from 'jose';
+import { type TokenClaims, user } from 'shared-schemas';
 
-self.addEventListener('install', () => {
-	self.skipWaiting();
+let token: string | null = null;
+
+self.addEventListener('install', function (this: ServiceWorkerGlobalScope) {
+	this.skipWaiting();
 });
 
 self.addEventListener('message', (event) => {
-	const msg = event.data;
-	switch (msg) {
+	const { ports, data } = event;
+	switch (data) {
 		case 'SET_TOKEN':
 			refreshTokens();
 			break;
 
 		case 'GET_USER': {
 			if (!token) return;
-			const payload = decodeJwt(token);
-			self.postMessage(payload);
+			const claims: TokenClaims = decodeJwt(token);
+			const parsedUser = user.parse(claims);
+			ports[0]?.postMessage(parsedUser);
 			break;
 		}
 	}
@@ -39,4 +43,13 @@ async function refreshTokens() {
 	const res = await fetch('/retrieve-token-pair');
 	const data = await res.json();
 	token = data.token;
+}
+
+function x(targetUnix: number) {
+	targetUnix *= 1000;
+
+	const now = Date.now();
+	const delay = targetUnix - now;
+
+	setTimeout(refreshTokens, delay);
 }

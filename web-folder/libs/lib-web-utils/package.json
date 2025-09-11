@@ -44,5 +44,8 @@
 	},
 	"keywords": [
 		"svelte"
-	]
+	],
+	"dependencies": {
+		"shared-schemas": "workspace:*"
+	}
 }

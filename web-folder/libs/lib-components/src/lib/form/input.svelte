@@ -1,14 +1,5 @@
 <script>
-	import { getFormContext } from './form-context.js';
-	let { name, ...props } = $props();
-
-	let value = $state();
-
-	const form = getFormContext();
-
-	$effect(() => {
-		form.updateValue(name, value);
-	});
+	let { value = $bindable(), ...props } = $props();
 </script>
 
-<input {name} {...props} bind:value />
+<input bind:value {...props} />

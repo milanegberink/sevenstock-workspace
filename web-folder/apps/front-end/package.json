@@ -23,6 +23,7 @@
 	"dependencies": {
 		"jose": "^6.1.0",
 		"lib-components": "workspace:*",
+		"lib-web-utils": "workspace:*",
 		"shared-schemas": "workspace:*"
 	}
 }

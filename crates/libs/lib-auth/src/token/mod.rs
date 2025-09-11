@@ -79,6 +79,7 @@ pub struct Claims<U> {
     exp: u64,
     iat: u64,
     org: Option<String>,
+    email: Option<String>,
 }
 
 impl Claims<Sub> {
@@ -127,6 +128,7 @@ impl TokenBuilder<NoSub> {
                 exp: self.claims.exp,
                 iat: self.claims.iat,
                 org: self.claims.org,
+                email: self.claims.email,
             },
             _state: PhantomData,
         }
@@ -149,6 +151,11 @@ impl TokenBuilder<Sub> {
         self.claims.avatar = Some(avatar.into());
         self
     }
+    pub fn email<S: Into<String>>(mut self, email: S) -> Self {
+        self.claims.email = Some(email.into());
+        self
+    }
+
     pub async fn build_async(self) -> Result<String> {
         let config = signing_config();
         let current_timestamp = get_current_timestamp();
@@ -160,6 +167,7 @@ impl TokenBuilder<Sub> {
             exp: current_timestamp + self.token_type.exp(),
             iat: current_timestamp,
             org: self.claims.org,
+            email: self.claims.email,
         };
 
         let jwt_header = config.get(self.token_type).await.unwrap();

@@ -1,25 +1,22 @@
 <script lang="ts">
 	let { children, schema, onsubmit } = $props();
-	import { setFormContext } from './form-context.js';
 
-	let formValues = $state({});
-	let formErrors = $state({});
+	let form = $state(Object.fromEntries(Object.keys(schema.shape).map((key) => [key, ''])));
 
-	setFormContext({
-		updateValue: (name: string, value) => {
-			formValues[name] = value;
+	async function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
+
+		try {
+			const parsed = await schema.parseAsync(form);
+			console.log('Form validated');
+		} catch {
+			console.log('Form invalid');
 		}
-	});
-
-	async function handleSubmit() {
-		const parsed = await schema.parseAsync(formValues);
-		console.log(parsed);
-
-		onsubmit();
+		onsubmit(form);
 	}
 </script>
 
 <form onsubmit={handleSubmit}>
-	{@render children()}
+	{@render children(form)}
 	<button>Click</button>
 </form>
