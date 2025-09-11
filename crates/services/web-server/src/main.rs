@@ -7,6 +7,7 @@ pub use self::error::{Error, Result};
 mod web;
 
 use axum::{Router, middleware};
+use lib_auth::token::config::init_verifying_config;
 use lib_core::model::ModelManager;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
@@ -22,19 +23,7 @@ const PORT: u16 = 3000;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let file_appender = rolling::daily(".logs", "app.log");
-
-    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
-
-    let console_layer = fmt::layer().with_target(false).with_writer(std::io::stdout);
-
-    let file_layer = fmt::layer().with_ansi(false).with_writer(non_blocking);
-
-    tracing_subscriber::registry()
-        .with(EnvFilter::from_default_env())
-        .with(console_layer)
-        .with(file_layer)
-        .init();
+    init_logging();
 
     let mm = ModelManager::new().await?;
 
@@ -56,4 +45,20 @@ async fn main() -> Result<()> {
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
+}
+
+fn init_logging() {
+    let file_appender = rolling::daily(".logs", "app.log");
+
+    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+
+    let console_layer = fmt::layer().with_target(false).with_writer(std::io::stdout);
+
+    let file_layer = fmt::layer().with_ansi(false).with_writer(non_blocking);
+
+    tracing_subscriber::registry()
+        .with(EnvFilter::from_default_env())
+        .with(console_layer)
+        .with(file_layer)
+        .init();
 }

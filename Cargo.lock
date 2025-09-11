@@ -4694,6 +4694,7 @@ name = "web-server"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "lib-auth",
  "lib-core",
  "lib-utils",
  "lib-web",

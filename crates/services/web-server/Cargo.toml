@@ -7,6 +7,7 @@ edition = "2024"
 lib-utils = { path = "../../libs/lib-utils" }
 lib-core = { path = "../../libs/lib-core" }
 lib-web = { path = "../../libs/lib-web" }
+lib-auth = { path = "../../libs/lib-auth"}
 
 
 tracing = { workspace = true }

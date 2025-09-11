@@ -78,6 +78,7 @@ pub struct Claims<U> {
     avatar: Option<String>,
     exp: u64,
     iat: u64,
+    org: Option<String>,
 }
 
 impl Claims<Sub> {
@@ -125,6 +126,7 @@ impl TokenBuilder<NoSub> {
                 avatar: self.claims.avatar,
                 exp: self.claims.exp,
                 iat: self.claims.iat,
+                org: self.claims.org,
             },
             _state: PhantomData,
         }
@@ -135,6 +137,11 @@ impl TokenBuilder<NoSub> {
 impl TokenBuilder<Sub> {
     pub fn ident<S: Into<String>>(mut self, ident: S) -> Self {
         self.claims.ident = Some(ident.into());
+        self
+    }
+
+    pub fn org<S: Into<String>>(mut self, org: S) -> Self {
+        self.claims.org = Some(org.into());
         self
     }
 
@@ -152,6 +159,7 @@ impl TokenBuilder<Sub> {
             avatar: self.claims.avatar,
             exp: current_timestamp + self.token_type.exp(),
             iat: current_timestamp,
+            org: self.claims.org,
         };
 
         let jwt_header = config.get(self.token_type).await.unwrap();

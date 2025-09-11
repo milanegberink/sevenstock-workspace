@@ -1,6 +1,6 @@
 use lib_auth::token::{
     TokenBuilder, TokenType,
-    config::init_private_config,
+    config::init_signing_config,
     jwks::{PrivateJwk, PrivateJwkSet},
 };
 use lib_grpc::{AuthServer, AuthService};
@@ -23,7 +23,7 @@ async fn main() {
 
     set.keys.push(private_jwk);
 
-    init_private_config(set).unwrap();
+    init_signing_config(set).unwrap();
 
     let token = TokenBuilder::access()
         .sub(Uuid::now_v7())

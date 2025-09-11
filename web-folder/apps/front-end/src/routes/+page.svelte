@@ -1,9 +1,16 @@
 <script>
-	import { Qr } from 'lib-components';
+	import { Form, Input } from 'lib-components';
+	import { userForLogin } from 'shared-schemas';
 
 	let x = $state();
+
+	async function onSubmit() {
+		console.log('test');
+	}
 </script>
 
-<Qr class="h-96 w-96" url="https://youtube.com" />
-
-<h1>{x}</h1>
+<Form schema={userForLogin} onsubmit={onSubmit}>
+	<Input name="username" />
+	<Input name="password" type="password" />
+	<Input name="email" />
+</Form>
