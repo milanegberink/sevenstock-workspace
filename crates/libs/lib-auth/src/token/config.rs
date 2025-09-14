@@ -12,25 +12,21 @@ use crate::token::{
     jwks::{PrivateJwkSet, PublicJwkSet},
 };
 
+pub enum Behaviour {
+    Public,
+    #[cfg(feature = "private")]
+    Private,
+}
+
 static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 
 #[cfg(feature = "private")]
 static PRIVATE_INSTANCE: OnceLock<SigningConfig> = OnceLock::new();
 
-pub fn init_verifying_config(set: PublicJwkSet) -> Result<()> {
+pub fn init_config(set: PublicJwkSet) -> Result<()> {
     let public_config = VerifyingConfig::try_from(set)?;
     PUBLIC_INSTANCE
         .set(public_config)
-        .map_err(|_| Error::AlreadyInitialized)?;
-
-    Ok(())
-}
-
-#[cfg(feature = "private")]
-pub fn init_signing_config(set: PrivateJwkSet) -> Result<()> {
-    let private_config = SigningConfig::try_from(set)?;
-    PRIVATE_INSTANCE
-        .set(private_config)
         .map_err(|_| Error::AlreadyInitialized)?;
 
     Ok(())
@@ -63,6 +59,14 @@ impl VerifyingConfig {
 }
 
 impl SigningConfig {
+    pub fn init(set: PrivateJwkSet) -> Result<()> {
+        let private_config = SigningConfig::try_from(set)?;
+        PRIVATE_INSTANCE
+            .set(private_config)
+            .map_err(|_| Error::AlreadyInitialized)?;
+
+        Ok(())
+    }
     pub async fn get(&self, token_type: TokenType) -> Option<Arc<JwtHeader>> {
         let map = self.signing.read().await;
         map.get(&token_type).cloned()

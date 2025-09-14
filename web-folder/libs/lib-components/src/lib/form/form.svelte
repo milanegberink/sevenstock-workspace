@@ -5,7 +5,6 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-
 		try {
 			const parsed = await schema.parseAsync(form);
 			console.log('Form validated');

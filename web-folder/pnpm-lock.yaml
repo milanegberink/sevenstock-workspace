@@ -30,6 +30,9 @@ importers:
 
   apps/front-end:
     dependencies:
+      '@lucide/svelte':
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.38.7)
       jose:
         specifier: ^6.1.0
         version: 6.1.0
@@ -67,9 +70,15 @@ importers:
 
   libs/lib-components:
     dependencies:
+      '@lucide/svelte':
+        specifier: ^0.544.0
+        version: 0.544.0(svelte@5.38.7)
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
+      shared-schemas:
+        specifier: workspace:*
+        version: link:../shared-schemas
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^6.0.0
@@ -340,6 +349,11 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
+
+  '@lucide/svelte@0.544.0':
+    resolution: {integrity: sha512-9f9O6uxng2pLB01sxNySHduJN3HTl5p0HDu4H26VR51vhZfiMzyOMe9Mhof3XAk4l813eTtl+/DYRvGyoRR+yw==}
+    peerDependencies:
+      svelte: ^5
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
@@ -1243,6 +1257,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@lucide/svelte@0.544.0(svelte@5.38.7)':
+    dependencies:
+      svelte: 5.38.7
 
   '@polka/url@1.0.0-next.29': {}
 

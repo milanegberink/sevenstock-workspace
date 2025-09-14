@@ -1,26 +1,15 @@
+import { goto } from '$app/navigation';
+import { sendMessageToSw, SwRequest } from '$lib/service-worker/send-message';
+import { Err, Ok, type PromiseResult } from 'lib-web-utils';
 import { type User } from 'shared-schemas';
 
 let user: User | null = $state(null);
 
-export async function getUser(): Promise<User> {
+export async function getUser(): PromiseResult<User> {
 	if (!user) {
-		if ('serviceWorker' in navigator) {
-			const channel = new MessageChannel();
-
-			const registration = await navigator.serviceWorker.ready;
-
-			registration.active?.postMessage('GET_USER', [channel.port2]);
-
-			user = await new Promise<User>((resolve) => {
-				channel.port1.onmessage = (event) => {
-					resolve(event.data);
-				};
-			});
-		}
-		if (!user) {
-			throw new Error();
-		}
+		const result = await sendMessageToSw<User>(SwRequest.GetUser);
+		if (!result.ok) return result;
+		user = result.value;
 	}
-
-	return user;
+	return Ok(user);
 }

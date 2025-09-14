@@ -1,32 +1,46 @@
+/// <reference no-default-lib="true"/>
+/// <reference lib="esnext" />
 /// <reference lib="webworker" />
-
+//
 import { decodeJwt } from 'jose';
 import { type TokenClaims, user } from 'shared-schemas';
+import { SwRequest } from '../src/lib/service-worker/request';
+import { type Result, Err, Ok } from 'lib-web-utils/result';
+
+const sw = self as unknown as ServiceWorkerGlobalScope;
 
 let token: string | null = null;
 
-self.addEventListener('install', function (this: ServiceWorkerGlobalScope) {
-	this.skipWaiting();
+sw.addEventListener('install', () => {
+	sw.skipWaiting();
 });
 
-self.addEventListener('message', (event) => {
+sw.addEventListener('message', async (event: ExtendableMessageEvent) => {
 	const { ports, data } = event;
-	switch (data) {
-		case 'SET_TOKEN':
-			refreshTokens();
-			break;
+	const port = ports[0];
 
-		case 'GET_USER': {
-			if (!token) return;
+	if (!port) return;
+	switch (data.type) {
+		case SwRequest.SetToken: {
+			const result = await refreshTokens();
+			port.postMessage(result);
+			break;
+		}
+		case SwRequest.GetUser: {
+			if (!token) {
+				port.postMessage(Err(new Error('Missing token')));
+				return;
+			}
+
 			const claims: TokenClaims = decodeJwt(token);
 			const parsedUser = user.parse(claims);
-			ports[0]?.postMessage(parsedUser);
+			port.postMessage(Ok(parsedUser));
 			break;
 		}
 	}
 });
 
-self.addEventListener('fetch', (event) => {
+sw.addEventListener('fetch', (event: FetchEvent) => {
 	if (!token) return;
 
 	const headers = new Headers(event.request.headers);
@@ -39,10 +53,11 @@ self.addEventListener('fetch', (event) => {
 	event.respondWith(fetch(request));
 });
 
-async function refreshTokens() {
+async function refreshTokens(): Promise<Result<void, Error>> {
 	const res = await fetch('/retrieve-token-pair');
 	const data = await res.json();
 	token = data.token;
+	return Ok(undefined);
 }
 
 function x(targetUnix: number) {
