@@ -1,7 +1,7 @@
 <script lang="ts">
 	import NavLink from './nav-link.svelte';
 	import type { NavLink as Link } from './nav-link.js';
-	import type { User } from 'shared-schemas';
+	import type { User } from '@lib/core/schemas';
 	import UserInfo from './user-info.svelte';
 	let { links, user }: { links: Link[]; user: User } = $props();
 

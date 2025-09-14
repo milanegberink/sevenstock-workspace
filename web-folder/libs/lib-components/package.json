@@ -49,6 +49,6 @@
 	"dependencies": {
 		"@lucide/svelte": "^0.544.0",
 		"qrcode": "^1.5.4",
-		"shared-schemas": "workspace:*"
+		"@lib/core": "workspace:*"
 	}
 }

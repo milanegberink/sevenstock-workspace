@@ -3,9 +3,9 @@
 /// <reference lib="webworker" />
 //
 import { decodeJwt } from 'jose';
-import { type TokenClaims, user } from 'shared-schemas';
+import { type TokenClaims, user } from '@lib/core/schemas';
+import { type Result, Err, Ok } from '@lib/core/service-worker';
 import { SwRequest } from '../src/lib/service-worker/request';
-import { type Result, Err, Ok } from 'lib-web-utils/result';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 

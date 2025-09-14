@@ -1,5 +1,5 @@
-import { type TokenClaims, type User } from 'shared-schemas';
-import { type PromiseResult, type Result, Err } from 'lib-web-utils';
+import { type TokenClaims, type User } from '@lib/core/schemas';
+import { type PromiseResult, type Result, Err } from '@lib/core';
 import { SwRequest } from './request';
 export { SwRequest };
 

@@ -1,5 +1,5 @@
 {
-	"name": "shared-schemas",
+	"name": "@lib/core",
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "vite dev",
@@ -26,10 +26,19 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"svelte": "./dist/index.js"
+		},
+		"./service-worker": {
+			"types": "./dist/result.d.ts",
+			"svelte": "./dist/result.js"
+		},
+		"./schemas": {
+			"types": "./dist/schemas/index.d.ts",
+			"svelte": "./dist/schemas/index.js"
 		}
 	},
 	"peerDependencies": {
-		"svelte": "^5.0.0"
+		"svelte": "^5.0.0",
+		"@sveltejs/kit": "^2.22.0"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^6.0.0",
