@@ -2,7 +2,12 @@
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
 	import { Library, GalleryHorizontal } from '@lucide/svelte';
-	import { sendMessageToSw, SwRequest } from '$lib/service-worker/send-message';
+	import {
+		sendRequest,
+		loginUserRequest,
+		getUserRequest,
+		setTokenRequest
+	} from '@lib/core/service-worker';
 	import { getUser } from '$lib/stores/user.svelte';
 	let { children } = $props();
 
@@ -10,12 +15,12 @@
 
 	$effect(() => {
 		(async () => {
-			const result = await sendMessageToSw(SwRequest.SetToken);
+			const result = await sendRequest(setTokenRequest);
 			if (!result.ok) {
 				goto('/login');
 				return;
 			}
-			const userResult = await sendMessageToSw(SwRequest.GetUser);
+			const userResult = await sendRequest(getUserRequest);
 			if (!userResult.ok) {
 				goto('/login');
 				return;
@@ -32,7 +37,7 @@
 
 <div class="flex h-full w-full">
 	{#if user}
-		<Sidebar {links} {user} />
+		<Sidebar {links} />
 	{/if}
 	<div>
 		{@render children()}

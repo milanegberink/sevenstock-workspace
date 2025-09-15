@@ -2,8 +2,8 @@
 	import NavLink from './nav-link.svelte';
 	import type { NavLink as Link } from './nav-link.js';
 	import type { User } from '@lib/core/schemas';
-	import UserInfo from './user-info.svelte';
-	let { links, user }: { links: Link[]; user: User } = $props();
+	import Profile from './profile.svelte';
+	let { links }: { links: Link[] } = $props();
 
 	let width = $state(256);
 </script>
@@ -15,6 +15,6 @@
 			<NavLink {link} />
 		{/each}
 	</ul>
-	<UserInfo {user} />
+	<Profile />
 	<div role="separator"></div>
 </nav>

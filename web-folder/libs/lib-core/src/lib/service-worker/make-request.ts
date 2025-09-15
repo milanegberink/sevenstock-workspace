@@ -1,9 +1,7 @@
-import { type TokenClaims, type User } from '@lib/core/schemas';
-import { type PromiseResult, type Result, Err } from '@lib/core';
-import { SwRequest } from './request';
-export { SwRequest };
+import { type SWRequest } from './request.js';
+import { type PromiseResult, type Result, Err } from '$lib/result.js';
 
-export async function sendMessageToSw<T>(req: SwRequest): PromiseResult<T> {
+export async function sendRequest<T>(req: SWRequest): PromiseResult<T> {
 	const controller = navigator.serviceWorker?.controller;
 	if (!controller) return Err(new Error('No service worker active'));
 
@@ -15,7 +13,7 @@ export async function sendMessageToSw<T>(req: SwRequest): PromiseResult<T> {
 
 			resolve(result);
 		};
-		controller.postMessage({ type: req }, [channel.port2]);
+		controller.postMessage(req, [channel.port2]);
 	});
 
 	return result;

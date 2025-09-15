@@ -1,2 +1,2 @@
 export * from './better-fetch.svelte';
-export * from './result';
+export * from './result.js';
