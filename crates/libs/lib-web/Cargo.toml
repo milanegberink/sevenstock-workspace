@@ -15,6 +15,7 @@ redis.workspace = true
 aws-sdk-secretsmanager.workspace = true
 aws-sdk-s3.workspace = true
 aws-sdk-elasticache.workspace = true
+secrecy.workspace = true
 
 
 [lints]

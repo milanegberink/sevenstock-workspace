@@ -17,12 +17,17 @@ interface SWMessageEvent<T> extends ExtendableMessageEvent {
 enum SWEvent {
 	Install = 'install',
 	Message = 'message',
-	Fetch = 'fetch'
+	Fetch = 'fetch',
+	Activate = 'activate'
 }
 
 export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	self.addEventListener(SWEvent.Install, () => {
 		self.skipWaiting();
+	});
+
+	self.addEventListener(SWEvent.Activate, (event) => {
+		event.waitUntil(self.clients.claim());
 	});
 
 	self.addEventListener(SWEvent.Message, async (event: SWMessageEvent<SWRequest>) => {
@@ -33,7 +38,21 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		switch (data.type) {
 			case SWReqType.SetToken: {
 				const result = await refreshTokens();
-				port.postMessage(result);
+				if (!result.ok) {
+					port.postMessage(result);
+					return;
+				}
+
+				if (!token) {
+					port.postMessage(Err(new Error('Missing token')));
+					return;
+				}
+
+				const claims = decodeJwt(token);
+				const parsedUser = user.parse(claims);
+
+				port.postMessage(Ok(parsedUser));
+
 				break;
 			}
 			case SWReqType.GetUser: {

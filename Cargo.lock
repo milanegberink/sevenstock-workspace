@@ -2324,6 +2324,7 @@ dependencies = [
  "lib-auth",
  "lib-core",
  "redis",
+ "secrecy",
  "thiserror 2.0.16",
  "tracing",
  "uuid",

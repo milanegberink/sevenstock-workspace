@@ -32,6 +32,15 @@ pub fn init_config(set: PublicJwkSet) -> Result<()> {
     Ok(())
 }
 
+pub fn init_signing_config(set: PrivateJwkSet) -> Result<()> {
+    let public_config = SigningConfig::try_from(set)?;
+    PRIVATE_INSTANCE
+        .set(public_config)
+        .map_err(|_| Error::AlreadyInitialized)?;
+
+    Ok(())
+}
+
 pub fn verifying_config() -> &'static VerifyingConfig {
     PUBLIC_INSTANCE.get().expect("No public config initialised")
 }

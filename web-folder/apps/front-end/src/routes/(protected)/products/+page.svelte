@@ -1,10 +1,11 @@
 <script>
-	import { getUser } from '$lib/stores/user.svelte';
+	import { userStore } from '@lib/core/stores';
 
 	async function onclick() {
-		const user = await getUser();
-		console.log(user);
+		console.log(userStore.user);
 	}
 </script>
 
 <button {onclick}>X</button>
+
+<h1>{JSON.stringify(userStore.user)}</h1>

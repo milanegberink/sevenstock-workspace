@@ -9,6 +9,6 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="h-screen w-screen">
+<div class="h-screen w-screen overflow-hidden">
 	{@render children?.()}
 </div>

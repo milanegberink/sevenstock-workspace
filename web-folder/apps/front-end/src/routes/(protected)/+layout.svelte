@@ -1,31 +1,29 @@
 <script lang="ts">
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
-	import { Library, GalleryHorizontal } from '@lucide/svelte';
+	import { Library, GalleryHorizontal, LoaderCircle } from '@lucide/svelte';
+	import { initUser } from '@lib/core/stores';
 	import {
 		sendRequest,
 		loginUserRequest,
 		getUserRequest,
 		setTokenRequest
 	} from '@lib/core/service-worker';
-	import { getUser } from '$lib/stores/user.svelte';
+	import { scale } from 'svelte/transition';
 	let { children } = $props();
 
-	let user = $state();
+	let loading = $state<boolean>(true);
 
 	$effect(() => {
 		(async () => {
-			const result = await sendRequest(setTokenRequest);
-			if (!result.ok) {
+			// Initialise user
+			const res = await initUser();
+
+			if (!res.ok) {
 				goto('/login');
-				return;
+			} else {
+				loading = false;
 			}
-			const userResult = await sendRequest(getUserRequest);
-			if (!userResult.ok) {
-				goto('/login');
-				return;
-			}
-			user = userResult.value;
 		})();
 	});
 	let links: NavLink[] = [
@@ -35,11 +33,17 @@
 	];
 </script>
 
-<div class="flex h-full w-full">
-	{#if user}
-		<Sidebar {links} />
-	{/if}
-	<div>
-		{@render children()}
+{#if loading}
+	<div class="flex h-full w-full items-center justify-center">
+		<div transition:scale={{ start: 0.5 }}>
+			<LoaderCircle class="animate-spin" size="30" />
+		</div>
 	</div>
-</div>
+{:else}
+	<div class="flex h-full w-full">
+		<Sidebar {links} />
+		<div>
+			{@render children()}
+		</div>
+	</div>
+{/if}

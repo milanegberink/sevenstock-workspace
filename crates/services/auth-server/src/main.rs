@@ -27,7 +27,7 @@ async fn main() {
 
     let token = TokenBuilder::access()
         .sub(Uuid::now_v7())
-        .ident("John Burger The Fourth")
+        .ident("Meow meow")
         .email("me@milanegberink.com")
         .avatar("https://example.com")
         .build_async()

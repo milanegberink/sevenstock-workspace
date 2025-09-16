@@ -1,6 +1,6 @@
 pub mod aws;
 pub mod error;
-pub mod repositories;
+pub mod user;
 
 use lib_grpc::AuthClient;
 use redis::aio::MultiplexedConnection;

@@ -2,8 +2,13 @@ import { type SWRequest } from './request.js';
 import { type PromiseResult, type Result, Err } from '$lib/result.js';
 
 export async function sendRequest<T>(req: SWRequest): PromiseResult<T> {
-	const controller = navigator.serviceWorker?.controller;
-	if (!controller) return Err(new Error('No service worker active'));
+	await navigator.serviceWorker.ready;
+
+	const controller = navigator.serviceWorker.controller;
+
+	if (!controller) {
+		return Err(new Error('No service worker active'));
+	}
 
 	const result = new Promise<Result<T>>((resolve) => {
 		const channel = new MessageChannel();

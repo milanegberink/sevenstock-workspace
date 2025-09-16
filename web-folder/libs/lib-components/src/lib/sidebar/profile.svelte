@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { user } from '@lib/core/stores';
+	import { userStore } from '@lib/core/stores';
 	import Avatar from '../avatar.svelte';
 </script>
 
-{#if user}
-	<Avatar url={user.avatar} />
+{#if userStore.user}
+	<Avatar url={userStore.user.avatar} />
 
-	<h1>{user.email}</h1>
+	<h1>{userStore.user.email}</h1>
 {/if}

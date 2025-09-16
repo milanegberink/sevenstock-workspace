@@ -1,7 +1,6 @@
 use aws_config::BehaviorVersion;
 use aws_sdk_elasticache::Client as CacheClient;
 use aws_sdk_s3::Client as S3Client;
-use aws_sdk_secretsmanager::Client as SecretsClient;
 
 #[derive(Clone)]
 pub struct Aws {
