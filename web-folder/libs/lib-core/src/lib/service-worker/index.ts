@@ -3,7 +3,8 @@
 import { decodeJwt } from 'jose';
 import { type SWRequest, SWReqType } from './request.js';
 import { Err, Ok, type Result, type PromiseResult } from '$lib/result.js';
-import { user, type UserForLogin } from '$lib/schemas/index.js';
+import { user, type LoginPayload } from '$lib/schemas/index.js';
+import { post } from '$lib/better-fetch.svelte';
 export * from '../result.js';
 export * from './request.js';
 export { sendRequest } from './make-request.js';
@@ -67,8 +68,8 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 				break;
 			}
 			case SWReqType.LoginRequest: {
-				const user = data.payload;
-				const result = await loginUser(user);
+				console.log(data.payload);
+				const result = await loginUser(data.payload);
 
 				port.postMessage(result);
 			}
@@ -105,6 +106,10 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	}
 }
 
-async function loginUser(user: UserForLogin): PromiseResult<void> {
+async function loginUser(payload: LoginPayload): PromiseResult<void> {
+	const url = new URL('http://api.localhost:3000/auth/login');
+	const res = await post(url, payload);
+	console.log(res);
+
 	return Ok(undefined);
 }

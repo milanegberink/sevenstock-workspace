@@ -1,11 +1,10 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { post } from '@lib/core';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	await new Promise((resolve) => setTimeout(resolve, 5000));
-
 	const refresh = cookies.get('refresh');
 
-	cookies.set('refresh', 'meow', { path: '/' });
+	cookies.set('refresh', 'X', { path: '/retrieve-token-pair' });
 
 	return json({
 		token:

@@ -1,17 +1,24 @@
 <script lang="ts">
-	let { children, schema, onsubmit } = $props();
+	import type { Snippet } from 'svelte';
+	import { type ZodObject, z } from 'zod';
 
-	let form = $state(Object.fromEntries(Object.keys(schema.shape).map((key) => [key, ''])));
+	let {
+		children,
+		schema,
+		onsubmit
+	}: { children: Snippet<[form: any]>; schema: ZodObject; onsubmit: (payload: any) => any } =
+		$props();
+
+	let form = $state(Object.fromEntries(Object.keys(schema.shape).map((key) => [key, undefined])));
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
-		try {
-			const parsed = await schema.parseAsync(form);
-			console.log('Form validated');
-		} catch {
-			console.log('Form invalid');
-		}
-		onsubmit(form);
+
+		const parsed = await schema.safeParseAsync(form);
+
+		if (parsed.error) return console.error('fix');
+
+		onsubmit(parsed.data);
 	}
 </script>
 

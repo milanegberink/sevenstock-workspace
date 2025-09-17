@@ -1,12 +1,6 @@
 import { z } from 'zod';
 
-export const userForLogin = z.object({
-	password: z.string().min(8, 'Password should be 8 charecters minimum.'),
-	email: z.email()
-});
-
-export const userForCreate = z.object({
-	username: z.string().min(5, 'Username should be 5 charecters minimum.'),
+export const loginPayload = z.object({
 	email: z.email(),
 	password: z.string().min(8, 'Password should be 8 charecters minimum.')
 });
@@ -18,6 +12,6 @@ export const user = z.object({
 	org: z.string().optional()
 });
 
-export type UserForLogin = z.infer<typeof userForLogin>;
+export type LoginPayload = z.infer<typeof loginPayload>;
 
 export type User = z.infer<typeof user>;

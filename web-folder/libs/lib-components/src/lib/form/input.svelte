@@ -1,5 +1,11 @@
 <script>
-	let { value = $bindable(), ...props } = $props();
+	let { value = $bindable(), name, label, ...props } = $props();
 </script>
 
-<input bind:value {...props} />
+<div class="flex flex-col">
+	{#if label}
+		<label for={name}>{label} </label>
+	{/if}
+
+	<input bind:value {name} {...props} />
+</div>

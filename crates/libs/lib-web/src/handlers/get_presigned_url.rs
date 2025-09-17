@@ -1,5 +1,5 @@
 use aws_sdk_s3::presigning::PresigningConfig;
-use lib_core::{model::ModelManager, model::aws::Bucket};
+use lib_core::model::ModelManager;
 
 use crate::error::Result;
 

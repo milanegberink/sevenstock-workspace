@@ -3,12 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { Library, GalleryHorizontal, LoaderCircle } from '@lucide/svelte';
 	import { initUser } from '@lib/core/stores';
-	import {
-		sendRequest,
-		loginUserRequest,
-		getUserRequest,
-		setTokenRequest
-	} from '@lib/core/service-worker';
 	import { scale } from 'svelte/transition';
 	let { children } = $props();
 

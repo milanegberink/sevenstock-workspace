@@ -13,9 +13,9 @@ use crate::token::{
 };
 
 pub enum Behaviour {
-    Public,
+    Public(PublicJwkSet),
     #[cfg(feature = "private")]
-    Private,
+    Private(PrivateJwkSet),
 }
 
 static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
@@ -23,7 +23,7 @@ static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 #[cfg(feature = "private")]
 static PRIVATE_INSTANCE: OnceLock<SigningConfig> = OnceLock::new();
 
-pub fn init_config(set: PublicJwkSet) -> Result<()> {
+pub fn init_verifying_config(set: PublicJwkSet) -> Result<()> {
     let public_config = VerifyingConfig::try_from(set)?;
     PUBLIC_INSTANCE
         .set(public_config)
@@ -32,6 +32,7 @@ pub fn init_config(set: PublicJwkSet) -> Result<()> {
     Ok(())
 }
 
+#[cfg(feature = "private")]
 pub fn init_signing_config(set: PrivateJwkSet) -> Result<()> {
     let public_config = SigningConfig::try_from(set)?;
     PRIVATE_INSTANCE

@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+use crate::token::TokenType;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, Error)]
@@ -21,6 +23,9 @@ pub enum Error {
 
     #[error("Config was already initialized")]
     AlreadyInitialized,
+
+    #[error("No header was found for token type: {token_type}")]
+    NoHeaderFound { token_type: TokenType },
 
     #[error(transparent)]
     TokenEncodeFail(#[from] jsonwebtoken::errors::Error),

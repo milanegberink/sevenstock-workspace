@@ -7,7 +7,11 @@ pub use self::error::{Error, Result};
 mod web;
 
 use axum::{Router, middleware};
-use lib_auth::token::config::init_verifying_config;
+use lib_auth::token::{
+    TokenType,
+    config::{init_signing_config, init_verifying_config},
+    jwks::{PrivateJwk, PrivateJwkSet},
+};
 use lib_core::model::ModelManager;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
@@ -29,12 +33,24 @@ async fn main() -> Result<()> {
 
     let temp_routes = Router::new().merge(routes_login::routes(mm.clone()));
 
+    let private_jwk = PrivateJwk::new(TokenType::Access);
+
+    let private_jwk_2 = PrivateJwk::new(TokenType::Refresh);
+
+    let mut set = PrivateJwkSet { keys: Vec::new() };
+
+    set.keys.push(private_jwk);
+
+    set.keys.push(private_jwk_2);
+
+    init_signing_config(set).unwrap();
+
     let app = Router::new()
-        .nest("/api", temp_routes)
-        .layer(TraceLayer::new_for_http())
-        .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
-        .layer(middleware::from_fn(mw_ctx_require))
-        .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));
+        .nest("/auth", temp_routes)
+        .layer(TraceLayer::new_for_http());
+    // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
+    // .layer(middleware::from_fn(mw_ctx_require))
+    // .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));
 
     let addr = format!("0.0.0.0:{}", PORT);
 

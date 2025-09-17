@@ -1,27 +1,53 @@
-use crate::error::{Error, Result};
+use crate::error::Result;
 
+use axum::Json;
 use axum::extract::State;
-use lib_auth::token::{Token, TokenBuilder, secrets::KeyPair};
+use axum_extra::extract::{CookieJar, cookie::Cookie};
+use lib_auth::pwd::{hash_password, verify_password};
+use lib_auth::token::TokenBuilder;
 use lib_core::model::ModelManager;
 use secrecy::SecretString;
-use tracing::info;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub async fn api_login_handler(
     State(mm): State<ModelManager>,
+    cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
-) -> Result<&'static str> {
+) -> Result<(CookieJar, Json<LoginResponse>)> {
     let LoginPayload {
         email,
-        pwd: pwd_clear,
+        password: pwd_clear,
     } = payload;
 
-    info!("{:?}", secret.secret_string());
+    verify_password("$argon2id$v=19$m=19456,t=2,p=1$CIqj9N/UsqaeW4qt6Y4dGg$PkGeH8Nj6NMO8oe1R8/WKEr14b8IL9nvYUEjVXcG8Yw".to_string(), pwd_clear)?;
 
-    Ok("string")
+    let uuid = Uuid::now_v7();
+
+    let access_token = TokenBuilder::access()
+        .sub(uuid)
+        .email(email)
+        .build_async()
+        .await?;
+
+    let refresh_token = TokenBuilder::refresh().sub(uuid).build_async().await?;
+
+    let cookie = Cookie::new("rt", refresh_token);
+
+    let cookies = cookies.add(cookie);
+
+    let response = LoginResponse { access_token };
+
+    Ok((cookies, Json(response)))
 }
 
-struct LoginPayload {
+#[derive(Deserialize)]
+pub struct LoginPayload {
     email: String,
-    pwd: SecretString,
+    password: SecretString,
+}
+
+#[derive(Serialize)]
+pub struct LoginResponse {
+    access_token: String,
 }

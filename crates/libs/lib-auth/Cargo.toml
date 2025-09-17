@@ -20,6 +20,8 @@ tracing = { workspace = true }
 ed25519-dalek = { version = "2.1.1", features = ["pem", "pkcs8", "rand_core"] }
 rand = "0.8.5"
 pkcs8 = "0.10.2"
+strum = "0.27.2"
+strum_macros = "0.27.2"
 
 
 [lints]

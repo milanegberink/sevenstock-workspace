@@ -11,7 +11,6 @@ use axum_extra::{
     extract::CookieJar,
     headers::{Authorization, authorization::Bearer},
 };
-use lib_auth::token::{ACCESS_TOKEN, Token};
 use lib_core::{ctx::Ctx, model::ModelManager};
 use thiserror::Error;
 use tracing::debug;
@@ -33,7 +32,7 @@ pub async fn mw_ctx_resolver(
 ) -> Response {
     debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
-    let ctx_ext_result = ctx_resolve(mm, &token).await;
+    let ctx_ext_result = ctx_resolve(mm, &token.0.token()).await;
 
     req.extensions_mut().insert(ctx_ext_result);
 

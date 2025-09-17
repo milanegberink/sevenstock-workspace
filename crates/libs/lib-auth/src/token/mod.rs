@@ -7,6 +7,7 @@ mod error;
 use crate::token::config::{Identifier, signing_config, verifying_config};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
+use strum_macros::Display;
 use uuid::Uuid;
 
 pub use self::error::{Error, Result};
@@ -15,11 +16,14 @@ pub use self::error::{Error, Result};
 #[serde(transparent)]
 pub struct KeyId(Uuid);
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone, Debug, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum TokenType {
+    #[strum(serialize = "Access")]
     Access,
+    #[strum(serialize = "Refresh")]
     Refresh,
+    #[strum(serialize = "Two factor")]
     TwoFactor,
 }
 
@@ -170,7 +174,12 @@ impl TokenBuilder<Sub> {
             email: self.claims.email,
         };
 
-        let jwt_header = config.get(self.token_type).await.unwrap();
+        let jwt_header = config
+            .get(self.token_type)
+            .await
+            .ok_or(Error::NoHeaderFound {
+                token_type: self.token_type,
+            })?;
 
         let header = jwt_header.header();
 
