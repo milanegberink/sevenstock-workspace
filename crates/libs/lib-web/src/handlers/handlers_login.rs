@@ -3,7 +3,7 @@ use crate::error::Result;
 use axum::Json;
 use axum::extract::State;
 use axum_extra::extract::{CookieJar, cookie::Cookie};
-use lib_auth::pwd::{hash_password, verify_password};
+use lib_auth::pwd::verify_password;
 use lib_auth::token::TokenBuilder;
 use lib_core::model::ModelManager;
 use secrecy::SecretString;
@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub async fn api_login_handler(
-    State(mm): State<ModelManager>,
+    State(_mm): State<ModelManager>,
     cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
 ) -> Result<(CookieJar, Json<LoginResponse>)> {
@@ -27,12 +27,17 @@ pub async fn api_login_handler(
     let access_token = TokenBuilder::access()
         .sub(uuid)
         .email(email)
+        .ident("Milan")
         .build_async()
         .await?;
 
     let refresh_token = TokenBuilder::refresh().sub(uuid).build_async().await?;
 
-    let cookie = Cookie::new("rt", refresh_token);
+    let cookie = Cookie::build(("rt", refresh_token))
+        .path("/")
+        .http_only(true)
+        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .build();
 
     let cookies = cookies.add(cookie);
 

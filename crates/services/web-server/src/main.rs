@@ -6,13 +6,21 @@ pub use self::error::{Error, Result};
 
 mod web;
 
-use axum::{Router, middleware};
+use axum::{
+    Router,
+    http::{
+        HeaderValue, Method,
+        header::{AUTHORIZATION, CONTENT_TYPE, COOKIE},
+    },
+    middleware,
+};
 use lib_auth::token::{
     TokenType,
     config::{init_signing_config, init_verifying_config},
     jwks::{PrivateJwk, PrivateJwkSet},
 };
 use lib_core::model::ModelManager;
+use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 mod error;
@@ -45,9 +53,22 @@ async fn main() -> Result<()> {
 
     init_signing_config(set).unwrap();
 
+    let cors = CorsLayer::new()
+        .allow_methods([
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+        ])
+        .allow_credentials(true)
+        .allow_origin([HeaderValue::from_static("http://localhost:5173")])
+        .allow_headers([CONTENT_TYPE, COOKIE, AUTHORIZATION]);
+
     let app = Router::new()
         .nest("/auth", temp_routes)
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(cors);
     // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
     // .layer(middleware::from_fn(mw_ctx_require))
     // .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));

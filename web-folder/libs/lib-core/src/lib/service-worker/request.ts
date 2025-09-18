@@ -1,4 +1,4 @@
-import type { UserForLogin } from '$lib/schemas/user.js';
+import type { LoginPayload } from '$lib/schemas/user.js';
 
 export enum SWReqType {
 	SetToken = 'SET_TOKEN',
@@ -6,11 +6,7 @@ export enum SWReqType {
 	LoginRequest = 'LOGIN_REQUEST'
 }
 
-export type SWRequest = GetUserRequest | SetTokenRequest | LoginUserRequest;
-
-interface GetUserRequest {
-	type: SWReqType.GetUser;
-}
+export type SWRequest = SetTokenRequest | LoginUserRequest;
 
 interface SetTokenRequest {
 	type: SWReqType.SetToken;
@@ -18,18 +14,14 @@ interface SetTokenRequest {
 
 interface LoginUserRequest {
 	type: SWReqType.LoginRequest;
-	payload: UserForLogin;
+	payload: LoginPayload;
 }
-
-export const getUserRequest: GetUserRequest = {
-	type: SWReqType.GetUser
-};
 
 export const setTokenRequest: SetTokenRequest = {
 	type: SWReqType.SetToken
 };
 
-export const loginUserRequest = (payload: UserForLogin): LoginUserRequest => ({
+export const loginUserRequest = (payload: LoginPayload): LoginUserRequest => ({
 	type: SWReqType.LoginRequest,
 	payload
 });

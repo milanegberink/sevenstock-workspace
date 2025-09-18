@@ -2,7 +2,7 @@
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
 	import { Library, GalleryHorizontal, LoaderCircle } from '@lucide/svelte';
-	import { initUser } from '@lib/core/stores';
+	import { getOrInitUser } from '@lib/core/stores';
 	import { scale } from 'svelte/transition';
 	let { children } = $props();
 
@@ -11,7 +11,7 @@
 	$effect(() => {
 		(async () => {
 			// Initialise user
-			const res = await initUser();
+			const res = await getOrInitUser();
 
 			if (!res.ok) {
 				goto('/login');

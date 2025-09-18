@@ -13,14 +13,18 @@ enum Method {
 }
 
 async function request<T, R>(endpoint: URL, method: Method, body?: T): PromiseResult<R> {
+	let headers = new Headers({ 'Content-Type': 'application/json' });
 	const opts: RequestInit = {
 		method,
+		headers,
+		credentials: "include"
 		body: JSON.stringify(body)
 	};
 
 	const res = await fetch(endpoint, opts);
 
 	if (!res.ok) {
+		console.log(res);
 		return Err(new HttpError());
 	}
 

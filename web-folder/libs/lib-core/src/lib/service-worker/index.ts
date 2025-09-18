@@ -38,7 +38,17 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		if (!port) return;
 		switch (data.type) {
 			case SWReqType.SetToken: {
+				if (token) {
+					const claims = decodeJwt(token);
+					const parsedUser = await user.safeParseAsync(claims);
+
+					if (parsedUser.error) return Err(new Error(parsedUser.error.message));
+
+					port.postMessage(Ok(parsedUser.data));
+					return;
+				}
 				const result = await refreshTokens();
+
 				if (!result.ok) {
 					port.postMessage(result);
 					return;
@@ -50,28 +60,30 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 				}
 
 				const claims = decodeJwt(token);
-				const parsedUser = user.parse(claims);
+				const parsedUser = await user.safeParseAsync(claims);
 
-				port.postMessage(Ok(parsedUser));
+				if (parsedUser.error) return Err(new Error(parsedUser.error.message));
 
-				break;
-			}
-			case SWReqType.GetUser: {
-				if (!token) {
-					port.postMessage(Err(new Error('Missing token')));
-					return;
-				}
+				port.postMessage(Ok(parsedUser.data));
 
-				const claims = decodeJwt(token);
-				const parsedUser = user.parse(claims);
-				port.postMessage(Ok(parsedUser));
 				break;
 			}
 			case SWReqType.LoginRequest: {
-				console.log(data.payload);
-				const result = await loginUser(data.payload);
+				const res = await loginUser(data.payload);
 
-				port.postMessage(result);
+				if (!res.ok) {
+					port.postMessage(Err('Failed to login'));
+					return;
+				}
+
+				token = res.value.access_token;
+
+				const claims = decodeJwt(token);
+				const parsedUser = await user.safeParseAsync(claims);
+
+				if (parsedUser.error) return Err(new Error(parsedUser.error.message));
+
+				port.postMessage(Ok(parsedUser.data));
 			}
 		}
 	});
@@ -96,7 +108,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		return Ok(undefined);
 	}
 
-	function x(targetUnix: number) {
+	function runAtTimestamp(targetUnix: number) {
 		targetUnix *= 1000;
 
 		const now = Date.now();
@@ -106,10 +118,10 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	}
 }
 
-async function loginUser(payload: LoginPayload): PromiseResult<void> {
-	const url = new URL('http://api.localhost:3000/auth/login');
+async function loginUser(payload: LoginPayload): PromiseResult<{ access_token: string }> {
+	const url = new URL('http://localhost:3000/auth/login');
 	const res = await post(url, payload);
-	console.log(res);
+	if (!res.ok) return Err(new Error('Login fail'));
 
-	return Ok(undefined);
+	return res;
 }

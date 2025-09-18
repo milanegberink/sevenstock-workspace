@@ -19,7 +19,7 @@ secrecy = { workspace = true }
 serde_json = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
-tower-http = { version = "0.6.6", features = ["trace"] }
+tower-http = { version = "0.6.6", features = ["trace", "cors"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tracing-appender = "0.2.3"
 

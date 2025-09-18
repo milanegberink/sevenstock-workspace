@@ -1,7 +1,7 @@
 import { type PromiseResult, Err, Ok } from '$lib/result.js';
 import type { User } from '$lib/schemas/user.js';
 import { sendRequest } from '$lib/service-worker/make-request.js';
-import { getUserRequest, setTokenRequest } from '$lib/service-worker/request.js';
+import { setTokenRequest } from '$lib/service-worker/request.js';
 
 function createUserStore() {
 	let user = $state<User>();
@@ -18,7 +18,9 @@ function createUserStore() {
 
 export const userStore = createUserStore();
 
-export async function initUser(): PromiseResult<void> {
+export async function getOrInitUser(): PromiseResult<void> {
+	if (userStore.user) return Ok(undefined);
+
 	const result = await sendRequest<User>(setTokenRequest);
 
 	if (!result.ok) {
