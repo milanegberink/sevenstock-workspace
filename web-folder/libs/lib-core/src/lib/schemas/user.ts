@@ -14,4 +14,8 @@ export const user = z.object({
 
 export type LoginPayload = z.infer<typeof loginPayload>;
 
+export type LoginResponse = {
+	access_token: string;
+};
+
 export type User = z.infer<typeof user>;

@@ -75,7 +75,7 @@ impl TryFrom<String> for KeyId {
 }
 
 #[skip_serializing_none]
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Default, Clone)]
 pub struct Claims<U> {
     sub: U,
     ident: Option<String>,
@@ -87,8 +87,8 @@ pub struct Claims<U> {
 }
 
 impl Claims<Sub> {
-    pub fn sub(self) -> Uuid {
-        self.sub.0
+    pub fn sub(&self) -> &Uuid {
+        &self.sub.0
     }
 }
 
@@ -122,11 +122,11 @@ impl TokenBuilder<NoSub> {
         }
     }
 
-    pub fn sub(self, sub: Uuid) -> TokenBuilder<Sub> {
+    pub fn sub(self, sub: impl AsRef<Uuid>) -> TokenBuilder<Sub> {
         TokenBuilder {
             token_type: self.token_type,
             claims: Claims {
-                sub: Sub(sub),
+                sub: Sub(*sub.as_ref()),
                 ident: self.claims.ident,
                 avatar: self.claims.avatar,
                 exp: self.claims.exp,

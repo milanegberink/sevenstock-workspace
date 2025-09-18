@@ -26,7 +26,7 @@ async fn main() {
     init_signing_config(set).unwrap();
 
     let token = TokenBuilder::access()
-        .sub(Uuid::now_v7())
+        .sub(&Uuid::now_v7())
         .ident("Meow meow")
         .email("me@milanegberink.com")
         .avatar("https://example.com")

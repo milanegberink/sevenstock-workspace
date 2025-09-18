@@ -31,6 +31,9 @@ pub enum Error {
 
     #[error(transparent)]
     GetSecretError(#[from] SdkError<GetSecretValueError>),
+
+    #[error("No token found in cookie header")]
+    NoRefreshTokenFound,
 }
 
 impl IntoResponse for Error {

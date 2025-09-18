@@ -25,15 +25,15 @@ pub async fn api_login_handler(
     let uuid = Uuid::now_v7();
 
     let access_token = TokenBuilder::access()
-        .sub(uuid)
+        .sub(&uuid)
         .email(email)
         .ident("Milan")
         .build_async()
         .await?;
 
-    let refresh_token = TokenBuilder::refresh().sub(uuid).build_async().await?;
+    let refresh_token = TokenBuilder::refresh().sub(&uuid).build_async().await?;
 
-    let cookie = Cookie::build(("rt", refresh_token))
+    let cookie = Cookie::build(("refresh_token", refresh_token))
         .path("/")
         .http_only(true)
         .same_site(axum_extra::extract::cookie::SameSite::Lax)

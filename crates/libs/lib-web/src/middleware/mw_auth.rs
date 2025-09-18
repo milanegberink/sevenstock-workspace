@@ -26,20 +26,22 @@ pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -
 
 pub async fn mw_ctx_resolver(
     State(mm): State<ModelManager>,
-    token: TypedHeader<Authorization<Bearer>>,
+    token_hdr: TypedHeader<Authorization<Bearer>>,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
     debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
-    let ctx_ext_result = ctx_resolve(mm, &token.0.token()).await;
+    debug!("{}", token_hdr.token());
+
+    let ctx_ext_result = ctx_resolve(mm, token_hdr.token()).await;
 
     req.extensions_mut().insert(ctx_ext_result);
 
     next.run(req).await
 }
 
-async fn ctx_resolve(mm: ModelManager, token: &str) -> CtxExtResult {
+async fn ctx_resolve(_mm: ModelManager, _token: &str) -> CtxExtResult {
     Ctx::new(Uuid::now_v7())
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))

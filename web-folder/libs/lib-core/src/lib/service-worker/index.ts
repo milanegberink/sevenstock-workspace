@@ -3,7 +3,8 @@
 import { decodeJwt } from 'jose';
 import { type SWRequest, SWReqType } from './request.js';
 import { Err, Ok, type Result, type PromiseResult } from '$lib/result.js';
-import { user, type LoginPayload } from '$lib/schemas/index.js';
+import { user } from '$lib/schemas/index.js';
+import type { LoginPayload, LoginResponse, User } from '$lib/schemas/index.js';
 import { post } from '$lib/better-fetch.svelte';
 export * from '../result.js';
 export * from './request.js';
@@ -78,12 +79,14 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 
 				token = res.value.access_token;
 
-				const claims = decodeJwt(token);
-				const parsedUser = await user.safeParseAsync(claims);
+				const userResult = await userFromToken(token);
 
-				if (parsedUser.error) return Err(new Error(parsedUser.error.message));
+				if (!userResult.ok) {
+					port.postMessage(userResult);
+					return;
+				}
 
-				port.postMessage(Ok(parsedUser.data));
+				port.postMessage(Ok(userResult));
 			}
 		}
 	});
@@ -118,10 +121,20 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	}
 }
 
-async function loginUser(payload: LoginPayload): PromiseResult<{ access_token: string }> {
+async function loginUser(payload: LoginPayload): PromiseResult<LoginResponse> {
 	const url = new URL('http://localhost:3000/auth/login');
-	const res = await post(url, payload);
+	const res = await post<LoginPayload, LoginResponse>(url, payload);
 	if (!res.ok) return Err(new Error('Login fail'));
 
 	return res;
+}
+
+async function userFromToken(token: string): PromiseResult<User> {
+	const claims = decodeJwt(token);
+
+	const parsedUser = await user.safeParseAsync(claims);
+
+	if (parsedUser.error) return Err(new Error(parsedUser.error.message));
+
+	return Ok(parsedUser.data);
 }
