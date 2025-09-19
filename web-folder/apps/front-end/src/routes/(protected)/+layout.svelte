@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { Library, GalleryHorizontal, LoaderCircle } from '@lucide/svelte';
 	import { getOrInitUser } from '@lib/core/stores';
-	import { scale } from 'svelte/transition';
 	let { children } = $props();
 
 	let loading = $state<boolean>(true);
@@ -14,6 +13,7 @@
 			const res = await getOrInitUser();
 
 			if (!res.ok) {
+				console.log(res.error);
 				goto('/login');
 			} else {
 				loading = false;
@@ -29,7 +29,7 @@
 
 {#if loading}
 	<div class="flex h-full w-full items-center justify-center">
-		<div transition:scale={{ start: 0.5 }}>
+		<div>
 			<LoaderCircle class="animate-spin" size="30" />
 		</div>
 	</div>

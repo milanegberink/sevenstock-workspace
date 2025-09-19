@@ -10,8 +10,14 @@ export * from '../result.js';
 export * from './request.js';
 export { sendRequest } from './make-request.js';
 
-let token: string | null = null;
-
+class Config {
+	token: string;
+	user: User;
+	constructor(token: string, user: User) {
+		this.token = token;
+		this.user = user;
+	}
+}
 interface SWMessageEvent<T> extends ExtendableMessageEvent {
 	data: T;
 }
@@ -24,6 +30,9 @@ enum SWEvent {
 }
 
 export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
+	let token: string | undefined;
+	let authResult: PromiseResult<{ access_token: string }>;
+
 	self.addEventListener(SWEvent.Install, () => {
 		self.skipWaiting();
 	});
@@ -40,55 +49,32 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		switch (data.type) {
 			case SWReqType.SetToken: {
 				if (token) {
-					const claims = decodeJwt(token);
-					const parsedUser = await user.safeParseAsync(claims);
-
-					if (parsedUser.error) return Err(new Error(parsedUser.error.message));
-
-					port.postMessage(Ok(parsedUser.data));
-					return;
+					authResult = Promise.resolve(Ok({ access_token: token }));
+				} else {
+					authResult = refreshTokens();
 				}
-				const result = await refreshTokens();
-
-				if (!result.ok) {
-					port.postMessage(result);
-					return;
-				}
-
-				if (!token) {
-					port.postMessage(Err(new Error('Missing token')));
-					return;
-				}
-
-				const claims = decodeJwt(token);
-				const parsedUser = await user.safeParseAsync(claims);
-
-				if (parsedUser.error) return Err(new Error(parsedUser.error.message));
-
-				port.postMessage(Ok(parsedUser.data));
-
 				break;
 			}
 			case SWReqType.LoginRequest: {
-				const res = await loginUser(data.payload);
-
-				if (!res.ok) {
-					port.postMessage(Err('Failed to login'));
-					return;
-				}
-
-				token = res.value.access_token;
-
-				const userResult = await userFromToken(token);
-
-				if (!userResult.ok) {
-					port.postMessage(userResult);
-					return;
-				}
-
-				port.postMessage(Ok(userResult));
+				authResult = loginUser(data.payload);
+				break;
 			}
 		}
+
+		const result = await authResult;
+
+		if (!result.ok) {
+			port.postMessage(result);
+			return;
+		}
+
+		const newToken = result.value.access_token;
+
+		token = newToken;
+
+		const userResult = userFromToken(token);
+
+		port.postMessage(userResult);
 	});
 
 	self.addEventListener(SWEvent.Fetch, (event: FetchEvent) => {
@@ -104,20 +90,20 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		event.respondWith(fetch(request));
 	});
 
-	async function refreshTokens(): PromiseResult<void> {
-		const res = await fetch('/retrieve-token-pair');
-		const data = await res.json();
-		token = data.token;
-		return Ok(undefined);
+	async function refreshTokens(): PromiseResult<LoginResponse> {
+		const url = new URL('http://localhost:3000/auth/exchange-refresh');
+
+		const res = await post<undefined, LoginResponse>(url);
+
+		return res;
 	}
 
-	function runAtTimestamp(targetUnix: number) {
-		targetUnix *= 1000;
-
+	function runAtTimestamp(targetUnix: number, fn: () => any) {
+		const targetTime = targetUnix * 1000;
 		const now = Date.now();
-		const delay = targetUnix - now;
 
-		setTimeout(refreshTokens, delay);
+		const delay = Math.max(targetTime - now, 0);
+		setTimeout(fn, delay);
 	}
 }
 
@@ -129,10 +115,10 @@ async function loginUser(payload: LoginPayload): PromiseResult<LoginResponse> {
 	return res;
 }
 
-async function userFromToken(token: string): PromiseResult<User> {
+function userFromToken(token: string): Result<User> {
 	const claims = decodeJwt(token);
 
-	const parsedUser = await user.safeParseAsync(claims);
+	const parsedUser = user.safeParse(claims);
 
 	if (parsedUser.error) return Err(new Error(parsedUser.error.message));
 

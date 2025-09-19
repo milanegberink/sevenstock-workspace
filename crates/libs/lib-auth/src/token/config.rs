@@ -42,15 +42,13 @@ pub fn init_signing_config(set: PrivateJwkSet) -> Result<()> {
     Ok(())
 }
 
-pub fn verifying_config() -> &'static VerifyingConfig {
-    PUBLIC_INSTANCE.get().expect("No public config initialised")
+pub fn verifying_config() -> Result<&'static VerifyingConfig> {
+    PUBLIC_INSTANCE.get().ok_or(Error::NoConfigFound)
 }
 
 #[cfg(feature = "private")]
-pub fn signing_config() -> &'static SigningConfig {
-    PRIVATE_INSTANCE
-        .get()
-        .expect("No private config initialised")
+pub fn signing_config() -> Result<&'static SigningConfig> {
+    PRIVATE_INSTANCE.get().ok_or(Error::NoConfigFound)
 }
 
 pub struct VerifyingConfig {
@@ -59,9 +57,11 @@ pub struct VerifyingConfig {
 }
 
 impl VerifyingConfig {
-    pub async fn get(&self, id: &Identifier) -> Option<Arc<DecodingKey>> {
+    pub async fn get(&self, id: &Identifier) -> Result<Arc<DecodingKey>> {
         let map = self.keys.read().await;
-        map.get(id).cloned()
+        map.get(id)
+            .cloned()
+            .ok_or(Error::NoDecodingCode(id.0.into()))
     }
     pub fn validation(&self) -> &Validation {
         &self.validation

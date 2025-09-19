@@ -24,6 +24,12 @@ pub enum Error {
     #[error("Config was already initialized")]
     AlreadyInitialized,
 
+    #[error("No config found")]
+    NoConfigFound,
+
+    #[error("No decoding key found for key id: {0}")]
+    NoDecodingCode(String),
+
     #[error("No header was found for token type: {token_type}")]
     NoHeaderFound { token_type: TokenType },
 

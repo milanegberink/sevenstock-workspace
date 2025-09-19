@@ -14,7 +14,7 @@ pub use jsonwebtoken::EncodingKey;
 
 use crate::token::KeyId;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct JwkSet<T> {
     pub keys: Vec<T>,
 }

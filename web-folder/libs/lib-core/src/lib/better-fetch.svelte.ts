@@ -17,7 +17,7 @@ async function request<T, R>(endpoint: URL, method: Method, body?: T): PromiseRe
 	const opts: RequestInit = {
 		method,
 		headers,
-		credentials: "include"
+		credentials: 'include',
 		body: JSON.stringify(body)
 	};
 
@@ -36,6 +36,6 @@ export const get = async <R>(endpoint: URL): PromiseResult<R> => {
 	return request(endpoint, Method.Get);
 };
 
-export const post = async <T, R>(endpoint: URL, body: T): PromiseResult<R> => {
+export const post = async <T, R>(endpoint: URL, body?: T): PromiseResult<R> => {
 	return request(endpoint, Method.Post, body);
 };

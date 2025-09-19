@@ -39,13 +39,13 @@ impl TokenType {
 
 impl TokenType {
     pub async fn verify(&self, token: &str) -> Result<Claims<Sub>> {
-        let config = verifying_config();
+        let config = verifying_config()?;
 
         let header = decode_header(token).map_err(|_| Error::InvalidToken)?;
 
         let id: Identifier = (header.kid.unwrap().try_into().unwrap(), self.clone());
 
-        let decoding_key = config.get(&id).await.unwrap();
+        let decoding_key = config.get(&id).await?;
 
         let token_data = decode::<Claims<Sub>>(token, &decoding_key, config.validation())
             .map_err(|_| Error::InvalidToken)?;
@@ -122,11 +122,11 @@ impl TokenBuilder<NoSub> {
         }
     }
 
-    pub fn sub(self, sub: impl AsRef<Uuid>) -> TokenBuilder<Sub> {
+    pub fn sub(self, sub: &Uuid) -> TokenBuilder<Sub> {
         TokenBuilder {
             token_type: self.token_type,
             claims: Claims {
-                sub: Sub(*sub.as_ref()),
+                sub: Sub(*sub),
                 ident: self.claims.ident,
                 avatar: self.claims.avatar,
                 exp: self.claims.exp,
@@ -161,7 +161,7 @@ impl TokenBuilder<Sub> {
     }
 
     pub async fn build_async(self) -> Result<String> {
-        let config = signing_config();
+        let config = signing_config()?;
         let current_timestamp = get_current_timestamp();
 
         let claims = Claims {

@@ -17,7 +17,7 @@ use axum::{
 use lib_auth::token::{
     TokenType,
     config::{init_signing_config, init_verifying_config},
-    jwks::{PrivateJwk, PrivateJwkSet},
+    jwks::{PrivateJwk, PrivateJwkSet, PublicJwk, PublicJwkSet},
 };
 use lib_core::model::ModelManager;
 use tower_http::cors::{Any, CorsLayer};
@@ -51,7 +51,11 @@ async fn main() -> Result<()> {
 
     set.keys.push(private_jwk_2);
 
+    let public_set = PublicJwkSet::from(set.clone());
+
     init_signing_config(set).unwrap();
+
+    init_verifying_config(public_set).unwrap();
 
     let cors = CorsLayer::new()
         .allow_methods([

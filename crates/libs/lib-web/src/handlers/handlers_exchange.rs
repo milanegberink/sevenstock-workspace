@@ -1,20 +1,18 @@
-use crate::{Error, Result};
+use crate::error::{Error, Result};
 
-use axum::extract::State;
+use axum::{Json, extract::State};
 use axum_extra::extract::{
     CookieJar,
     cookie::{Cookie, SameSite},
 };
-use lib_auth::{
-    pwd::verify_password,
-    token::{TokenBuilder, TokenType},
-};
+use lib_auth::token::{TokenBuilder, TokenType};
 use lib_core::model::ModelManager;
+use serde::Serialize;
 
 pub async fn exchange_refresh(
     State(_mm): State<ModelManager>,
     cookies: CookieJar,
-) -> Result<(CookieJar, RefreshExchangeResponse)> {
+) -> Result<(CookieJar, Json<RefreshExchangeResponse>)> {
     let refresh_token = cookies
         .get("refresh_token")
         .ok_or(Error::NoRefreshTokenFound)?
@@ -28,11 +26,12 @@ pub async fn exchange_refresh(
 
     let access_token = TokenBuilder::access()
         .sub(sub)
-        .ident("X")
+        .ident("Milan refreshed")
+        .email("me@milanegberink.com")
         .build_async()
         .await?;
 
-    let refresh_cookie = Cookie::build(("refresh_token", "x"))
+    let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
         .path("/")
         .http_only(true)
         .same_site(SameSite::Lax)
@@ -40,9 +39,10 @@ pub async fn exchange_refresh(
 
     let res = RefreshExchangeResponse { access_token };
 
-    Ok((cookies.add(refresh_cookie), res))
+    Ok((cookies.add(refresh_cookie), Json(res)))
 }
 
-struct RefreshExchangeResponse {
+#[derive(Serialize)]
+pub struct RefreshExchangeResponse {
     access_token: String,
 }

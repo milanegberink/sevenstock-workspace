@@ -2,12 +2,16 @@ use crate::error::Result;
 
 use axum::Json;
 use axum::extract::State;
-use axum_extra::extract::{CookieJar, cookie::Cookie};
+use axum_extra::extract::{
+    CookieJar,
+    cookie::{Cookie, SameSite},
+};
 use lib_auth::pwd::verify_password;
 use lib_auth::token::TokenBuilder;
 use lib_core::model::ModelManager;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
+use tracing::{debug, info};
 use uuid::Uuid;
 
 pub async fn api_login_handler(
@@ -33,10 +37,12 @@ pub async fn api_login_handler(
 
     let refresh_token = TokenBuilder::refresh().sub(&uuid).build_async().await?;
 
+    info!("User logged in with id: {}", &refresh_token);
+
     let cookie = Cookie::build(("refresh_token", refresh_token))
         .path("/")
         .http_only(true)
-        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .same_site(SameSite::Lax)
         .build();
 
     let cookies = cookies.add(cookie);
