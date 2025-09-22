@@ -7,6 +7,8 @@ edition = "2024"
 axum-extra = { version = "0.10.1", features = ["cookie", "typed-header"] }
 lib-auth = { path = "../../libs/lib-auth" }
 lib-core = { path = "../../libs/lib-core" }
+lib-grpc = { path = "../../libs/lib-grpc" }
+
 axum.workspace = true
 tracing.workspace = true
 thiserror.workspace = true

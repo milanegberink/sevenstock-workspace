@@ -7,42 +7,40 @@ use axum_extra::extract::{
 };
 use lib_auth::token::{TokenBuilder, TokenType};
 use lib_core::model::ModelManager;
+use lib_grpc::{RefreshTokenRequest, Request};
 use serde::Serialize;
+use serde_json::{Value, json};
+use uuid::Uuid;
 
 pub async fn exchange_refresh(
-    State(_mm): State<ModelManager>,
+    State(mm): State<ModelManager>,
     cookies: CookieJar,
-) -> Result<(CookieJar, Json<RefreshExchangeResponse>)> {
-    let refresh_token = cookies
+) -> Result<(CookieJar, Json<Value>)> {
+    let refresh_token: String = cookies
         .get("refresh_token")
         .ok_or(Error::NoRefreshTokenFound)?
-        .value();
+        .value()
+        .into();
 
-    let claims = TokenType::Refresh.verify(refresh_token).await?;
+    // let claims = TokenType::Refresh.verify(&refresh_token).await?;
 
-    let sub = claims.sub();
+    let request = Request::new(RefreshTokenRequest { refresh_token });
 
-    let refresh_token = TokenBuilder::refresh().sub(sub).build_async().await?;
+    let response = mm.auth().refresh_token(request).await.unwrap().into_inner();
 
-    let access_token = TokenBuilder::access()
-        .sub(sub)
-        .ident("Milan refreshed")
-        .email("me@milanegberink.com")
-        .build_async()
-        .await?;
+    println!("{:?}", response);
 
-    let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
+    // let sub = claims.sub();
+    //
+    let sub = Uuid::now_v7();
+
+    let refresh_cookie = Cookie::build(("refresh_token", response.refresh_token))
         .path("/")
         .http_only(true)
         .same_site(SameSite::Lax)
         .build();
 
-    let res = RefreshExchangeResponse { access_token };
+    let res = json!({ "access_token": response.access_token });
 
     Ok((cookies.add(refresh_cookie), Json(res)))
-}
-
-#[derive(Serialize)]
-pub struct RefreshExchangeResponse {
-    access_token: String,
 }

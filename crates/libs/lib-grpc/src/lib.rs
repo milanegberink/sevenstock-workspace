@@ -6,10 +6,12 @@ mod proto {
 
 pub use proto::auth_client::AuthClient;
 pub use proto::auth_server::AuthServer;
-use tonic::{Request, Response, Status};
+pub use tonic::Request;
+pub use tonic::transport::Channel;
+use tonic::{Response, Status};
 use uuid::Uuid;
 
-use crate::proto::{RefreshTokenRequest, RefreshTokenResponse, auth_server::Auth};
+pub use crate::proto::{RefreshTokenRequest, RefreshTokenResponse, auth_server::Auth};
 
 #[derive(Debug, Default)]
 pub struct AuthService {}

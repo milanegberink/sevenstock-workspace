@@ -2,7 +2,9 @@ pub mod aws;
 pub mod error;
 pub mod user;
 
-use lib_grpc::AuthClient;
+use std::sync::Arc;
+
+use lib_grpc::{AuthClient, Channel};
 use redis::aio::MultiplexedConnection;
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use tracing::info;
@@ -18,20 +20,12 @@ pub struct ModelManager {
     db: Db,
     redis: MultiplexedConnection,
     http_client: reqwest::Client,
-    // services: Services,
+    services: Arc<Services>,
 }
 
-// pub struct Services {
-//     auth: lib_grpc::AuthClient,
-// }
-
-// impl Services {
-//     pub async fn new() -> Self {
-//         Self {
-//             auth: AuthClient::connect("http://[::1]:50051").await.unwrap(),
-//         }
-//     }
-// }
+pub struct Services {
+    auth: AuthClient<Channel>,
+}
 
 impl ModelManager {
     pub async fn new() -> Result<Self> {
@@ -58,10 +52,15 @@ impl ModelManager {
 
             let http_client = reqwest::Client::new();
 
+            let auth_client = AuthClient::connect("http://[::1]:50051").await.unwrap();
+
+            let services = Services { auth: auth_client };
+
             Ok(Self {
                 db,
                 redis,
                 http_client,
+                services: Arc::new(services),
             })
         }
 
@@ -79,5 +78,8 @@ impl ModelManager {
     }
     pub fn http_client(&self) -> &reqwest::Client {
         &self.http_client
+    }
+    pub fn auth(&self) -> AuthClient<Channel> {
+        self.services.auth.clone()
     }
 }

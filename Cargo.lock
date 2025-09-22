@@ -2325,6 +2325,7 @@ dependencies = [
  "axum-extra",
  "lib-auth",
  "lib-core",
+ "lib-grpc",
  "redis",
  "secrecy",
  "serde",
