@@ -1,5 +1,5 @@
 import type { Result, PromiseResult } from './result.js';
-import { Ok, Err } from './result.js';
+import { ok, err } from './result.js';
 
 class HttpError extends Error {
 	constructor() {
@@ -25,11 +25,11 @@ async function request<T, R>(endpoint: URL, method: Method, body?: T): PromiseRe
 
 	if (!res.ok) {
 		console.log(res);
-		return Err(new HttpError());
+		return err(new HttpError());
 	}
 
 	const data: R = await res.json();
-	return Ok(data);
+	return ok(data);
 }
 
 export const get = async <R>(endpoint: URL): PromiseResult<R> => {

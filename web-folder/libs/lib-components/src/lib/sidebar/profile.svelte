@@ -6,5 +6,5 @@
 {#if userStore.user}
 	<Avatar url={userStore.user.avatar} />
 
-	<h1>{userStore.user.email}</h1>
+	<span class="text-lg font-medium">{userStore.user.ident}</span>
 {/if}

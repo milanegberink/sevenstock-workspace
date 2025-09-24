@@ -2,7 +2,7 @@
 /// <reference lib="webworker" />
 import { decodeJwt } from 'jose';
 import { type SWRequest, SWReqType } from './request.js';
-import { Err, Ok, type Result, type PromiseResult } from '$lib/result.js';
+import { err, ok, type Result, type PromiseResult } from '$lib/result.js';
 import { user } from '$lib/schemas/index.js';
 import type { LoginPayload, LoginResponse, User } from '$lib/schemas/index.js';
 import { post } from '$lib/better-fetch.svelte';
@@ -11,13 +11,17 @@ export * from './request.js';
 export { sendRequest } from './make-request.js';
 
 class Config {
-	token: string;
-	user: User;
-	constructor(token: string, user: User) {
+	token?: string;
+	user?: User;
+	constructor(token?: string, user?: User) {
 		this.token = token;
 		this.user = user;
 	}
+	static new() {
+		return new Config(undefined, undefined);
+	}
 }
+
 interface SWMessageEvent<T> extends ExtendableMessageEvent {
 	data: T;
 }
@@ -29,9 +33,14 @@ enum SWEvent {
 	Activate = 'activate'
 }
 
+interface AuthResponse {
+	access_token: string;
+}
+
 export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
-	let token: string | undefined;
-	let authResult: PromiseResult<{ access_token: string }>;
+	const config = Config.new();
+
+	let authResult: PromiseResult<AuthResponse>;
 
 	self.addEventListener(SWEvent.Install, () => {
 		self.skipWaiting();
@@ -48,8 +57,8 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 		if (!port) return;
 		switch (data.type) {
 			case SWReqType.SetToken: {
-				if (token) {
-					authResult = Promise.resolve(Ok({ access_token: token }));
+				if (config.token) {
+					authResult = Promise.resolve(ok({ access_token: config.token }));
 				} else {
 					authResult = refreshTokens();
 				}
@@ -70,18 +79,25 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 
 		const newToken = result.value.access_token;
 
-		token = newToken;
+		config.token = newToken;
 
-		const userResult = userFromToken(token);
+		const userResult = userFromToken(config.token);
+
+		if (!userResult.ok) {
+			port.postMessage(userResult);
+			return;
+		}
+
+		config.user = userResult.value;
 
 		port.postMessage(userResult);
 	});
 
 	self.addEventListener(SWEvent.Fetch, (event: FetchEvent) => {
-		if (!token) return;
+		if (!config.token) return;
 
 		const headers = new Headers(event.request.headers);
-		headers.append('Authorization', `Bearer ${token}`);
+		headers.append('Authorization', `Bearer ${config.token}`);
 
 		const request = new Request(event.request, {
 			headers
@@ -110,7 +126,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 async function loginUser(payload: LoginPayload): PromiseResult<LoginResponse> {
 	const url = new URL('http://localhost:3000/auth/login');
 	const res = await post<LoginPayload, LoginResponse>(url, payload);
-	if (!res.ok) return Err(new Error('Login fail'));
+	if (!res.ok) return err(new Error('Login fail'));
 
 	return res;
 }
@@ -120,7 +136,7 @@ function userFromToken(token: string): Result<User> {
 
 	const parsedUser = user.safeParse(claims);
 
-	if (parsedUser.error) return Err(new Error(parsedUser.error.message));
+	if (parsedUser.error) return err(new Error(parsedUser.error.message));
 
-	return Ok(parsedUser.data);
+	return ok(parsedUser.data);
 }

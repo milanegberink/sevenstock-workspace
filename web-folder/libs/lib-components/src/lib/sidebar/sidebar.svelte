@@ -8,13 +8,13 @@
 </script>
 
 <!-- Sidebar Content -->
-<nav class="h-full bg-red-500" style="width: {width}px;">
+<nav class="flex h-full flex-col justify-between" style="width: {width}px;">
+	<!-- Profile section -->
+	<Profile />
 	<ul class="flex flex-col gap-2">
 		{#each links as link}
 			<NavLink {link} />
 		{/each}
 	</ul>
-	<!-- Profile section -->
-	<Profile />
 	<div role="separator"></div>
 </nav>

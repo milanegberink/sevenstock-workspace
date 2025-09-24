@@ -1,5 +1,5 @@
 import { type SWRequest } from './request.js';
-import { type PromiseResult, type Result, Err } from '$lib/result.js';
+import { type PromiseResult, type Result, err } from '$lib/result.js';
 
 export async function sendRequest<T>(req: SWRequest): PromiseResult<T> {
 	await navigator.serviceWorker.ready;
@@ -7,7 +7,7 @@ export async function sendRequest<T>(req: SWRequest): PromiseResult<T> {
 	const controller = navigator.serviceWorker.controller;
 
 	if (!controller) {
-		return Err(new Error('No service worker active'));
+		return err(new Error('No service worker active'));
 	}
 
 	const result = new Promise<Result<T>>((resolve) => {

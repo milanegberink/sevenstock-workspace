@@ -6,40 +6,34 @@ use axum_extra::extract::{
     CookieJar,
     cookie::{Cookie, SameSite},
 };
-use lib_auth::pwd::verify_password;
-use lib_auth::token::TokenBuilder;
 use lib_core::model::ModelManager;
-use secrecy::SecretString;
+use lib_grpc::{LoginRequest, Request};
+use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
-use tracing::{debug, info};
-use uuid::Uuid;
 
 pub async fn api_login_handler(
-    State(_mm): State<ModelManager>,
+    State(mm): State<ModelManager>,
     cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
 ) -> Result<(CookieJar, Json<LoginResponse>)> {
     let LoginPayload {
         email,
-        password: pwd_clear,
+        password: pwd_bytes,
     } = payload;
 
-    verify_password("$argon2id$v=19$m=19456,t=2,p=1$CIqj9N/UsqaeW4qt6Y4dGg$PkGeH8Nj6NMO8oe1R8/WKEr14b8IL9nvYUEjVXcG8Yw".to_string(), pwd_clear)?;
+    let req = LoginRequest {
+        email,
+        password: pwd_bytes.expose_secret().into(),
+    };
 
-    let uuid = Uuid::now_v7();
+    let res = mm
+        .auth()
+        .login(Request::new(req))
+        .await
+        .unwrap()
+        .into_inner();
 
-    let access_token = TokenBuilder::access()
-        .sub(&uuid)
-        .email(email)
-        .ident("Milan")
-        .build_async()
-        .await?;
-
-    let refresh_token = TokenBuilder::refresh().sub(&uuid).build_async().await?;
-
-    info!("User logged in with id: {}", &refresh_token);
-
-    let cookie = Cookie::build(("refresh_token", refresh_token))
+    let cookie = Cookie::build(("refresh_token", res.refresh_token))
         .path("/")
         .http_only(true)
         .same_site(SameSite::Lax)
@@ -47,18 +41,20 @@ pub async fn api_login_handler(
 
     let cookies = cookies.add(cookie);
 
-    let response = LoginResponse { access_token };
+    let response = LoginResponse {
+        access_token: res.access_token,
+    };
 
     Ok((cookies, Json(response)))
+}
+
+#[derive(Serialize)]
+pub struct LoginResponse {
+    access_token: String,
 }
 
 #[derive(Deserialize)]
 pub struct LoginPayload {
     email: String,
     password: SecretString,
-}
-
-#[derive(Serialize)]
-pub struct LoginResponse {
-    access_token: String,
 }

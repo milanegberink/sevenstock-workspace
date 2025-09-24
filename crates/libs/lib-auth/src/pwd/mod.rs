@@ -24,12 +24,12 @@ pub fn hash_password(password: SecretString) -> Result<String> {
     Ok(hash)
 }
 
-pub fn verify_password(pw_hash: String, password: SecretString) -> Result<()> {
+pub fn verify_password(pw_hash: String, password: &[u8]) -> Result<()> {
     let argon2 = pwd_config().argon2();
     let parsed_hash = PasswordHash::new(&pw_hash).map_err(|_| Error::PasswordHashFail)?;
 
     let ver_res = argon2
-        .verify_password(password.expose_secret().as_bytes(), &parsed_hash)
+        .verify_password(&password, &parsed_hash)
         .map_err(|_| Error::PasswordHashFail);
 
     ver_res

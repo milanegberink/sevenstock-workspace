@@ -4,6 +4,7 @@ package auth.v1;
 
 service Auth {
     rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+    rpc Login(LoginRequest) returns (LoginResponse) {}
 }
 
 message RefreshTokenRequest {
@@ -11,6 +12,16 @@ message RefreshTokenRequest {
 }
 
 message RefreshTokenResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+}
+
+message LoginRequest {
+    string email = 1;
+    bytes password = 2;
+}
+
+message LoginResponse {
     string access_token = 1;
     string refresh_token = 2;
 }

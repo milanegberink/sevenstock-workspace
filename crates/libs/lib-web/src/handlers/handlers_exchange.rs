@@ -5,12 +5,9 @@ use axum_extra::extract::{
     CookieJar,
     cookie::{Cookie, SameSite},
 };
-use lib_auth::token::{TokenBuilder, TokenType};
 use lib_core::model::ModelManager;
 use lib_grpc::{RefreshTokenRequest, Request};
-use serde::Serialize;
 use serde_json::{Value, json};
-use uuid::Uuid;
 
 pub async fn exchange_refresh(
     State(mm): State<ModelManager>,
@@ -22,17 +19,11 @@ pub async fn exchange_refresh(
         .value()
         .into();
 
-    // let claims = TokenType::Refresh.verify(&refresh_token).await?;
-
     let request = Request::new(RefreshTokenRequest { refresh_token });
 
     let response = mm.auth().refresh_token(request).await.unwrap().into_inner();
 
     println!("{:?}", response);
-
-    // let sub = claims.sub();
-    //
-    let sub = Uuid::now_v7();
 
     let refresh_cookie = Cookie::build(("refresh_token", response.refresh_token))
         .path("/")

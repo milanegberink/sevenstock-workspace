@@ -8,8 +8,8 @@
 	const isActive = $derived(page.url.pathname == href);
 </script>
 
-<li class="bg-gree flex hover:underline">
-	<a {href} class="mx-4 flex flex-1 gap-4 bg-green-500">
+<li class="flex hover:underline">
+	<a {href} class="flex flex-1 gap-4">
 		<Icon />
 		{text}
 	</a>

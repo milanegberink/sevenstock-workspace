@@ -14,11 +14,6 @@ use axum::{
     },
     middleware,
 };
-use lib_auth::token::{
-    TokenType,
-    config::{init_signing_config, init_verifying_config},
-    jwks::{PrivateJwk, PrivateJwkSet, PublicJwk, PublicJwkSet},
-};
 use lib_core::model::ModelManager;
 use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
@@ -40,22 +35,6 @@ async fn main() -> Result<()> {
     let mm = ModelManager::new().await?;
 
     let temp_routes = Router::new().merge(routes_login::routes(mm.clone()));
-
-    let private_jwk = PrivateJwk::new(TokenType::Access);
-
-    let private_jwk_2 = PrivateJwk::new(TokenType::Refresh);
-
-    let mut set = PrivateJwkSet { keys: Vec::new() };
-
-    set.keys.push(private_jwk);
-
-    set.keys.push(private_jwk_2);
-
-    let public_set = PublicJwkSet::from(set.clone());
-
-    init_signing_config(set).unwrap();
-
-    init_verifying_config(public_set).unwrap();
 
     let cors = CorsLayer::new()
         .allow_methods([
