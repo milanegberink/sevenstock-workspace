@@ -23,8 +23,6 @@ pub async fn exchange_refresh(
 
     let response = mm.auth().refresh_token(request).await.unwrap().into_inner();
 
-    println!("{:?}", response);
-
     let refresh_cookie = Cookie::build(("refresh_token", response.refresh_token))
         .path("/")
         .http_only(true)

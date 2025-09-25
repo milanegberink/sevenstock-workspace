@@ -9,21 +9,23 @@ use axum_extra::extract::{
 use lib_core::model::ModelManager;
 use lib_grpc::{LoginRequest, Request};
 use secrecy::{ExposeSecret, SecretString};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde_json::{Value, json};
+use tracing::debug;
 
 pub async fn api_login_handler(
     State(mm): State<ModelManager>,
     cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
-) -> Result<(CookieJar, Json<LoginResponse>)> {
+) -> Result<(CookieJar, Json<Value>)> {
     let LoginPayload {
         email,
-        password: pwd_bytes,
+        password: pwd_clear,
     } = payload;
 
     let req = LoginRequest {
         email,
-        password: pwd_bytes.expose_secret().into(),
+        password: pwd_clear.expose_secret().into(),
     };
 
     let res = mm
@@ -41,16 +43,11 @@ pub async fn api_login_handler(
 
     let cookies = cookies.add(cookie);
 
-    let response = LoginResponse {
-        access_token: res.access_token,
-    };
+    let response = json!({
+        "access_token": res.access_token,
+    });
 
     Ok((cookies, Json(response)))
-}
-
-#[derive(Serialize)]
-pub struct LoginResponse {
-    access_token: String,
 }
 
 #[derive(Deserialize)]

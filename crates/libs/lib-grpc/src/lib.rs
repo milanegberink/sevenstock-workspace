@@ -4,8 +4,6 @@ mod proto {
     tonic::include_proto!("auth.v1");
 }
 
-use std::f64::consts::PI;
-
 pub use crate::error::{Error, Result};
 pub use crate::proto::{LoginRequest, LoginResponse};
 
