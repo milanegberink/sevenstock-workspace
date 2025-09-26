@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
-	import { Library, GalleryHorizontal, LoaderCircle } from '@lucide/svelte';
+	import { ShoppingCart, House, LoaderCircle, ChartArea } from '@lucide/svelte';
 	import { getOrInitUser } from '@lib/core/stores';
 	let { children } = $props();
 
@@ -21,9 +21,9 @@
 		})();
 	});
 	let links: NavLink[] = [
-		{ href: '/', icon: Library, text: 'Home' },
-		{ href: '/products', icon: GalleryHorizontal, text: 'Products' },
-		{ href: '/insights', icon: Library, text: 'Insights' }
+		{ href: '/', icon: House, text: 'Home' },
+		{ href: '/products', icon: ShoppingCart, text: 'Products' },
+		{ href: '/insights', icon: ChartArea, text: 'Insights' }
 	];
 </script>
 

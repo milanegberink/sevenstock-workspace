@@ -1,11 +1,10 @@
 use lib_auth::token::{
-    TokenBuilder, TokenType,
+    TokenType,
     config::{init_signing_config, init_verifying_config},
     jwks::{PrivateJwk, PrivateJwkSet, PublicJwkSet},
 };
 use lib_grpc::{AuthServer, AuthService};
 use tonic::transport::Server;
-use uuid::Uuid;
 mod config;
 
 #[tokio::main]

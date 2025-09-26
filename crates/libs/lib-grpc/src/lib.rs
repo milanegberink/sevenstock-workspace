@@ -29,6 +29,13 @@ impl Auth for AuthService {
     ) -> Result<Response<RefreshTokenResponse>> {
         let input = request.get_ref();
 
+        let RefreshTokenRequest { refresh_token } = input;
+
+        TokenType::Refresh
+            .verify(&refresh_token)
+            .await
+            .map_err(Error::from)?;
+
         let uuid = Uuid::now_v7();
 
         let access_token = TokenBuilder::access()
