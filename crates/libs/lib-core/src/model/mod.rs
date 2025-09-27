@@ -29,7 +29,7 @@ pub struct Services {
 
 impl ModelManager {
     pub async fn new() -> Result<Self> {
-        #[cfg(debug_assertions)]
+        // #[cfg(debug_assertions)]
         {
             let config = config::core_config();
 
@@ -52,7 +52,7 @@ impl ModelManager {
 
             let http_client = reqwest::Client::new();
 
-            let auth_client = AuthClient::connect("http://[::1]:50051").await.unwrap();
+            let auth_client = AuthClient::connect(config.auth_grpc()).await.unwrap();
 
             let services = Services { auth: auth_client };
 
@@ -64,10 +64,10 @@ impl ModelManager {
             })
         }
 
-        #[cfg(not(debug_assertions))]
-        {
-            todo!()
-        }
+        // #[cfg(not(debug_assertions))]
+        // {
+        //     todo!()
+        // }
     }
 
     pub(in crate::model) fn db(&self) -> &Db {

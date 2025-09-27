@@ -6,15 +6,12 @@ edition = "2024"
 [dependencies]
 tokio.workspace = true
 lib-grpc = { path = "../../libs/lib-grpc" }
-lib-utils = { path = "../../libs/lib-utils" }
-
 lib-auth = { path = "../../libs/lib-auth", features = ["private"] }
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
 tonic.workspace = true
 jsonwebtoken = "9.3.1"
-
 
 [lints]
 workspace = true

@@ -25,7 +25,7 @@ async fn main() {
 
     init_verifying_config(public_set).unwrap();
 
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "[::]:50051".parse().unwrap();
 
     let auth_service = AuthService::default();
 

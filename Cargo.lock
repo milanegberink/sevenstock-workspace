@@ -120,7 +120,6 @@ dependencies = [
  "jsonwebtoken",
  "lib-auth",
  "lib-grpc",
- "lib-utils",
  "serde",
  "serde_json",
  "tokio",

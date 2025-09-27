@@ -15,6 +15,7 @@ members = [
     "crates/services/auth-server", "crates/services/aws-lambdas",
 ]
 
+
 [workspace.dependencies]
 sqlx = { version = "0.8.5", features = ["postgres", "uuid", "runtime-tokio"] }
 serde = { version = "1.0.219", features = ["derive"] }

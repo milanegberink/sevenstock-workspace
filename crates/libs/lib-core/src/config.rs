@@ -7,8 +7,9 @@ pub fn core_config() -> &'static CoreConfig {
 }
 
 pub struct CoreConfig {
-    db_url: &'static str,
-    redis_url: &'static str,
+    db_url: String,
+    redis_url: String,
+    auth_grpc: String,
 }
 
 impl CoreConfig {
@@ -18,13 +19,17 @@ impl CoreConfig {
     pub fn redis_url(&self) -> &str {
         &self.redis_url
     }
+    pub fn auth_grpc(&self) -> &str {
+        &self.auth_grpc
+    }
 }
 
 impl CoreConfig {
     fn load_from_env() -> Self {
         Self {
-            db_url: env!("DATABASE_URL"),
-            redis_url: env!("REDIS_URL"),
+            db_url: std::env::var("DATABASE_URL").expect("No database URL found"),
+            redis_url: std::env::var("REDIS_URL").expect("No redis URL found"),
+            auth_grpc: std::env::var("AUTH_GRPC_URL").expect("No redis URL found"),
         }
     }
 }

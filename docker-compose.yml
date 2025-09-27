@@ -1,4 +1,26 @@
 services:
+  auth-server:
+    build:
+      context: .
+      dockerfile: crates/services/auth-server/Dockerfile
+    container_name: auth-server
+    ports:
+      - "50051:50051"
+  web-server:
+    build:
+      context: .
+      dockerfile: crates/services/web-server/Dockerfile
+    container_name: web-server
+    depends_on:
+      - db
+      - valkey
+      - auth-server
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/sevenstock
+      REDIS_URL: redis://valkey:6379/
+      AUTH_GRPC_URL: http://auth-server:50051
   db:
     image: postgres:18beta3
     restart: always
@@ -14,3 +36,6 @@ services:
     restart: always
     ports:
       - "6379:6379"
+# volumes:
+#   db_date:
+#     driver: local
