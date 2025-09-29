@@ -13,12 +13,9 @@ export { sendRequest } from './make-request.js';
 class Config {
 	token?: string;
 	user?: User;
-	constructor(token?: string, user?: User) {
+	constructor({ token, user }: { token?: string; user?: User }) {
 		this.token = token;
 		this.user = user;
-	}
-	static new() {
-		return new Config(undefined, undefined);
 	}
 }
 
@@ -38,7 +35,7 @@ interface AuthResponse {
 }
 
 export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
-	const config = Config.new();
+	const config = new Config({ token: undefined, user: undefined });
 
 	let authResult: PromiseResult<AuthResponse>;
 
@@ -107,7 +104,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	});
 
 	async function refreshTokens(): PromiseResult<LoginResponse> {
-		const url = new URL('http://localhost:3000/auth/exchange-refresh');
+		const url = new URL('http://localhost:5000/auth/exchange-refresh');
 
 		const res = await post<undefined, LoginResponse>(url);
 
@@ -124,7 +121,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 }
 
 async function loginUser(payload: LoginPayload): PromiseResult<LoginResponse> {
-	const url = new URL('http://localhost:3000/auth/login');
+	const url = new URL('http://localhost:5000/auth/login');
 	const res = await post<LoginPayload, LoginResponse>(url, payload);
 	if (!res.ok) return err(new Error('Login fail'));
 

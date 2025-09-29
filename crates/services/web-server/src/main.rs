@@ -26,7 +26,7 @@ use lib_web::middleware::{
 use tower_http::trace::TraceLayer;
 use tracing_appender::rolling;
 
-const PORT: u16 = 3000;
+const PORT: u16 = 5000;
 
 #[tokio::main]
 async fn main() -> Result<()> {

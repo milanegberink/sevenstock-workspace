@@ -16,11 +16,18 @@ services:
       - valkey
       - auth-server
     ports:
-      - "3000:3000"
+      - "5000:5000"
     environment:
       DATABASE_URL: postgres://postgres:password@db:5432/sevenstock
       REDIS_URL: redis://valkey:6379/
       AUTH_GRPC_URL: http://auth-server:50051
+  # front-end:
+  #   build:
+  #     context: ./web-folder
+  #     dockerfile: apps/front-end/Dockerfile
+  #   container_name: front-end
+  #   ports:
+  #     - "3000:3000"
   db:
     image: postgres:18beta3
     restart: always
