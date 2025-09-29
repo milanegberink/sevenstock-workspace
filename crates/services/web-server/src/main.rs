@@ -1,5 +1,7 @@
 mod config;
 
+use std::env;
+
 use crate::web::routes_login;
 
 pub use self::error::{Error, Result};
@@ -25,8 +27,6 @@ use lib_web::middleware::{
 };
 use tower_http::trace::TraceLayer;
 use tracing_appender::rolling;
-
-const PORT: u16 = 5000;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -56,7 +56,12 @@ async fn main() -> Result<()> {
     // .layer(middleware::from_fn(mw_ctx_require))
     // .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));
 
-    let addr = format!("0.0.0.0:{}", PORT);
+    let port: u16 = env::var("BACKEND_PORT")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(5000);
+
+    let addr = format!("0.0.0.0:{}", port);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 

@@ -16,18 +16,25 @@ services:
       - valkey
       - auth-server
     ports:
-      - "5000:5000"
+      - ${BACKEND_PORT}:${BACKEND_PORT}
     environment:
+      BACKEND_PORT: ${BACKEND_PORT}
       DATABASE_URL: postgres://postgres:password@db:5432/sevenstock
       REDIS_URL: redis://valkey:6379/
       AUTH_GRPC_URL: http://auth-server:50051
-  # front-end:
-  #   build:
-  #     context: ./web-folder
-  #     dockerfile: apps/front-end/Dockerfile
-  #   container_name: front-end
-  #   ports:
-  #     - "3000:3000"
+  front-end:
+    build:
+      context: ./web-folder/
+      dockerfile: apps/front-end/Dockerfile
+    container_name: front-end
+    ports:
+      - "5173:5173"
+    environment:
+      BACKEND_URL: http://web-server:${BACKEND_PORT}
+
+    volumes:
+      - ./web-folder/:/app
+      - /app/node_modules
   db:
     image: postgres:18beta3
     restart: always
@@ -43,6 +50,3 @@ services:
     restart: always
     ports:
       - "6379:6379"
-# volumes:
-#   db_date:
-#     driver: local
