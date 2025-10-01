@@ -26,15 +26,16 @@ services:
     build:
       context: ./web-folder/
       dockerfile: apps/front-end/Dockerfile
+      args:
+        PUBLIC_BACKEND_URL: http://localhost:${BACKEND_PORT}
     container_name: front-end
     ports:
       - "5173:5173"
-    environment:
-      BACKEND_URL: http://web-server:${BACKEND_PORT}
-
     volumes:
       - ./web-folder/:/app
       - /app/node_modules
+    environment:
+      BACKEND_URL: http://localhost:${BACKEND_PORT}
   db:
     image: postgres:18beta3
     restart: always

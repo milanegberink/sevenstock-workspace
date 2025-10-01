@@ -51,10 +51,10 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .nest("/auth", temp_routes)
         .layer(TraceLayer::new_for_http())
+        // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
+        // .layer(middleware::from_fn(mw_ctx_require))
+        // .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver))
         .layer(cors);
-    // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
-    // .layer(middleware::from_fn(mw_ctx_require))
-    // .layer(middleware::from_fn_with_state(mm, mw_ctx_resolver));
 
     let port: u16 = env::var("BACKEND_PORT")
         .ok()

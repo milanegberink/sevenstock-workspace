@@ -4,4 +4,6 @@
 
 @theme {
 	--font-sans: 'Inter', sans-serif;
+	--background-color-secondary: #f9f9f9;
+	--border-color-primary: #f2f2f2;
 }

@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 
 class Config {
-	sidebar: { width: number; open: boolean } = $state({
+	sidebar: { width: number; open: boolean; openWidth: number } = $state({
 		open: true,
 		openWidth: 250,
 		get width() {

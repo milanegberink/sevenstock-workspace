@@ -29,7 +29,7 @@ impl CoreConfig {
         Self {
             db_url: std::env::var("DATABASE_URL").expect("No database URL found"),
             redis_url: std::env::var("REDIS_URL").expect("No redis URL found"),
-            auth_grpc: std::env::var("AUTH_GRPC_URL").expect("No redis URL found"),
+            auth_grpc: std::env::var("AUTH_GRPC_URL").expect("No auth GRPC URL found"),
         }
     }
 }

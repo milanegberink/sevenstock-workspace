@@ -1,6 +1,16 @@
+FROM rust:slim AS planner
+
+WORKDIR /app
+
+RUN cargo install cargo-chef
+
+COPY . .
+
+RUN cargo chef prepare --recipe-path recipe.json
+
 FROM rust:slim AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     protobuf-compiler \
@@ -9,9 +19,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+RUN cargo install cargo-chef
 
-# RUN mkdir src && echo "fn main() {}" > src/main.rs
+COPY --from=planner /app/recipe.json .
+
+RUN cargo chef cook --release --recipe-path recipe.json --bin web-server
+
+COPY . .
 
 ENV SQLX_OFFLINE=true
 ENV DATABASE_URL=postgres://postgres:password@127.0.0.1:5432/sevenstock
@@ -30,7 +44,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /usr/local/bin
 
-COPY --from=builder /usr/src/app/target/release/web-server .
+COPY --from=builder /app/target/release/web-server .
 
 ENV RUST_LOG=debug
 

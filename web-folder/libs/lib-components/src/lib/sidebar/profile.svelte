@@ -6,7 +6,7 @@
 
 {#if userStore.user}
 	<div class="flex items-center gap-2">
-		<Avatar url={userStore.user.avatar} />
+		<Avatar url={userStore.user.avatar} letter="M" />
 
 		{#if config.sidebar.open}
 			<span class="text-lg font-medium">{userStore.user.ident}</span>

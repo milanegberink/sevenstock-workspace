@@ -2,19 +2,39 @@ use crate::error::{Error, Result};
 use axum::{
     body::Body,
     extract::{FromRequestParts, State},
-    http::{Request, request::Parts},
+    http::{HeaderValue, Request, request::Parts},
     middleware::Next,
     response::Response,
 };
 use axum_extra::{
     TypedHeader,
     extract::CookieJar,
-    headers::{Authorization, authorization::Bearer},
+    headers::{
+        Authorization,
+        authorization::{Bearer, Credentials},
+    },
 };
 use lib_core::{ctx::Ctx, model::ModelManager};
 use thiserror::Error;
 use tracing::debug;
 use uuid::Uuid;
+
+pub struct ApiKey(pub String);
+
+impl Credentials for ApiKey {
+    const SCHEME: &'static str = "ApiKey";
+
+    fn encode(&self) -> HeaderValue {
+        let value = format!("{} {}", Self::SCHEME, self.0);
+        HeaderValue::from_str(&value).expect("Invalid header value")
+    }
+
+    fn decode(value: &HeaderValue) -> Option<Self> {
+        let s = value.to_str().ok()?;
+        s.strip_prefix(&(Self::SCHEME.to_string() + " "))
+            .map(|key| ApiKey(key.to_string()))
+    }
+}
 
 pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
     debug!("{:<12} - mw_ctx_require - {ctx:?}", "MIDDLEWARE");

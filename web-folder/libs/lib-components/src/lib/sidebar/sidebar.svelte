@@ -2,9 +2,10 @@
 	import NavLink from './nav-link.svelte';
 	import type { NavLink as Link } from './nav-link.js';
 	import Profile from './profile.svelte';
-	let { links }: { links: Link[] } = $props();
+	let { spaces } = $props();
 	import { config } from '@lib/core/stores';
-	import { PanelLeft } from '@lucide/svelte';
+	import { PanelLeft, ChartArea, House } from '@lucide/svelte';
+	import SidebarSpace from './sidebar-space.svelte';
 
 	let sidebar: HTMLElement;
 
@@ -38,19 +39,27 @@
 <div class="flex">
 	<nav
 		bind:this={sidebar}
-		class="flex h-full flex-col justify-between p-2 transition-all"
+		class="bg-secondary flex h-full flex-col items-center transition-[width]"
 		style="width: {config.sidebar.width}px;"
 	>
 		<button
-			class="aspect-square h-10 bg-red-500"
-			onclick={() => (config.sidebar.open = !config.sidebar.open)}><PanelLeft size="20" /></button
+			class="flex aspect-square w-8 items-center justify-center rounded-xl hover:bg-gray-200"
+			onclick={() => (config.sidebar.open = !config.sidebar.open)}
 		>
+			{#if config.sidebar.open}
+				<PanelLeft size="20" />
+			{:else}{/if}
+		</button>
+		{#each spaces as space}
+			<SidebarSpace name={space.name} icon={space.icon}>
+				<ul class="border-primary flex flex-1 flex-col gap-0.5">
+					{#each space.links as link}
+						<NavLink {link} />
+					{/each}
+				</ul>
+			</SidebarSpace>
+		{/each}
 
-		<ul class="flex flex-col gap-0.5">
-			{#each links as link}
-				<NavLink {link} />
-			{/each}
-		</ul>
 		<!-- Profile section -->
 		<Profile />
 	</nav>
@@ -59,7 +68,7 @@
 		role="separator"
 		aria-orientation="vertical"
 		class={[
-			'w-0.5 bg-gray-50 transition-all duration-100 ',
+			'border-primary w-0.5 border-x transition-all duration-100 ',
 			config.sidebar.open && 'hover:cursor-e-resize hover:bg-blue-300'
 		]}
 		onmousedown={handleMouseDown}

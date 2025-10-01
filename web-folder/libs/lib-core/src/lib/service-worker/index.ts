@@ -9,6 +9,7 @@ import { post } from '$lib/better-fetch.svelte';
 export * from '../result.js';
 export * from './request.js';
 export { sendRequest } from './make-request.js';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 class Config {
 	token?: string;
@@ -104,7 +105,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	});
 
 	async function refreshTokens(): PromiseResult<LoginResponse> {
-		const url = new URL('http://localhost:5000/auth/exchange-refresh');
+		const url = new URL(`${PUBLIC_BACKEND_URL}/auth/exchange-refresh`);
 
 		const res = await post<undefined, LoginResponse>(url);
 
@@ -121,7 +122,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 }
 
 async function loginUser(payload: LoginPayload): PromiseResult<LoginResponse> {
-	const url = new URL('http://localhost:5000/auth/login');
+	const url = new URL(`${PUBLIC_BACKEND_URL}/auth/login`);
 	const res = await post<LoginPayload, LoginResponse>(url, payload);
 	if (!res.ok) return err(new Error('Login fail'));
 

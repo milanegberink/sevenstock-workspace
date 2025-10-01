@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
-	import { ShoppingCart, House, LoaderCircle, ChartArea } from '@lucide/svelte';
+	import { ShoppingCart, LayoutDashboard, LoaderCircle, ChartArea, House } from '@lucide/svelte';
 	import { getOrInitUser } from '@lib/core/stores';
 	let { children } = $props();
+	import { navigating } from '$app/state';
+	import { Loader } from 'lib-components';
 
 	let loading = $state<boolean>(true);
 
@@ -20,10 +22,25 @@
 			}
 		})();
 	});
-	let links: NavLink[] = [
-		{ href: '/', icon: House, text: 'Home' },
-		{ href: '/products', icon: ShoppingCart, text: 'Products' },
-		{ href: '/insights', icon: ChartArea, text: 'Insights' }
+	let spaces = [
+		{
+			name: 'Home',
+			icon: House,
+			links: [
+				{ href: '/', icon: LayoutDashboard, text: 'Dashboard' },
+				{ href: '/products', icon: ShoppingCart, text: 'Products' },
+				{ href: '/insights', icon: ChartArea, text: 'Insights' }
+			]
+		},
+		{
+			name: 'Analytics',
+			icon: ChartArea,
+			links: [
+				{ href: '/', icon: LayoutDashboard, text: 'Dashboard' },
+				{ href: '/products', icon: ShoppingCart, text: 'Products' },
+				{ href: '/insights', icon: ChartArea, text: 'Insights' }
+			]
+		}
 	];
 </script>
 
@@ -34,9 +51,13 @@
 		</div>
 	</div>
 {:else}
+	<Loader />
 	<div class="flex h-full w-full">
-		<Sidebar {links} />
+		<Sidebar {spaces} />
 		<div>
+			{#if navigating.to}
+				navigating to {navigating.to.url.pathname}
+			{/if}
 			{@render children()}
 		</div>
 	</div>

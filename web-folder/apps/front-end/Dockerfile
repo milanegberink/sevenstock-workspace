@@ -14,4 +14,7 @@ RUN pnpm store prune && pnpm install --frozen-lockfile
 
 COPY . .
 
+ARG PUBLIC_BACKEND_URL
+ENV PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL
+
 CMD ["pnpm", "--filter", "front-end", "dev"]

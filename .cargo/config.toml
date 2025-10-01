@@ -3,3 +3,4 @@
 RUST_LOG = "debug"
 DATABASE_URL = "postgres://postgres:password@127.0.0.1:5432/sevenstock"
 REDIS_URL = "redis://127.0.0.1"
+AUTH_GRPC_URL = "http://localhost:50051"
