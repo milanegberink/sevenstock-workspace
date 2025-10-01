@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Sidebar, type NavLink } from 'lib-components';
 	import { goto } from '$app/navigation';
-	import { ShoppingCart, LayoutDashboard, LoaderCircle, ChartArea, House } from '@lucide/svelte';
+	import HouseBold from '~icons/ph/house-bold';
 	import { getOrInitUser } from '@lib/core/stores';
 	let { children } = $props();
 	import { navigating } from '$app/state';
@@ -25,20 +25,20 @@
 	let spaces = [
 		{
 			name: 'Home',
-			icon: House,
+			icon: HouseBold,
 			links: [
-				{ href: '/', icon: LayoutDashboard, text: 'Dashboard' },
-				{ href: '/products', icon: ShoppingCart, text: 'Products' },
-				{ href: '/insights', icon: ChartArea, text: 'Insights' }
+				{ href: '/', icon: HouseBold, text: 'Dashboard' },
+				{ href: '/products', icon: HouseBold, text: 'Products' },
+				{ href: '/insights', icon: HouseBold, text: 'Insights' }
 			]
 		},
 		{
 			name: 'Analytics',
-			icon: ChartArea,
+			icon: HouseBold,
 			links: [
-				{ href: '/', icon: LayoutDashboard, text: 'Dashboard' },
-				{ href: '/products', icon: ShoppingCart, text: 'Products' },
-				{ href: '/insights', icon: ChartArea, text: 'Insights' }
+				{ href: '/', icon: HouseBold, text: 'Dashboard' },
+				{ href: '/products', icon: HouseBold, text: 'Products' },
+				{ href: '/insights', icon: HouseBold, text: 'Insights' }
 			]
 		}
 	];
@@ -47,7 +47,7 @@
 {#if loading}
 	<div class="flex h-full w-full items-center justify-center">
 		<div>
-			<LoaderCircle class="animate-spin" size="30" />
+			<HouseBold class="animate-spin" size="30" />
 		</div>
 	</div>
 {:else}

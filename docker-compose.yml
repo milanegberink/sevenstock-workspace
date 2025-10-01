@@ -31,9 +31,10 @@ services:
     container_name: front-end
     ports:
       - "5173:5173"
-    volumes:
-      - ./web-folder/:/app
-      - /app/node_modules
+    # volumes:
+    #   - ./web-folder:/app
+    #   - /app/node_modules
+
     environment:
       BACKEND_URL: http://localhost:${BACKEND_PORT}
   db:

@@ -10,11 +10,13 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 
 COPY apps/front-end/package.json ./apps/front-end/
 
-RUN pnpm store prune && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 ARG PUBLIC_BACKEND_URL
 ENV PUBLIC_BACKEND_URL=$PUBLIC_BACKEND_URL
 
-CMD ["pnpm", "--filter", "front-end", "dev"]
+WORKDIR /app/apps/front-end
+
+CMD ["pnpm", "run", "dev"]

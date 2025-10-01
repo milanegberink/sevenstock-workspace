@@ -4,7 +4,7 @@
 	import Profile from './profile.svelte';
 	let { spaces } = $props();
 	import { config } from '@lib/core/stores';
-	import { PanelLeft, ChartArea, House } from '@lucide/svelte';
+	import HouseBold from '~icons/ph/house-bold';
 	import SidebarSpace from './sidebar-space.svelte';
 
 	let sidebar: HTMLElement;
@@ -47,7 +47,7 @@
 			onclick={() => (config.sidebar.open = !config.sidebar.open)}
 		>
 			{#if config.sidebar.open}
-				<PanelLeft size="20" />
+				<HouseBold size="20" />
 			{:else}{/if}
 		</button>
 		{#each spaces as space}

@@ -47,8 +47,7 @@
 		"svelte"
 	],
 	"dependencies": {
-		"@lucide/svelte": "^0.544.0",
-		"qrcode": "^1.5.4",
-		"@lib/core": "workspace:*"
+		"@lib/core": "workspace:*",
+		"qrcode": "^1.5.4"
 	}
 }
