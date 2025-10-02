@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Sidebar, type NavLink } from 'lib-components';
+	import { Sidebar, LoadBar, type NavLink } from 'lib-components';
+	import CircleNotch from '~icons/ph/circle-notch';
+
 	import { goto } from '$app/navigation';
-	import HouseBold from '~icons/ph/house-bold';
+	import { icons } from '$lib/icons';
 	import { getOrInitUser } from '@lib/core/stores';
 	let { children } = $props();
 	import { navigating } from '$app/state';
-	import { Loader } from 'lib-components';
 
 	let loading = $state<boolean>(true);
 
@@ -25,20 +26,26 @@
 	let spaces = [
 		{
 			name: 'Home',
-			icon: HouseBold,
 			links: [
-				{ href: '/', icon: HouseBold, text: 'Dashboard' },
-				{ href: '/products', icon: HouseBold, text: 'Products' },
-				{ href: '/insights', icon: HouseBold, text: 'Insights' }
+				{ href: '/', icon: icons.house, text: 'Dashboard' },
+				{ href: '/products', icon: icons.shoppingCart, text: 'Products' },
+				{ href: '/insights', icon: icons.chartBar, text: 'Insights' }
 			]
 		},
 		{
 			name: 'Analytics',
-			icon: HouseBold,
 			links: [
-				{ href: '/', icon: HouseBold, text: 'Dashboard' },
-				{ href: '/products', icon: HouseBold, text: 'Products' },
-				{ href: '/insights', icon: HouseBold, text: 'Insights' }
+				{ href: '/', icon: icons.house, text: 'Dashboard' },
+				{ href: '/products', icon: icons.house, text: 'Products' },
+				{ href: '/insights', icon: icons.house, text: 'Insights' }
+			]
+		},
+		{
+			name: 'Analytics',
+			links: [
+				{ href: '/', icon: icons.house, text: 'Dashboard' },
+				{ href: '/products', icon: icons.house, text: 'Products' },
+				{ href: '/insights', icon: icons.house, text: 'Insights' }
 			]
 		}
 	];
@@ -47,11 +54,11 @@
 {#if loading}
 	<div class="flex h-full w-full items-center justify-center">
 		<div>
-			<HouseBold class="animate-spin" size="30" />
+			<CircleNotch class="animate-spin" size="30" />
 		</div>
 	</div>
 {:else}
-	<Loader />
+	<LoadBar />
 	<div class="flex h-full w-full">
 		<Sidebar {spaces} />
 		<div>

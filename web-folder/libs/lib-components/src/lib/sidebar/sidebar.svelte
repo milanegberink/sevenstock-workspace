@@ -4,7 +4,8 @@
 	import Profile from './profile.svelte';
 	let { spaces } = $props();
 	import { config } from '@lib/core/stores';
-	import HouseBold from '~icons/ph/house-bold';
+	import CaretBold from '~icons/ph/caret-down-bold';
+
 	import SidebarSpace from './sidebar-space.svelte';
 
 	let sidebar: HTMLElement;
@@ -47,11 +48,11 @@
 			onclick={() => (config.sidebar.open = !config.sidebar.open)}
 		>
 			{#if config.sidebar.open}
-				<HouseBold size="20" />
-			{:else}{/if}
+				<CaretBold />
+			{/if}
 		</button>
 		{#each spaces as space}
-			<SidebarSpace name={space.name} icon={space.icon}>
+			<SidebarSpace name={space.name}>
 				<ul class="border-primary flex flex-1 flex-col gap-0.5">
 					{#each space.links as link}
 						<NavLink {link} />
