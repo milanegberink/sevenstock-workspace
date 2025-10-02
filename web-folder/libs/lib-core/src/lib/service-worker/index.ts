@@ -92,7 +92,7 @@ export function mountServiceWorker(self: ServiceWorkerGlobalScope) {
 	});
 
 	self.addEventListener(SWEvent.Fetch, (event: FetchEvent) => {
-		if (!config.token) return;
+		if (!config.token || event.request.url !== PUBLIC_BACKEND_URL) return;
 
 		const headers = new Headers(event.request.headers);
 		headers.append('Authorization', `Bearer ${config.token}`);

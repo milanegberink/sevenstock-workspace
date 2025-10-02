@@ -54,6 +54,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0674a1ddeecb70197781e945de4b3b8ffb61fa939a5597bcf48503737663100"
 
 [[package]]
+name = "api-gateway"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "lib-auth",
+ "lib-core",
+ "lib-utils",
+ "lib-web",
+ "redis",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.16",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
 name = "argon2"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4742,28 +4764,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a05d73b933a847d6cccdda8f838a22ff101ad9bf93e33684f39c1f5f0eece3d"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "web-server"
-version = "0.1.0"
-dependencies = [
- "axum",
- "lib-auth",
- "lib-core",
- "lib-utils",
- "lib-web",
- "redis",
- "secrecy",
- "serde",
- "serde_json",
- "thiserror 2.0.16",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-appender",
- "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]

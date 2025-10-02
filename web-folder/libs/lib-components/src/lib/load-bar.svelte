@@ -23,7 +23,7 @@
 
 {#if visible}
 	<div
-		class="fixed top-0 left-0 h-1.5 w-full origin-left bg-gradient-to-br from-blue-500 to-blue-300"
+		class="fixed top-0 left-0 h-1 w-full origin-left bg-orange-600"
 		style="transform: scaleX({progress.current / 100});"
 	></div>
 {/if}

@@ -23,16 +23,16 @@ RUN cargo install cargo-chef
 
 COPY --from=planner /app/recipe.json .
 
-RUN cargo chef cook --release --recipe-path recipe.json --bin web-server
+RUN cargo chef cook --release --recipe-path recipe.json --bin api-gateway
 
 COPY . .
 
 ENV SQLX_OFFLINE=true
 ENV DATABASE_URL=postgres://postgres:password@127.0.0.1:5432/sevenstock
 
-RUN cargo build --release --bin web-server
+RUN cargo build --release --bin api-gateway
 
-COPY crates/services/web-server/src ./crates/services/web-server/src
+COPY crates/services/api-gateway/src ./crates/services/api-gateway/src
 
 FROM debian:trixie-slim
 
@@ -44,8 +44,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /usr/local/bin
 
-COPY --from=builder /app/target/release/web-server .
+COPY --from=builder /app/target/release/api-gateway .
 
 ENV RUST_LOG=debug
 
-CMD ["./web-server"]
+CMD ["./api-gateway"]

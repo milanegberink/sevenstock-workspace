@@ -3,10 +3,15 @@
 	import CircleNotch from '~icons/ph/circle-notch';
 
 	import { goto } from '$app/navigation';
-	import { icons } from '$lib/icons';
 	import { getOrInitUser } from '@lib/core/stores';
 	let { children } = $props();
 	import { navigating } from '$app/state';
+
+	import HouseBold from '~icons/ph/house-bold';
+	import ChartBar from '~icons/ph/chart-bar-bold';
+	import ShoppingCart from '~icons/ph/shopping-cart-simple-bold';
+	import ChartLineUp from '~icons/ph/chart-line-up-bold';
+	import TrendUp from '~icons/ph/trend-up-bold';
 
 	let loading = $state<boolean>(true);
 
@@ -27,25 +32,25 @@
 		{
 			name: 'Home',
 			links: [
-				{ href: '/', icon: icons.house, text: 'Dashboard' },
-				{ href: '/products', icon: icons.shoppingCart, text: 'Products' },
-				{ href: '/insights', icon: icons.chartBar, text: 'Insights' }
+				{ href: '/', icon: HouseBold, text: 'Dashboard' },
+				{ href: '/products', icon: ShoppingCart, text: 'Products' },
+				{ href: '/insights', icon: ChartBar, text: 'Insights' }
 			]
 		},
 		{
 			name: 'Analytics',
 			links: [
-				{ href: '/', icon: icons.house, text: 'Dashboard' },
-				{ href: '/products', icon: icons.house, text: 'Products' },
-				{ href: '/insights', icon: icons.house, text: 'Insights' }
+				{ href: '/analytics', icon: ChartBar, text: 'Analytics' },
+				{ href: '/products', icon: TrendUp, text: 'Trends' },
+				{ href: '/insights', icon: ChartBar, text: 'Insights' }
 			]
 		},
 		{
-			name: 'Analytics',
+			name: 'Sales',
 			links: [
-				{ href: '/', icon: icons.house, text: 'Dashboard' },
-				{ href: '/products', icon: icons.house, text: 'Products' },
-				{ href: '/insights', icon: icons.house, text: 'Insights' }
+				{ href: '/analytics', icon: ChartLineUp, text: 'Leads' },
+				{ href: '/products', icon: ShoppingCart, text: 'Products' },
+				{ href: '/insights', icon: ChartBar, text: 'Insights' }
 			]
 		}
 	];

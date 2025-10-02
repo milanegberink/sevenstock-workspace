@@ -6,11 +6,11 @@ services:
     container_name: auth-server
     ports:
       - "50051:50051"
-  web-server:
+  api-gateway:
     build:
       context: .
-      dockerfile: crates/services/web-server/Dockerfile
-    container_name: web-server
+      dockerfile: crates/services/api-gateway/Dockerfile
+    container_name: api-gateway
     depends_on:
       - db
       - valkey

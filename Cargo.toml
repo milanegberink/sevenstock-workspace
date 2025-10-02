@@ -9,7 +9,7 @@ members = [
     "crates/libs/lib-web",
     "crates/libs/lib-utils",
     "crates/libs/lib-proc-macros",
-    "crates/services/web-server",
+    "crates/services/api-gateway",
     "crates/libs/lib-proc-macros",
     "crates/libs/lib-grpc",
     "crates/services/auth-server", "crates/services/aws-lambdas",
