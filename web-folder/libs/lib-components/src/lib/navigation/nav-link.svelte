@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { NavLink } from './nav-link.js';
 	import { page } from '$app/state';
 	const { href, text, icon } = $props();
-	import { config } from '@lib/core/stores';
 	import { fade } from 'svelte/transition';
+	import { getSidebarContext } from './context.js';
 
-	const isActive = $derived(page.url.pathname == href);
+	const open = getSidebarContext();
+
+	const isActive = $derived(page.url.pathname.startsWith(href));
 </script>
 
 <li
@@ -23,7 +24,7 @@
 			{@render icon()}
 		</div>
 
-		{#if config.sidebar.open}
+		{#if open()}
 			<span transition:fade={{ duration: 50 }} class="text-shadow-2xs text-shadow-white"
 				>{text}</span
 			>

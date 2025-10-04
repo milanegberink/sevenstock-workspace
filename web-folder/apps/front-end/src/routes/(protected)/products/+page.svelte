@@ -1,11 +1,10 @@
 <script>
 	import { userStore } from '@lib/core/stores';
+	import { Header } from 'lib-components';
 
 	async function onclick() {
 		console.log(userStore.user);
 	}
 </script>
 
-<button {onclick}>X</button>
-
-<h1>{JSON.stringify(userStore.user)}</h1>
+<Header name="Products" />

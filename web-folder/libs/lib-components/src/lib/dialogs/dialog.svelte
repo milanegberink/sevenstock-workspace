@@ -1,6 +1,8 @@
 <script lang="ts">
 	let { trigger, content } = $props();
 
+	let id = 'settings-dialog';
+
 	let dialog: HTMLDialogElement;
 </script>
 

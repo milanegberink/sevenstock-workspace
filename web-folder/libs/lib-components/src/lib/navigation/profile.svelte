@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { userStore } from '@lib/core/stores';
 	import Avatar from '../avatar.svelte';
-	import { config } from '@lib/core/stores';
+
+	import { getSidebarContext } from './context.js';
+
+	const open = getSidebarContext();
 </script>
 
 {#if userStore.user}
@@ -10,7 +13,7 @@
 			<Avatar url={userStore.user.avatar} letter="M" />
 		</div>
 
-		{#if config.sidebar.open}
+		{#if open()}
 			<span class="-ml-2">{userStore.user.ident}</span>
 		{/if}
 	</div>

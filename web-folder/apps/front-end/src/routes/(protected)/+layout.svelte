@@ -32,9 +32,8 @@
 		{
 			name: 'Home',
 			links: [
-				{ href: '/', icon: HouseBold, text: 'Dashboard' },
-				{ href: '/products', icon: ShoppingCart, text: 'Products' },
-				{ href: '/insights', icon: ChartBar, text: 'Insights' }
+				{ href: '/overview', icon: HouseBold, text: 'Overview' },
+				{ href: '/products', icon: ShoppingCart, text: 'Products' }
 			]
 		},
 		{
@@ -46,7 +45,7 @@
 			]
 		},
 		{
-			name: 'Sales',
+			name: 'Advertising',
 			links: [
 				{ href: '/analytics', icon: ChartLineUp, text: 'Leads' },
 				{ href: '/products', icon: ShoppingCart, text: 'Products' },
@@ -57,19 +56,16 @@
 </script>
 
 {#if loading}
-	<div class="flex h-full w-full items-center justify-center">
+	<div class="flex size-full items-center justify-center">
 		<div>
 			<CircleNotch class="animate-spin" size="30" />
 		</div>
 	</div>
 {:else}
 	<LoadBar />
-	<div class="flex h-full w-full">
+	<div class="flex size-full">
 		<Sidebar {spaces} />
-		<div>
-			{#if navigating.to}
-				navigating to {navigating.to.url.pathname}
-			{/if}
+		<div class="flex-1">
 			{@render children()}
 		</div>
 	</div>
