@@ -1,24 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	const { href, text, icon } = $props();
 	import { fade } from 'svelte/transition';
+	let { onclick, href, text, icon, ...props } = $props();
+
 	import { getSidebarContext } from './context.js';
 
 	const open = getSidebarContext();
 
-	const isActive = $derived(page.url.pathname.startsWith(href));
+	const tag = href ? 'a' : 'button';
 </script>
 
-<li
-	class={[
-		'group rounded-md transition-colors hover:bg-gray-100',
-		isActive && 'text-black',
-		!isActive && 'text-black/70'
-	]}
->
-	<a
+<li class={['group rounded-md text-black transition-colors hover:bg-gray-100', props.class]}>
+	<svelte:element
+		this={tag}
+		{onclick}
 		{href}
-		class="group flex h-10 flex-1 items-center transition-transform group-active:scale-[.98]"
+		role={tag === 'a' ? 'link' : 'button'}
+		class="group flex h-10 w-full items-center transition-transform group-active:scale-[.98]"
 	>
 		<div class="flex aspect-square h-full items-center justify-center">
 			{@render icon()}
@@ -35,5 +33,5 @@
 				{text}
 			</span>
 		{/if}
-	</a>
+	</svelte:element>
 </li>

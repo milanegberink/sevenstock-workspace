@@ -1,7 +1,7 @@
 <script>
 	let { children } = $props();
 	import { VerticalSeparator } from '$lib/separators/index.js';
-	import NavLink from './nav-link.svelte';
+	import NavLink from './link.svelte';
 	import MenuSpace from './menu-space.svelte';
 	import KeyBold from '~icons/ph/key-bold';
 	import SettingsIcon from '~icons/ph/gear-six-bold';

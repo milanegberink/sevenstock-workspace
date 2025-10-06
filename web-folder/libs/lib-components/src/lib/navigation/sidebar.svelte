@@ -1,6 +1,5 @@
 <script lang="ts">
-	import NavLink from './nav-link.svelte';
-	import NavButton from './nav-button.svelte';
+	import NavLink from './link.svelte';
 	import { setSidebarContext } from './context.js';
 	import Profile from './profile.svelte';
 	let { spaces } = $props();
@@ -64,12 +63,12 @@
 		<SidebarSpace>
 			<ul class="border-primary flex flex-1 flex-col gap-0.5">
 				<AlertDialog>
-					{#snippet trigger({ onclick })}
-						<NavButton {onclick} text={'Settings'}>
+					{#snippet trigger({ onclick, isOpen })}
+						<NavLink {onclick} text={'Settings'} class={[isOpen && 'bg-gray-200']}>
 							{#snippet icon()}
 								<SettingsIcon />
 							{/snippet}
-						</NavButton>
+						</NavLink>
 					{/snippet}
 					{#snippet content({ close })}
 						<div class="h-[70vh] w-[70vw] overflow-hidden rounded-sm bg-white">
