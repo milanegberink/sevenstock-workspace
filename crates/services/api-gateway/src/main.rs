@@ -2,7 +2,7 @@ mod config;
 
 use std::env;
 
-use crate::web::routes_login;
+use crate::web::{routes_api_keys, routes_login};
 
 pub use self::error::{Error, Result};
 
@@ -34,7 +34,9 @@ async fn main() -> Result<()> {
 
     let mm = ModelManager::new().await?;
 
-    let temp_routes = Router::new().merge(routes_login::routes(mm.clone()));
+    let temp_routes = Router::new()
+        .merge(routes_api_keys::routes(mm.clone()))
+        .merge(routes_login::routes(mm.clone()));
 
     let cors = CorsLayer::new()
         .allow_methods([
@@ -50,6 +52,7 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .nest("/auth", temp_routes)
+        .merge(routes_api_keys::routes(mm.clone()))
         .layer(TraceLayer::new_for_http())
         // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
         // .layer(middleware::from_fn(mw_ctx_require))
