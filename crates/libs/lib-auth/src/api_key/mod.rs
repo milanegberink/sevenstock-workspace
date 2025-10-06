@@ -2,13 +2,17 @@ mod error;
 
 use lib_utils::b64::b64u_encode;
 use rand::{RngCore, rngs::OsRng};
+use uuid::Uuid;
 
 use self::error::{Error, Result};
 
 pub fn generate_api_key() -> String {
     let mut raw = [0u8; 32];
     OsRng.fill_bytes(&mut raw);
-    b64u_encode(raw)
+    let uuid = Uuid::now_v7();
+    let secret = b64u_encode(raw);
+    let key = format!("{}.{}", uuid, secret);
+    key
 }
 
 pub fn hash_api_key(key: &str) -> String {

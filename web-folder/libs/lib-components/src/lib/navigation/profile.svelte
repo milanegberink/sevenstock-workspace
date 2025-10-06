@@ -14,7 +14,10 @@
 		</div>
 
 		{#if open()}
-			<span class="-ml-2">{userStore.user.ident}</span>
+			<div class="gap flex flex-col">
+				<span class="-ml-2 text-sm">{userStore.user.ident}</span>
+				<span class="-mt-1 -ml-2 text-sm text-gray-600">{userStore.user.email}</span>
+			</div>
 		{/if}
 	</div>
 {/if}

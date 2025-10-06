@@ -7,11 +7,9 @@
 	const open = getSidebarContext();
 </script>
 
-<div class="flex w-full flex-col p-2 text-black/60">
+<div class="flex w-full flex-col p-1.5">
 	{#if open() && name}
-		<span transition:slide={{ duration: 200 }} class="p-2 text-sm font-medium select-none"
-			>{name}</span
-		>
+		<span transition:slide={{ duration: 200 }} class="p-2 text-sm select-none">{name}</span>
 	{/if}
 
 	{@render children()}
