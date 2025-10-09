@@ -8,3 +8,5 @@ workspace = true
 
 [dependencies]
 base64 = "0.22.1"
+time = "0.3.44"
+thiserror.workspace = true

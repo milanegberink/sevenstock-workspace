@@ -1,15 +1,15 @@
+pub mod api_keys;
 pub mod aws;
+pub mod base;
 pub mod error;
+pub mod store;
 pub mod user;
-
-use std::sync::Arc;
-
-use lib_grpc::{AuthClient, Channel};
 use redis::aio::MultiplexedConnection;
-use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
+use sqlx::{Pool, Postgres};
 use tracing::info;
 
-use crate::config;
+use crate::model::store::dbx::Dbx;
+use crate::{config, model::store::new_db_pool};
 
 pub use self::error::{Error, Result};
 
@@ -17,29 +17,23 @@ pub type Db = Pool<Postgres>;
 
 #[derive(Clone)]
 pub struct ModelManager {
-    db: Db,
+    dbx: Dbx,
     redis: MultiplexedConnection,
     http_client: reqwest::Client,
-    services: Arc<Services>,
-}
-
-pub struct Services {
-    auth: AuthClient<Channel>,
 }
 
 impl ModelManager {
     pub async fn new() -> Result<Self> {
-        // #[cfg(debug_assertions)]
         {
             let config = config::core_config();
 
-            let db = PgPoolOptions::new().connect(config.db_url()).await?;
+            let db_pool = new_db_pool()
+                .await
+                .map_err(|ex| Error::CantCreateModelManagerProvider(ex.to_string()))?;
 
-            let pg_version = sqlx::query!("SELECT version()")
-                .fetch_one(&db)
-                .await?
-                .version
-                .unwrap();
+            let dbx = Dbx::new(db_pool, false)?;
+
+            let pg_version = "1";
 
             info!(
                 "Connected to database with Postgres version: {} ",
@@ -52,34 +46,29 @@ impl ModelManager {
 
             let http_client = reqwest::Client::new();
 
-            let auth_client = AuthClient::connect(config.auth_grpc()).await.unwrap();
-
-            let services = Services { auth: auth_client };
-
             Ok(Self {
-                db,
+                dbx,
                 redis,
                 http_client,
-                services: Arc::new(services),
             })
         }
-
-        // #[cfg(not(debug_assertions))]
-        // {
-        //     todo!()
-        // }
     }
 
-    pub(in crate::model) fn db(&self) -> &Db {
-        &self.db
+    pub fn new_with_txn(&self) -> Result<ModelManager> {
+        Ok(ModelManager {
+            dbx: Dbx::new(self.dbx.db().clone(), true)?,
+            redis: self.redis(),
+            http_client: self.http_client.clone(),
+        })
+    }
+
+    pub(in crate::model) fn dbx(&self) -> &Dbx {
+        &self.dbx
     }
     pub fn redis(&self) -> MultiplexedConnection {
         self.redis.clone()
     }
     pub fn http_client(&self) -> &reqwest::Client {
         &self.http_client
-    }
-    pub fn auth(&self) -> AuthClient<Channel> {
-        self.services.auth.clone()
     }
 }

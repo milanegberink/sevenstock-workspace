@@ -9,6 +9,8 @@ pub use crate::proto::{LoginRequest, LoginResponse};
 
 use lib_auth::pwd::verify_password;
 use lib_auth::token::{TokenBuilder, TokenType};
+use lib_core::ctx::Ctx;
+use lib_core::model::user::{UserBmc, UserForLogin};
 pub use proto::auth_client::AuthClient;
 pub use proto::auth_server::AuthServer;
 use tonic::Response;
@@ -17,9 +19,11 @@ pub use tonic::{Request, Status};
 use uuid::Uuid;
 
 pub use crate::proto::{RefreshTokenRequest, RefreshTokenResponse, auth_server::Auth};
+use lib_core::model::ModelManager;
 
-#[derive(Debug, Default)]
-pub struct AuthService {}
+pub struct AuthService {
+    mm: ModelManager,
+}
 
 #[tonic::async_trait]
 impl Auth for AuthService {
@@ -68,19 +72,28 @@ impl Auth for AuthService {
             password: pwd_bytes,
         } = input;
 
-        verify_password("$argon2id$v=19$m=19456,t=2,p=1$CIqj9N/UsqaeW4qt6Y4dGg$PkGeH8Nj6NMO8oe1R8/WKEr14b8IL9nvYUEjVXcG8Yw".to_string(), pwd_bytes).map_err(Error::from)?;
-        let uuid = Uuid::now_v7();
+        let ctx = Ctx::root_ctx();
+
+        let user: UserForLogin = UserBmc::first_by_email(&ctx, &self.mm, &email)
+            .await
+            .map_err(Error::from)?;
+
+        let Some(pwd) = user.pwd else {
+            return Err(Status::unauthenticated("C"));
+        };
+
+        verify_password(pwd, pwd_bytes).map_err(Error::from)?;
 
         let access_token = TokenBuilder::access()
-            .sub(&uuid)
+            .sub(&user.id)
             .email(email)
-            .ident("Milan")
+            .ident(user.username)
             .build_async()
             .await
             .map_err(Error::from)?;
 
         let refresh_token = TokenBuilder::refresh()
-            .sub(&uuid)
+            .sub(&user.id)
             .build_async()
             .await
             .map_err(Error::from)?;

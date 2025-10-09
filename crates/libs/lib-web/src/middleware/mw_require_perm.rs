@@ -1,16 +1,16 @@
-use crate::{error::Result, middleware::mw_auth::CtxW, services::Services};
 use axum::{body::Body, extract::State, http::Request, middleware::Next, response::Response};
-use tracing::info;
+use uuid::Uuid;
 
-pub async fn mw_rate_limiter(
+use crate::{Result, middleware::mw_auth::CtxW, permission::Permission, services::Services};
+
+pub async fn mw_require_permissions<const N: usize>(
+    permissions: [Permission; N],
     State(mm): State<Services>,
     ctx: CtxW,
     req: Request<Body>,
     next: Next,
 ) -> Result<Response> {
     let ctx = ctx.0;
-
-    info!("{:?}", ctx);
 
     Ok(next.run(req).await)
 }

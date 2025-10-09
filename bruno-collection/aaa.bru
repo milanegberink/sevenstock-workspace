@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: https://onellm.dev/api
+  url: http://localhost:5000/auth/get-user
   body: json
   auth: inherit
 }
@@ -15,14 +15,10 @@ headers {
 }
 
 body:json {
-  {
-    "model": "GPT-4.1",
-    "messages": [
-      {
-        "role": "user",
-        "content": "Tell me a joke about computers."
-      }
-    ],
-    "max_tokens": 50
-  }
+  // {
+  //   "username":"milanegberink2",
+  //   "pwd_clear":"welkom123"
+  // }
+  
+  {"id": "0199c3a5-f82c-7699-90bc-97572667991b"}
 }

@@ -1,8 +1,10 @@
 use crate::error::{Error, Result};
+use crate::services::Services;
+use axum::http::HeaderValue;
 use axum::{
     body::Body,
     extract::{FromRequestParts, State},
-    http::{HeaderValue, Request, request::Parts},
+    http::{Request, request::Parts},
     middleware::Next,
     response::Response,
 };
@@ -14,10 +16,18 @@ use axum_extra::{
         authorization::{Bearer, Credentials},
     },
 };
-use lib_core::{ctx::Ctx, model::ModelManager};
+use lib_core::ctx::Ctx;
 use thiserror::Error;
-use tracing::debug;
+use tracing::{debug, info};
 use uuid::Uuid;
+
+pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
+    debug!("{:<12} - mw_ctx_require - {ctx:?}", "MIDDLEWARE");
+
+    ctx?;
+
+    Ok(next.run(req).await)
+}
 
 pub struct ApiKey(pub String);
 
@@ -36,32 +46,27 @@ impl Credentials for ApiKey {
     }
 }
 
-pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
-    debug!("{:<12} - mw_ctx_require - {ctx:?}", "MIDDLEWARE");
-
-    ctx?;
-
-    Ok(next.run(req).await)
-}
-
 pub async fn mw_ctx_resolver(
-    State(mm): State<ModelManager>,
+    State(mm): State<Services>,
     token_hdr: TypedHeader<Authorization<Bearer>>,
+    api_key: TypedHeader<Authorization<ApiKey>>,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
     debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
-    debug!("{}", token_hdr.token());
+    let token = token_hdr.token();
 
-    let ctx_ext_result = ctx_resolve(mm, token_hdr.token()).await;
+    debug!("{}", token);
+
+    let ctx_ext_result = ctx_resolve(mm, token).await;
 
     req.extensions_mut().insert(ctx_ext_result);
 
     next.run(req).await
 }
 
-async fn ctx_resolve(_mm: ModelManager, _token: &str) -> CtxExtResult {
+async fn ctx_resolve(_mm: Services, _token: &str) -> CtxExtResult {
     Ctx::new(Uuid::now_v7())
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
@@ -105,4 +110,18 @@ pub enum CtxExtError {
     CtxNotInRequestExt,
     #[error("Token not in cookie: {0}")]
     CtxCreateFail(String),
+}
+
+pub async fn mw_require_permission(
+    permission: impl Into<String>,
+    State(services): State<Services>,
+    ctx: CtxW,
+    req: Request<Body>,
+    next: Next,
+) -> Result<Response> {
+    let ctx = ctx.0;
+
+    info!("{:?}", ctx);
+
+    Ok(next.run(req).await)
 }

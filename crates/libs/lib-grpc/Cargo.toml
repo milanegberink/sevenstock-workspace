@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 lib-auth = { path = "../../libs/lib-auth" }
+lib-core = { path = "../../libs/lib-core" }
 tokio.workspace = true
 thiserror.workspace = true
 tonic.workspace = true

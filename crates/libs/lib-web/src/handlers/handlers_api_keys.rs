@@ -1,27 +1,30 @@
-use crate::error::Result;
+use crate::{error::Result, services::Services};
 
 use axum::{Json, extract::State};
 use lib_auth::api_key::{self, generate_api_key, hash_api_key};
-use lib_core::model::ModelManager;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tracing::debug;
 
 use crate::middleware::mw_auth::CtxW;
 
-pub async fn gen_api_key(State(mm): State<ModelManager>) -> Result<Json<Value>> {
+pub async fn new_api_key(State(services): State<Services>) -> Result<Json<Value>> {
     // let ctx = ctx.0;
 
     let api_key = generate_api_key();
 
-    let hash = hash_api_key(&api_key);
+    let hash = hash_api_key(api_key);
     debug!("{}", hash);
 
     let res = json!({
-        "api_key": api_key
+        "api_key": "x"
     });
 
     Ok(Json(res))
+}
+
+pub async fn delete_api_key(State(services): State<Services>) -> Result<Json<Value>> {
+    todo!();
 }
 
 #[derive(Deserialize)]

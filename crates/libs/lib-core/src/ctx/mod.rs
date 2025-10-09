@@ -5,17 +5,22 @@ pub use self::error::{Error, Result};
 
 #[derive(Debug, Clone)]
 pub struct Ctx {
-    sub: Uuid,
+    user_id: Uuid,
 }
 
 impl Ctx {
-    pub fn new(sub: Uuid) -> Result<Self> {
-        Ok(Self { sub })
+    pub fn new(user_id: Uuid) -> Result<Self> {
+        Ok(Self { user_id })
+    }
+    pub fn root_ctx() -> Self {
+        Ctx {
+            user_id: Uuid::nil(),
+        }
     }
 }
 
 impl Ctx {
-    pub fn sub(&self) -> &Uuid {
-        &self.sub
+    pub fn user_id(&self) -> Uuid {
+        self.user_id
     }
 }

@@ -8,11 +8,10 @@ members = [
     "crates/libs/lib-core",
     "crates/libs/lib-web",
     "crates/libs/lib-utils",
-    "crates/libs/lib-proc-macros",
     "crates/services/api-gateway",
-    "crates/libs/lib-proc-macros",
     "crates/libs/lib-grpc",
-    "crates/services/auth-server", "crates/services/aws-lambdas",
+    "crates/services/auth-server",
+    "crates/services/aws-lambdas",
 ]
 
 
@@ -34,3 +33,5 @@ aws-sdk-s3 = "1.103.0"
 aws-sdk-elasticache = "1.87.0"
 tokio = { version = "1.45.0", features = ["full"] }
 tonic = "0.14.1"
+sea-query = "0.32.6"
+sea-query-binder = { version = "0.7.0", features = ["with-uuid", "sqlx-postgres", "with-time"] }

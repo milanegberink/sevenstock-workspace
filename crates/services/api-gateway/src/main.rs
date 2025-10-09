@@ -21,9 +21,13 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 mod error;
-use lib_web::middleware::{
-    mw_auth::{mw_ctx_require, mw_ctx_resolver},
-    mw_rate_limiter::mw_rate_limiter,
+use lib_web::{
+    middleware::{
+        mw_auth::{mw_ctx_require, mw_ctx_resolver},
+        mw_rate_limiter::mw_rate_limiter,
+        mw_require_perm::mw_require_permissions,
+    },
+    permission::Permission,
 };
 use tower_http::trace::TraceLayer;
 use tracing_appender::rolling;

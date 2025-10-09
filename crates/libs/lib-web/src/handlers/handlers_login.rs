@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::{error::Result, services::Services};
 
 use axum::Json;
 use axum::extract::State;
@@ -6,15 +6,13 @@ use axum_extra::extract::{
     CookieJar,
     cookie::{Cookie, SameSite},
 };
-use lib_core::model::ModelManager;
 use lib_grpc::{LoginRequest, Request};
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use serde_json::{Value, json};
-use tracing::debug;
 
 pub async fn api_login_handler(
-    State(mm): State<ModelManager>,
+    State(services): State<Services>,
     cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
 ) -> Result<(CookieJar, Json<Value>)> {
@@ -28,7 +26,7 @@ pub async fn api_login_handler(
         password: pwd_clear.expose_secret().into(),
     };
 
-    let res = mm
+    let res = services
         .auth()
         .login(Request::new(req))
         .await

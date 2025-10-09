@@ -7,9 +7,6 @@ edition = "2024"
 [dependencies]
 lib-utils = { path = "../../libs/lib-utils" }
 lib-auth = { path = "../../libs/lib-auth" }
-lib-proc-macros = { path = "../../libs/lib-proc-macros" }
-lib-grpc = { path = "../../libs/lib-grpc" }
-
 
 sqlx = { workspace = true }
 serde = { workspace = true }
@@ -18,17 +15,18 @@ serde_json = { workspace = true }
 miette = { workspace = true }
 reqwest = { workspace = true }
 secrecy = { workspace = true }
-axum = { workspace = true }
 tracing = { workspace = true }
 
 
 uuid = { workspace = true }
 thiserror = { workspace = true }
 tokio = "1.45.0"
-sea-query = "0.32.6"
+sea-query.workspace = true
+sea-query-binder.workspace = true
 aws-config = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 aws-sdk-elasticache = { workspace = true }
+modql = { version = "0.4.1", features = ["with-sea-query"] }
 
 [lints]
 workspace = true

@@ -11,6 +11,9 @@ pub enum Error {
 
     #[error(transparent)]
     Pwd(#[from] pwd::Error),
+
+    #[error(transparent)]
+    Model(#[from] lib_core::model::Error),
 }
 
 impl From<Error> for Status {
@@ -18,6 +21,7 @@ impl From<Error> for Status {
         match err {
             Error::Token(_inner) => Status::unauthenticated("Unauthorized"),
             Error::Pwd(_inner) => Status::unauthenticated("Unauthorized"),
+            Error::Model(_inner) => Status::unauthenticated("Unauthorized"),
         }
     }
 }
