@@ -1,33 +1,34 @@
 use crate::{error::Result, services::Services};
 
 use axum::{Json, extract::State};
-use lib_core::ctx::Ctx;
+use lib_core::{ctx::Ctx, model::user::UserForCreate};
+use lib_grpc::SignUpRequest;
+use secrecy::ExposeSecret;
 use serde_json::{Value, json};
-use uuid::Uuid;
 
 pub async fn api_signup(
-    State(mm): State<Services>,
+    State(services): State<Services>,
     Json(user_c): Json<UserForCreate>,
 ) -> Result<Json<Value>> {
-    let ctx = Ctx::root_ctx();
+    let UserForCreate {
+        username,
+        email,
+        pwd_clear,
+    } = user_c;
+
+    let res = services
+        .auth()
+        .sign_up(SignUpRequest {
+            username,
+            email,
+            pwd_clear: pwd_clear.expose_secret().into(),
+        })
+        .await?
+        .into_inner();
 
     let res = json!({
-        "user_id": id
+        "user_id": res.id
     });
 
     Ok(Json(res))
-}
-
-#[derive(serde::Deserialize)]
-pub struct GetUser {
-    id: Uuid,
-}
-
-pub async fn get_user(
-    State(mm): State<Services>,
-    Json(user_c): Json<GetUser>,
-) -> Result<Json<User>> {
-    let ctx = Ctx::root_ctx();
-
-    Ok(Json(user))
 }

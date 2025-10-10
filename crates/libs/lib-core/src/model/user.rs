@@ -8,6 +8,7 @@ use sea_query::Iden;
 use sea_query::PostgresQueryBuilder;
 use sea_query::Query;
 use sea_query_binder::SqlxBinder;
+use secrecy::SecretBox;
 use secrecy::SecretString;
 use serde::Deserialize;
 use serde::Serialize;
@@ -19,12 +20,13 @@ use crate::model::Error;
 use crate::model::Result;
 use crate::model::base;
 use crate::model::base::DbBmc;
-use crate::model::base::utils::prep_fields_for_update;
+use crate::model::base::prep_fields_for_update;
 use crate::{ctx::Ctx, model::ModelManager};
 
 #[derive(Deserialize)]
 pub struct UserForCreate {
     pub username: String,
+    pub email: String,
     pub pwd_clear: SecretString,
 }
 
@@ -55,7 +57,7 @@ impl UserBy for UserForLogin {}
 pub struct UserBmc {}
 
 impl DbBmc for UserBmc {
-    const TABLE: &'static str = "users";
+    const TABLE: &'static str = "user";
 }
 
 #[derive(Clone, FromRow, Fields, Debug)]
@@ -70,6 +72,7 @@ impl UserBmc {
         let UserForCreate {
             username,
             pwd_clear,
+            email,
         } = user_c;
 
         let user_fi = UserForInsert {
@@ -80,7 +83,7 @@ impl UserBmc {
 
         mm.dbx.begin_txn().await?;
 
-        let user_id = base::crud_fns::create::<Self, _>(&ctx, &mm, user_fi)
+        let user_id = base::create::<Self, _>(&ctx, &mm, user_fi)
             .await
             .map_err(|model_error| {
                 Error::resolve_unique_violation(
@@ -105,7 +108,7 @@ impl UserBmc {
     where
         E: UserBy,
     {
-        base::crud_fns::get::<Self, _>(ctx, mm, id).await
+        base::get::<Self, _>(ctx, mm, id).await
     }
 
     pub async fn update_pwd(

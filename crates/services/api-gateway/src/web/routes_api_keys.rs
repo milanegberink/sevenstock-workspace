@@ -1,10 +1,8 @@
 use axum::{Router, routing::post};
-use lib_core::model::ModelManager;
-use lib_web::handlers::handlers_api_keys;
+use lib_web::{handlers::handlers_api_keys, services::Services};
 
-pub fn routes(mm: ModelManager) -> Router {
+pub fn routes(services: Services) -> Router {
     Router::new()
         .route("/new-api-key", post(handlers_api_keys::new_api_key))
-        .route("/verify-api-key", post(handlers_api_keys::verify_api_key))
-        .with_state(mm)
+        .with_state(services)
 }

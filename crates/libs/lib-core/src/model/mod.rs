@@ -1,7 +1,7 @@
-pub mod api_keys;
 pub mod aws;
 pub mod base;
 pub mod error;
+pub mod permission;
 pub mod store;
 pub mod user;
 use redis::aio::MultiplexedConnection;

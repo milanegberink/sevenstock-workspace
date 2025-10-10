@@ -16,22 +16,14 @@ pub async fn api_login_handler(
     cookies: CookieJar,
     Json(payload): Json<LoginPayload>,
 ) -> Result<(CookieJar, Json<Value>)> {
-    let LoginPayload {
-        email,
-        password: pwd_clear,
-    } = payload;
+    let LoginPayload { email, password } = payload;
 
     let req = LoginRequest {
         email,
-        password: pwd_clear.expose_secret().into(),
+        pwd_clear: password.expose_secret().into(),
     };
 
-    let res = services
-        .auth()
-        .login(Request::new(req))
-        .await
-        .unwrap()
-        .into_inner();
+    let res = services.auth().login(Request::new(req)).await?.into_inner();
 
     let cookie = Cookie::build(("refresh_token", res.refresh_token))
         .path("/")

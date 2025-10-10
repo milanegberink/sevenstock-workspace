@@ -28,6 +28,7 @@ use lib_web::{
         mw_require_perm::mw_require_permissions,
     },
     permission::Permission,
+    services::Services,
 };
 use tower_http::trace::TraceLayer;
 use tracing_appender::rolling;
@@ -36,11 +37,11 @@ use tracing_appender::rolling;
 async fn main() -> Result<()> {
     init_logging();
 
-    let mm = ModelManager::new().await?;
+    let services = Services::new().await?;
 
     let temp_routes = Router::new()
-        .merge(routes_api_keys::routes(mm.clone()))
-        .merge(routes_login::routes(mm.clone()));
+        .merge(routes_api_keys::routes(services))
+        .merge(routes_login::routes(services.clone()));
 
     let cors = CorsLayer::new()
         .allow_methods([
@@ -56,7 +57,7 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .nest("/auth", temp_routes)
-        .merge(routes_api_keys::routes(mm.clone()))
+        .merge(routes_api_keys::routes(services.clone()))
         .layer(TraceLayer::new_for_http())
         // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
         // .layer(middleware::from_fn(mw_ctx_require))

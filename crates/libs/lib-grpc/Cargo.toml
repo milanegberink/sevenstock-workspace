@@ -13,6 +13,7 @@ tonic-prost = "0.14.1"
 uuid.workspace = true
 aws-sdk-secretsmanager.workspace = true
 prost = "0.14.1"
+secrecy.workspace = true
 
 
 [build-dependencies]

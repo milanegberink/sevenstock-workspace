@@ -3,6 +3,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use lib_auth::{pwd, token};
+use lib_grpc::Status;
 use thiserror::Error;
 use tracing::error;
 use uuid::Uuid;
@@ -13,6 +14,9 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Error, Debug)]
 pub enum Error {
+    #[error("GRPC Error")]
+    GrpcError,
+
     #[error("User has no password")]
     LoginFailUserHasNoPwd { user_id: Uuid },
 
@@ -36,5 +40,11 @@ impl IntoResponse for Error {
         error!("{}", self);
 
         response
+    }
+}
+
+impl From<Status> for Error {
+    fn from(status: Status) -> Self {
+        Error::GrpcError
     }
 }

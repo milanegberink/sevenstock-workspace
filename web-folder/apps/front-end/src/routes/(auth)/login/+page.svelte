@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Form, Input } from 'lib-components';
+	import { Form, Input } from '@lib/components';
 	import { loginPayload as schema, type LoginPayload, type User } from '@lib/core/schemas';
 	import { loginUserRequest, sendRequest } from '@lib/core/service-worker';
 	import { goto } from '$app/navigation';

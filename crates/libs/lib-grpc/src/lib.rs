@@ -5,20 +5,24 @@ mod proto {
 }
 
 pub use crate::error::{Error, Result};
+use crate::proto::SignUpResponse;
 pub use crate::proto::{LoginRequest, LoginResponse};
-
 use lib_auth::pwd::verify_password;
 use lib_auth::token::{TokenBuilder, TokenType};
 use lib_core::ctx::Ctx;
-use lib_core::model::user::{UserBmc, UserForLogin};
+use lib_core::model::permission::{Level, Permission, Resource};
+use lib_core::model::user::{UserBmc, UserForCreate, UserForLogin};
 pub use proto::auth_client::AuthClient;
 pub use proto::auth_server::AuthServer;
+use secrecy::SecretString;
 use tonic::Response;
 pub use tonic::transport::Channel;
 pub use tonic::{Request, Status};
 use uuid::Uuid;
 
-pub use crate::proto::{RefreshTokenRequest, RefreshTokenResponse, auth_server::Auth};
+pub use crate::proto::{
+    RefreshTokenRequest, RefreshTokenResponse, SignUpRequest, auth_server::Auth,
+};
 use lib_core::model::ModelManager;
 
 pub struct AuthService {
@@ -67,10 +71,7 @@ impl Auth for AuthService {
     async fn login(&self, request: Request<LoginRequest>) -> Result<Response<LoginResponse>> {
         let input = request.get_ref();
 
-        let LoginRequest {
-            email,
-            password: pwd_bytes,
-        } = input;
+        let LoginRequest { email, pwd_clear } = input;
 
         let ctx = Ctx::root_ctx();
 
@@ -82,12 +83,13 @@ impl Auth for AuthService {
             return Err(Status::unauthenticated("C"));
         };
 
-        verify_password(pwd, pwd_bytes).map_err(Error::from)?;
+        verify_password(&pwd, &pwd_clear).map_err(Error::from)?;
 
         let access_token = TokenBuilder::access()
             .sub(&user.id)
             .email(email)
             .ident(user.username)
+            .scope(Permission::new(Resource::Product, Level::All))
             .build_async()
             .await
             .map_err(Error::from)?;
@@ -104,5 +106,27 @@ impl Auth for AuthService {
         };
 
         Ok(Response::new(res))
+    }
+
+    async fn sign_up(&self, request: Request<SignUpRequest>) -> Result<Response<SignUpResponse>> {
+        let SignUpRequest {
+            username,
+            pwd_clear,
+            email,
+        } = request.get_ref().clone();
+
+        let user_c = UserForCreate {
+            username,
+            email,
+            pwd_clear: SecretString::new(pwd_clear.into_boxed_str()),
+        };
+
+        let id = UserBmc::create(&Ctx::root_ctx(), &self.mm, user_c)
+            .await
+            .map_err(Error::from)?;
+
+        let res = Response::new(SignUpResponse { id: id.into() });
+
+        Ok(res)
     }
 }

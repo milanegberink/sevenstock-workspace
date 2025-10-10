@@ -23,8 +23,6 @@ pub enum TokenType {
     Access,
     #[strum(serialize = "Refresh")]
     Refresh,
-    #[strum(serialize = "Two factor")]
-    TwoFactor,
 }
 
 impl TokenType {
@@ -32,7 +30,6 @@ impl TokenType {
         match self {
             TokenType::Access => 900,
             TokenType::Refresh => 604_800,
-            TokenType::TwoFactor => 300,
         }
     }
 }
@@ -82,13 +79,18 @@ pub struct Claims<U> {
     avatar: Option<String>,
     exp: u64,
     iat: u64,
+    iss: Option<String>,
     org: Option<String>,
     email: Option<String>,
+    scope: String,
 }
 
 impl Claims<Sub> {
     pub fn sub(&self) -> &Uuid {
         &self.sub.0
+    }
+    pub fn scope(&self) -> &str {
+        &self.scope
     }
 }
 
@@ -133,6 +135,8 @@ impl TokenBuilder<NoSub> {
                 iat: self.claims.iat,
                 org: self.claims.org,
                 email: self.claims.email,
+                iss: self.claims.iss,
+                scope: self.claims.scope,
             },
             _state: PhantomData,
         }
@@ -143,6 +147,25 @@ impl TokenBuilder<NoSub> {
 impl TokenBuilder<Sub> {
     pub fn ident<S: Into<String>>(mut self, ident: S) -> Self {
         self.claims.ident = Some(ident.into());
+        self
+    }
+
+    pub fn scope<S: Into<String>>(mut self, scope: S) -> Self {
+        if !self.claims.scope.is_empty() {
+            self.claims.scope.push_str(" ");
+        }
+
+        self.claims.scope.push_str(&scope.into());
+
+        self
+    }
+
+    pub fn scopes<S: IntoIterator>(self, scopes: S) -> Self {
+        todo!()
+    }
+
+    pub fn iss<S: Into<String>>(mut self, iss: S) -> Self {
+        self.claims.iss = Some(iss.into());
         self
     }
 
@@ -172,6 +195,8 @@ impl TokenBuilder<Sub> {
             iat: current_timestamp,
             org: self.claims.org,
             email: self.claims.email,
+            scope: self.claims.scope,
+            iss: self.claims.iss,
         };
 
         let jwt_header = config

@@ -1,7 +1,7 @@
 mod config;
 mod error;
 
-use secrecy::{ExposeSecret, SecretString};
+use secrecy::{ExposeSecret, SecretBox, SecretString};
 
 use crate::pwd::config::pwd_config;
 
@@ -24,12 +24,12 @@ pub fn hash_password(password: SecretString) -> Result<String> {
     Ok(hash)
 }
 
-pub fn verify_password(pw_hash: String, pwd: &[u8]) -> Result<()> {
+pub fn verify_password(pw_hash: &str, pwd: &str) -> Result<()> {
     let argon2 = pwd_config().argon2();
     let parsed_hash = PasswordHash::new(&pw_hash).map_err(|_| Error::PasswordHashFail)?;
 
     let ver_res = argon2
-        .verify_password(pwd, &parsed_hash)
+        .verify_password(pwd.as_bytes(), &parsed_hash)
         .map_err(|_| Error::PasswordHashFail);
 
     ver_res

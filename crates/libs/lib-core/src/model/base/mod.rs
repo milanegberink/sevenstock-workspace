@@ -1,4 +1,3 @@
-use sea_query::Iden;
 mod crud_fns;
 mod macro_utils;
 mod utils;
@@ -8,6 +7,8 @@ pub use utils::*;
 
 const LIST_LIMIT_DEFAULT: i64 = 100;
 const LIST_LIMIT_MAX: i64 = 250;
+
+use sea_query::Iden;
 
 #[derive(Iden)]
 pub enum CommonIden {

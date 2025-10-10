@@ -22,6 +22,6 @@
 	},
 	"dependencies": {
 		"@lib/core": "workspace:*",
-		"lib-components": "workspace:*"
+		"@lib/components": "workspace:*"
 	}
 }

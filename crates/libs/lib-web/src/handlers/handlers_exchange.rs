@@ -23,12 +23,7 @@ pub async fn exchange_refresh(
 
     let request = Request::new(RefreshTokenRequest { refresh_token });
 
-    let response = services
-        .auth()
-        .refresh_token(request)
-        .await
-        .unwrap()
-        .into_inner();
+    let response = services.auth().refresh_token(request).await?.into_inner();
 
     let refresh_cookie = Cookie::build(("refresh_token", response.refresh_token))
         .path("/")

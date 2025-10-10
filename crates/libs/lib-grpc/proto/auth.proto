@@ -5,7 +5,7 @@ package auth.v1;
 service Auth {
     rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
     rpc Login(LoginRequest) returns (LoginResponse) {}
-    rpc ValidateApiKey(ValidateApiKeyRequest) returns (ValidateApiKeyResponse) {}
+    rpc SignUp(SignUpRequest) returns (SignUpResponse) {}
 }
 
 message RefreshTokenRequest {
@@ -19,18 +19,19 @@ message RefreshTokenResponse {
 
 message LoginRequest {
     string email = 1;
-    bytes password = 2;
+    string pwd_clear = 2;
 }
 
 message LoginResponse {
     string access_token = 1;
     string refresh_token = 2;
 }
-
-message ValidateApiKeyRequest {
-    string api_key = 1;
+message SignUpRequest {
+    string email = 1;
+    string username = 2;
+    string pwd_clear = 3;
 }
 
-message ValidateApiKeyResponse {
-    bool valid = 1;
+message SignUpResponse {
+    string id = 1;
 }

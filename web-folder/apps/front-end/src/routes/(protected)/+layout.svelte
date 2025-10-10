@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Sidebar, LoadBar, type NavLink } from 'lib-components';
+	import { Sidebar, LoadBar, type NavLink } from '@lib/components';
 	import CircleNotch from '~icons/ph/circle-notch';
 
 	import { goto } from '$app/navigation';

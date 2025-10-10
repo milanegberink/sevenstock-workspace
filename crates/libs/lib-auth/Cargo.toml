@@ -10,7 +10,6 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
 axum = { workspace = true }
-miette = { workspace = true }
 secrecy = { workspace = true }
 tokio = { workspace = true }
 argon2 = { version = "0.5.3", features = ["std"] }
@@ -20,9 +19,8 @@ tracing = { workspace = true }
 ed25519-dalek = { version = "2.1.1", features = ["pem", "pkcs8", "rand_core"] }
 rand = "0.8.5"
 pkcs8 = "0.10.2"
-strum = "0.27.2"
-strum_macros = "0.27.2"
-blake3 = "1.8.2"
+strum.workspace = true
+strum_macros.workspace = true
 
 
 [lints]

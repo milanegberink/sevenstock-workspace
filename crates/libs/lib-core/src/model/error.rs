@@ -15,6 +15,9 @@ pub enum Error {
     #[error("Entity not found: {entity} ({id})")]
     EntityNotFound { entity: &'static str, id: Uuid },
 
+    #[error("Invalied permission format")]
+    InvalidPermissionFormat,
+
     #[error("Failed to create modelmanager")]
     CantCreateModelManagerProvider(String),
 

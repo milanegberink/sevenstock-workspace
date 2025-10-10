@@ -1,3 +1,7 @@
+use std::collections::{HashMap, HashSet};
+use std::hash::Hash;
+use std::str::FromStr;
+
 use crate::error::{Error, Result};
 use crate::services::Services;
 use axum::http::HeaderValue;
@@ -10,15 +14,20 @@ use axum::{
 };
 use axum_extra::{
     TypedHeader,
-    extract::CookieJar,
     headers::{
         Authorization,
         authorization::{Bearer, Credentials},
     },
 };
+use lib_auth::api_key::{decode_api_key, verify_api_key};
+use lib_auth::token::TokenType;
 use lib_core::ctx::Ctx;
+use lib_core::model::permission::{Action, Permission, Permissions, Resource};
+use lib_grpc::Request as GrpcRequest;
+use lib_grpc::ValidateApiKeyRequest;
+use secrecy::{ExposeSecret, SecretString};
 use thiserror::Error;
-use tracing::{debug, info};
+use tracing::debug;
 use uuid::Uuid;
 
 pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -> Result<Response> {
@@ -29,27 +38,9 @@ pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -
     Ok(next.run(req).await)
 }
 
-pub struct ApiKey(pub String);
-
-impl Credentials for ApiKey {
-    const SCHEME: &'static str = "ApiKey";
-
-    fn encode(&self) -> HeaderValue {
-        let value = format!("{} {}", Self::SCHEME, self.0);
-        HeaderValue::from_str(&value).expect("Invalid header value")
-    }
-
-    fn decode(value: &HeaderValue) -> Option<Self> {
-        let s = value.to_str().ok()?;
-        s.strip_prefix(&(Self::SCHEME.to_string() + " "))
-            .map(|key| ApiKey(key.to_string()))
-    }
-}
-
 pub async fn mw_ctx_resolver(
     State(mm): State<Services>,
     token_hdr: TypedHeader<Authorization<Bearer>>,
-    api_key: TypedHeader<Authorization<ApiKey>>,
     mut req: Request<Body>,
     next: Next,
 ) -> Response {
@@ -66,8 +57,49 @@ pub async fn mw_ctx_resolver(
     next.run(req).await
 }
 
-async fn ctx_resolve(_mm: Services, _token: &str) -> CtxExtResult {
-    Ctx::new(Uuid::now_v7())
+pub async fn mw_ctx_resolver(
+    State(mm): State<Services>,
+    token_hdr: TypedHeader<Authorization<Bearer>>,
+    mut req: Request<Body>,
+    next: Next,
+) -> Response {
+    debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
+
+    let token = token_hdr.token();
+
+    debug!("{}", token);
+
+    let ctx_ext_result = ctx_resolve(mm, token).await;
+
+    req.extensions_mut().insert(ctx_ext_result);
+
+    next.run(req).await
+}
+
+async fn ctx_resolve(_services: Services, token: &str) -> CtxExtResult {
+    let claims = TokenType::Access
+        .verify(token)
+        .await
+        .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
+
+    let mut permissions: Permissions = HashMap::new();
+
+    let scope = claims.scope();
+
+    for token in scope.split_whitespace() {
+        if let Some((resource_str, action_str)) = token.split_once(':') {
+            let resource = Resource::from_str(resource_str)?;
+
+            let action = Action::from_str(action_str)?;
+
+            permissions
+                .entry(resource)
+                .or_insert_with(HashSet::new)
+                .insert(action);
+        }
+    }
+
+    Ctx::new(claims.sub().clone(), permissions)
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }
@@ -110,18 +142,4 @@ pub enum CtxExtError {
     CtxNotInRequestExt,
     #[error("Token not in cookie: {0}")]
     CtxCreateFail(String),
-}
-
-pub async fn mw_require_permission(
-    permission: impl Into<String>,
-    State(services): State<Services>,
-    ctx: CtxW,
-    req: Request<Body>,
-    next: Next,
-) -> Result<Response> {
-    let ctx = ctx.0;
-
-    info!("{:?}", ctx);
-
-    Ok(next.run(req).await)
 }
