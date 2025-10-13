@@ -25,7 +25,7 @@ sea-query-binder.workspace = true
 aws-config = { workspace = true }
 aws-sdk-s3 = { workspace = true }
 aws-sdk-elasticache = { workspace = true }
-modql = { version = "0.4.1", features = ["with-sea-query"] }
+modql.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
 

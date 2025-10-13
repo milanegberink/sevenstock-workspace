@@ -1,7 +1,9 @@
 pub mod aws;
 pub mod base;
 pub mod error;
+pub mod organisation;
 pub mod permission;
+pub mod role;
 pub mod store;
 pub mod user;
 use redis::aio::MultiplexedConnection;
@@ -62,7 +64,7 @@ impl ModelManager {
         })
     }
 
-    pub(in crate::model) fn dbx(&self) -> &Dbx {
+    pub fn dbx(&self) -> &Dbx {
         &self.dbx
     }
     pub fn redis(&self) -> MultiplexedConnection {

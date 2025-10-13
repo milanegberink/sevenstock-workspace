@@ -34,8 +34,8 @@ pub enum Error {
     #[error("Unique violation at {table} with {constraint}")]
     UniqueViolation { table: String, constraint: String },
 
-    #[error(r#"Username "{username}" already exists"#)]
-    UserAlreadyExists { username: String },
+    #[error(r#"Username "{email}" already exists"#)]
+    UserAlreadyExists { email: String },
 
     // -- Externals
     #[error(transparent)]

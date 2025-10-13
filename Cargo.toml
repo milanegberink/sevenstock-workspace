@@ -10,8 +10,7 @@ members = [
     "crates/libs/lib-utils",
     "crates/services/api-gateway",
     "crates/libs/lib-grpc",
-    "crates/services/auth-server",
-    "crates/services/aws-lambdas",
+    "crates/services/aws-lambdas", "crates/services/auth-server",
 ]
 
 
@@ -36,3 +35,4 @@ sea-query = "0.32.6"
 sea-query-binder = { version = "0.7.0", features = ["with-uuid", "sqlx-postgres", "with-time"] }
 strum = "0.27.2"
 strum_macros = "0.27.2"
+modql = { version = "0.4.1", features = ["with-sea-query"] }

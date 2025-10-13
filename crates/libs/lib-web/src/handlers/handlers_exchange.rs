@@ -3,24 +3,37 @@ use crate::{
     services::Services,
 };
 
-use axum::{Json, extract::State};
-use axum_extra::extract::{
-    CookieJar,
-    cookie::{Cookie, SameSite},
+use axum::{Form, Json, extract::State};
+use axum_extra::{
+    extract::{
+        CookieJar,
+        cookie::{Cookie, SameSite},
+    },
+    headers::authorization::Bearer,
 };
 use lib_grpc::{RefreshTokenRequest, Request};
+use secrecy::SecretString;
 use serde_json::{Value, json};
+
+struct ExchangeForm {
+    grant_type: String,
+    refresh_token: SecretString,
+    client_id: String,
+    client_secret: SecretString,
+}
+
+struct ExchangeResponse {
+    access_token: String,
+    token_type: Bearer,
+    expires_in: u64,
+    refresh_token: String,
+    id_token: String,
+}
 
 pub async fn exchange_refresh(
     State(services): State<Services>,
-    cookies: CookieJar,
-) -> Result<(CookieJar, Json<Value>)> {
-    let refresh_token: String = cookies
-        .get("refresh_token")
-        .ok_or(Error::NoRefreshTokenFound)?
-        .value()
-        .into();
-
+    Form(form): Form<ExchangeForm>,
+) -> Result {
     let request = Request::new(RefreshTokenRequest { refresh_token });
 
     let response = services.auth().refresh_token(request).await?.into_inner();

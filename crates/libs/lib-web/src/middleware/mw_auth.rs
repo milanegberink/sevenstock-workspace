@@ -19,12 +19,9 @@ use axum_extra::{
         authorization::{Bearer, Credentials},
     },
 };
-use lib_auth::api_key::{decode_api_key, verify_api_key};
 use lib_auth::token::TokenType;
 use lib_core::ctx::Ctx;
 use lib_core::model::permission::{Action, Permission, Permissions, Resource};
-use lib_grpc::Request as GrpcRequest;
-use lib_grpc::ValidateApiKeyRequest;
 use secrecy::{ExposeSecret, SecretString};
 use thiserror::Error;
 use tracing::debug;

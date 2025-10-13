@@ -1,8 +1,8 @@
 services:
-  auth-server:
+  authn-server:
     build:
       context: .
-      dockerfile: crates/services/auth-server/Dockerfile
+      dockerfile: crates/services/authn-server/Dockerfile
     container_name: auth-server
     ports:
       - "50051:50051"
@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
       - valkey
-      - auth-server
+      - authn-server
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     environment:

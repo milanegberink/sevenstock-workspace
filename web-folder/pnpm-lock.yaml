@@ -36,12 +36,12 @@ importers:
 
   apps/front-end:
     dependencies:
+      '@lib/components':
+        specifier: workspace:*
+        version: link:../../libs/lib-components
       '@lib/core':
         specifier: workspace:*
         version: link:../../libs/lib-core
-      lib-components:
-        specifier: workspace:*
-        version: link:../../libs/lib-components
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^6.0.0

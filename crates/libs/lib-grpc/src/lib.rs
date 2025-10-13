@@ -10,7 +10,7 @@ pub use crate::proto::{LoginRequest, LoginResponse};
 use lib_auth::pwd::verify_password;
 use lib_auth::token::{TokenBuilder, TokenType};
 use lib_core::ctx::Ctx;
-use lib_core::model::permission::{Level, Permission, Resource};
+use lib_core::model::permission::{Action, Resource};
 use lib_core::model::user::{UserBmc, UserForCreate, UserForLogin};
 pub use proto::auth_client::AuthClient;
 pub use proto::auth_server::AuthServer;

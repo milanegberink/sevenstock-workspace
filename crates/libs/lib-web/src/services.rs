@@ -17,3 +17,9 @@ impl Services {
         &self.cache
     }
 }
+
+impl Services {
+    pub async fn new() -> Self {
+        todo!()
+    }
+}

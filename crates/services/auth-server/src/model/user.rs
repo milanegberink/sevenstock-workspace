@@ -15,13 +15,13 @@ use sqlx::FromRow;
 use sqlx::postgres::PgRow;
 use uuid::Uuid;
 
-use crate::model::Error;
-use crate::model::Result;
-use crate::model::base;
-use crate::model::base::DbBmc;
-use crate::model::base::prep_fields_for_update;
-use crate::model::permission::Permission;
-use crate::{ctx::Ctx, model::ModelManager};
+use lib_core::model::Error;
+use lib_core::model::Result;
+use lib_core::model::base;
+use lib_core::model::base::DbBmc;
+use lib_core::model::base::prep_fields_for_update;
+use lib_core::model::permission::Permission;
+use lib_core::{ctx::Ctx, model::ModelManager};
 
 #[derive(Deserialize)]
 pub struct UserForCreate {
@@ -83,7 +83,7 @@ impl UserBmc {
 
         let mm = mm.new_with_txn()?;
 
-        mm.dbx.begin_txn().await?;
+        mm.dbx().begin_txn().await?;
 
         let user_id = base::create::<Self, _>(&ctx, &mm, user_fi)
             .await

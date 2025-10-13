@@ -29,7 +29,7 @@ where
     let mut query = Query::insert();
 
     query
-        .into_table(MC::TABLE)
+        .into_table(MC::table_ref())
         .columns(columns)
         .values(sea_values)?
         .returning(Query::returning().columns([CommonIden::Id]));
@@ -52,7 +52,7 @@ where
     let mut query = Query::select();
 
     query
-        .from(MC::TABLE)
+        .from(MC::table_ref())
         .columns(E::sea_column_refs())
         .and_where(Expr::col(CommonIden::Id).eq(id));
 
@@ -90,7 +90,7 @@ where
 
         // Append values for each item
         query
-            .into_table(MC::TABLE)
+            .into_table(MC::table_ref())
             .columns(columns.clone())
             .values(sea_values)?;
     }
@@ -118,7 +118,7 @@ where
     // -- Build query
     let mut query = Query::delete();
     query
-        .from_table(MC::TABLE)
+        .from_table(MC::table_ref())
         .and_where(Expr::col(CommonIden::Id).eq(id));
 
     // -- Execute query
@@ -148,7 +148,7 @@ where
     // -- Build query
     let mut query = Query::delete();
     query
-        .from_table(MC::TABLE)
+        .from_table(MC::table_ref())
         .and_where(Expr::col(CommonIden::Id).is_in(ids.clone()));
 
     // -- Execute query
@@ -180,7 +180,7 @@ where
     let fields = fields.for_sea_update();
     let mut query = Query::update();
     query
-        .table(MC::TABLE)
+        .table(MC::table_ref())
         .values(fields)
         .and_where(Expr::col(CommonIden::Id).eq(id));
 

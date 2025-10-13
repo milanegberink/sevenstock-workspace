@@ -81,7 +81,6 @@ pub struct Claims<U> {
     iat: u64,
     iss: Option<String>,
     org: Option<String>,
-    email: Option<String>,
     scope: String,
 }
 
@@ -134,7 +133,6 @@ impl TokenBuilder<NoSub> {
                 exp: self.claims.exp,
                 iat: self.claims.iat,
                 org: self.claims.org,
-                email: self.claims.email,
                 iss: self.claims.iss,
                 scope: self.claims.scope,
             },
@@ -151,17 +149,9 @@ impl TokenBuilder<Sub> {
     }
 
     pub fn scope<S: Into<String>>(mut self, scope: S) -> Self {
-        if !self.claims.scope.is_empty() {
-            self.claims.scope.push_str(" ");
-        }
-
-        self.claims.scope.push_str(&scope.into());
+        self.claims.scope = scope.into();
 
         self
-    }
-
-    pub fn scopes<S: IntoIterator>(self, scopes: S) -> Self {
-        todo!()
     }
 
     pub fn iss<S: Into<String>>(mut self, iss: S) -> Self {
@@ -178,10 +168,6 @@ impl TokenBuilder<Sub> {
         self.claims.avatar = Some(avatar.into());
         self
     }
-    pub fn email<S: Into<String>>(mut self, email: S) -> Self {
-        self.claims.email = Some(email.into());
-        self
-    }
 
     pub async fn build_async(self) -> Result<String> {
         let config = signing_config()?;
@@ -194,7 +180,6 @@ impl TokenBuilder<Sub> {
             exp: current_timestamp + self.token_type.exp(),
             iat: current_timestamp,
             org: self.claims.org,
-            email: self.claims.email,
             scope: self.claims.scope,
             iss: self.claims.iss,
         };

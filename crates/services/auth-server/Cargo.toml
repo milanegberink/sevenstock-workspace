@@ -4,14 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tokio.workspace = true
-lib-grpc = { path = "../../libs/lib-grpc" }
-lib-auth = { path = "../../libs/lib-auth", features = ["private"] }
-serde.workspace = true
-serde_json.workspace = true
+lib-core = { path = "../../libs/lib-core" }
+lib-web = { path = "../../libs/lib-web" }
+lib-auth = { path = "../../libs/lib-auth", features = ["private"]}
+
+axum.workspace = true
+sea-query.workspace = true
+sea-query-binder.workspace = true
 uuid.workspace = true
-tonic.workspace = true
-jsonwebtoken = "9.3.1"
+serde.workspace = true
 
 [lints]
 workspace = true

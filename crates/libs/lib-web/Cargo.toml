@@ -22,8 +22,7 @@ secrecy.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 moka = { version = "0.12.11", features = ["future"] }
-strum.workspace = true
-strum_macros.workspace = true
+
 
 [lints]
 workspace = true
