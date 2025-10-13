@@ -1,6 +1,7 @@
+mod handlers;
 mod model;
+mod routes;
 mod web;
 
-fn main() {
-    println!("Hello, world!");
-}
+#[tokio::main]
+async fn main() {}

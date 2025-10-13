@@ -12,20 +12,10 @@ use crate::token::{
     jwks::{PrivateJwkSet, PublicJwkSet},
 };
 
-pub enum Behaviour {
-    Public(PublicJwkSet),
-    #[cfg(feature = "private")]
-    Private(PrivateJwkSet),
-}
-
 static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 
 #[cfg(feature = "private")]
 static PRIVATE_INSTANCE: OnceLock<SigningConfig> = OnceLock::new();
-
-pub fn verifying_config() -> Result<&'static VerifyingConfig> {
-    PUBLIC_INSTANCE.get().ok_or(Error::NoConfigFound)
-}
 
 #[cfg(feature = "private")]
 pub fn signing_config() -> Result<&'static SigningConfig> {
@@ -35,10 +25,11 @@ pub fn signing_config() -> Result<&'static SigningConfig> {
 pub struct VerifyingConfig {
     validation: Validation,
     keys: RwLock<HashMap<Identifier, Arc<DecodingKey>>>,
+    jwk_set: PublicJwkSet,
 }
 
 impl VerifyingConfig {
-    pub async fn init(set: PublicJwkSet) -> Result<()> {
+    pub fn init(set: PublicJwkSet) -> Result<()> {
         let public_config = VerifyingConfig::try_from(set)?;
         PUBLIC_INSTANCE
             .set(public_config)
@@ -46,7 +37,10 @@ impl VerifyingConfig {
 
         Ok(())
     }
-    pub async fn get(&self, id: &Identifier) -> Result<Arc<DecodingKey>> {
+    pub fn get() -> Result<&'static Self> {
+        PUBLIC_INSTANCE.get().ok_or(Error::NoConfigFound)
+    }
+    pub async fn get_decoding_key(&self, id: &Identifier) -> Result<Arc<DecodingKey>> {
         let map = self.keys.read().await;
         map.get(id)
             .cloned()
@@ -54,6 +48,9 @@ impl VerifyingConfig {
     }
     pub fn validation(&self) -> &Validation {
         &self.validation
+    }
+    pub fn pub_jwk_set(&self) -> &PublicJwkSet {
+        &self.jwk_set
     }
 }
 
@@ -75,7 +72,6 @@ impl SigningConfig {
 pub type Identifier = (KeyId, TokenType);
 
 pub struct SigningConfig {
-    verifying: VerifyingConfig,
     signing: RwLock<HashMap<TokenType, Arc<JwtHeader>>>,
 }
 
@@ -97,7 +93,7 @@ impl TryFrom<PublicJwkSet> for VerifyingConfig {
     type Error = Error;
     fn try_from(set: PublicJwkSet) -> Result<Self> {
         let mut keys = HashMap::new();
-        for jwk in set.keys {
+        for jwk in &set.keys {
             let token_type = jwk.metadata.token_type;
 
             let decoding_key = DecodingKey::from_ed_components(&jwk.metadata.x).unwrap();
@@ -110,6 +106,7 @@ impl TryFrom<PublicJwkSet> for VerifyingConfig {
         Ok(Self {
             validation: Validation::new(jsonwebtoken::Algorithm::EdDSA),
             keys: RwLock::new(keys),
+            jwk_set: set,
         })
     }
 }
@@ -149,13 +146,8 @@ impl TryFrom<PrivateJwkSet> for SigningConfig {
             keys.insert(token_type, Arc::new(jwt_header));
         }
 
-        let public_set = PublicJwkSet::from(set);
-
-        let public_config = VerifyingConfig::try_from(public_set)?;
-
         Ok(Self {
             signing: RwLock::new(keys),
-            verifying: public_config,
         })
     }
 }

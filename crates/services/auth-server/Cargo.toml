@@ -13,6 +13,8 @@ sea-query.workspace = true
 sea-query-binder.workspace = true
 uuid.workspace = true
 serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
 
 [lints]
 workspace = true

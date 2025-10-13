@@ -4,7 +4,7 @@ pub mod jwks;
 
 use jsonwebtoken::{decode, decode_header, encode, get_current_timestamp};
 mod error;
-use crate::token::config::{Identifier, signing_config, verifying_config};
+use crate::token::config::{Identifier, VerifyingConfig, signing_config};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use strum_macros::Display;
@@ -36,13 +36,13 @@ impl TokenType {
 
 impl TokenType {
     pub async fn verify(&self, token: &str) -> Result<Claims<Sub>> {
-        let config = verifying_config()?;
+        let config = VerifyingConfig::get()?;
 
         let header = decode_header(token).map_err(|_| Error::InvalidToken)?;
 
         let id: Identifier = (header.kid.unwrap().try_into().unwrap(), self.clone());
 
-        let decoding_key = config.get(&id).await?;
+        let decoding_key = config.get_decoding_key(&id).await?;
 
         let token_data = decode::<Claims<Sub>>(token, &decoding_key, config.validation())
             .map_err(|_| Error::InvalidToken)?;
