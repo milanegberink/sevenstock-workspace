@@ -11,6 +11,7 @@ use sea_query_binder::SqlxBinder;
 use secrecy::SecretString;
 use serde::Deserialize;
 use serde::Serialize;
+use serde_email::Email;
 use sqlx::FromRow;
 use sqlx::postgres::PgRow;
 use uuid::Uuid;
@@ -26,7 +27,7 @@ use crate::{ctx::Ctx, model::ModelManager};
 #[derive(Deserialize)]
 pub struct UserForCreate {
     pub username: String,
-    pub email: String,
+    pub email: Email,
     pub pwd_clear: SecretString,
 }
 
@@ -92,7 +93,9 @@ impl UserBmc {
                     model_error,
                     Some(|table: &str, constraint: &str| {
                         if table == "user" && constraint.contains("email") {
-                            Some(Error::UserAlreadyExists { email })
+                            Some(Error::UserAlreadyExists {
+                                email: email.to_string(),
+                            })
                         } else {
                             None // Error::UniqueViolation will be created by resolve_unique_violation
                         }
@@ -140,7 +143,7 @@ impl UserBmc {
 
         Ok(())
     }
-    pub async fn first_by_email<E>(_ctx: &Ctx, mm: &ModelManager, email: &str) -> Result<E>
+    pub async fn first_by_email<E>(_ctx: &Ctx, mm: &ModelManager, email: &Email) -> Result<E>
     where
         E: UserBy,
     {
@@ -148,7 +151,7 @@ impl UserBmc {
 
         query
             .from(Self::table_ref())
-            .and_where(Expr::col(UserIden::Email).eq(email));
+            .and_where(Expr::col(UserIden::Email).eq(email.to_string()));
 
         let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
         let sqlx_query = sqlx::query_as_with::<_, E, _>(&sql, values);
@@ -174,7 +177,7 @@ impl UserBmc {
 
         let sqlx_query = sqlx::query_as::<_, Permission>(&sql)
             .bind(ctx.user_id())
-            .bind(ctx.org_id());
+            .bind(Uuid::max());
 
         let permissions = mm.dbx().fetch_all(sqlx_query).await?;
 

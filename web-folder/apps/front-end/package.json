@@ -21,7 +21,7 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"@lib/core": "workspace:*",
-		"@lib/components": "workspace:*"
+		"@lib/components": "workspace:*",
+		"@lib/core": "workspace:*"
 	}
 }

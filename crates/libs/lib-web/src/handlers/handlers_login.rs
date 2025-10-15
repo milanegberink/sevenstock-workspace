@@ -1,37 +1,61 @@
-use crate::{error::Result, services::Services};
-
-use axum::Json;
-use axum::extract::State;
-use axum_extra::extract::{
-    CookieJar,
-    cookie::{Cookie, SameSite},
+use axum::{
+    Json,
+    extract::{Query, State},
+    response::Redirect,
 };
-use lib_grpc::{LoginRequest, Request};
+use axum_extra::{TypedHeader, headers::Referer};
+use lib_auth::{pwd::verify_password, token::TokenType};
+use lib_core::{
+    ctx::Ctx,
+    model::{
+        ModelManager,
+        user::{UserBmc, UserForLogin},
+    },
+};
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_email::Email;
+use serde_json::Value;
+use tracing::info;
 
-pub async fn api_login_handler(
-    State(services): State<Services>,
-    Json(payload): Json<LoginPayload>,
-) -> Result<(CookieJar, Json<Value>)> {
-    let LoginPayload { email, password } = payload;
-
-    let req = LoginRequest {
-        email,
-        pwd_clear: password.expose_secret().into(),
-    };
-
-    let res = services.auth().login(Request::new(req)).await?.into_inner();
-    let response = json!({
-        "access_token": res.access_token,
-    });
-
-    Ok((cookies, Json(response)))
-}
+use crate::{Error, Result};
 
 #[derive(Deserialize)]
 pub struct LoginPayload {
-    email: String,
-    password: SecretString,
+    email: Email,
+    pwd: SecretString,
+}
+
+#[derive(Deserialize)]
+pub struct X {
+    token: String,
+}
+
+pub async fn api_login_handler(
+    State(mm): State<ModelManager>,
+    TypedHeader(referer): TypedHeader<Referer>,
+    Json(req): Json<LoginPayload>,
+) -> Result<()> {
+    let LoginPayload {
+        email,
+        pwd: pwd_clear,
+    } = req;
+
+    info!("{}", referer);
+
+    let root_ctx = Ctx::root_ctx();
+
+    let UserForLogin {
+        username: _username,
+        id,
+        pwd: pwd_hash,
+    } = UserBmc::first_by_email(&root_ctx, &mm, &email).await?;
+
+    let Some(pwd) = pwd_hash else {
+        return Err(Error::LoginFailUserHasNoPwd { user_id: id });
+    };
+
+    verify_password(&pwd, &pwd_clear.expose_secret())?;
+
+    Ok(())
 }

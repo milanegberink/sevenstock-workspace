@@ -78,3 +78,8 @@ CREATE TABLE "oauth_client" (
     mid uuid NOT NULL,
     mtime timestamp with time zone NOT NULL
 );
+
+CREATE TABLE "user_session" (
+    id uuid DEFAULT uuidv7() PRIMARY KEY,
+    user_id uuid REFERENCES "user"(id) ON DELETE cascade
+)

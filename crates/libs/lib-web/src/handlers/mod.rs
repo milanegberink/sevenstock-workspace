@@ -1,4 +1,4 @@
-pub mod handlers_exchange;
 pub mod handlers_login;
-pub mod handlers_signup;
-pub mod refresh_token;
+pub mod handlers_oauth2;
+pub mod signup;
+pub mod well_known;

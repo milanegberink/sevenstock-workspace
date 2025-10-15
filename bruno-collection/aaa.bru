@@ -4,21 +4,18 @@ meta {
   seq: 1
 }
 
-post {
-  url: http://localhost:5000/auth/get-user
+get {
+  url: http://localhost:5000/oauth2/authorize?client_id=1&response_type=1&redirect_uri=http://google.com
   body: json
   auth: inherit
 }
 
-headers {
-  Authorization: Bearer oa-93647458886594318673
+params:query {
+  client_id: 1
+  response_type: 1
+  redirect_uri: http://google.com
 }
 
-body:json {
-  // {
-  //   "username":"milanegberink2",
-  //   "pwd_clear":"welkom123"
-  // }
-  
-  {"id": "0199c3a5-f82c-7699-90bc-97572667991b"}
+headers {
+  Authorization: Bearer oa-93647458886594318673
 }

@@ -8,9 +8,9 @@ members = [
     "crates/libs/lib-core",
     "crates/libs/lib-web",
     "crates/libs/lib-utils",
-    "crates/services/api-gateway",
+    "crates/services/web-server",
     "crates/libs/lib-grpc",
-    "crates/services/aws-lambdas", "crates/services/auth-server",
+    "crates/services/aws-lambdas",
 ]
 
 
@@ -36,3 +36,5 @@ sea-query-binder = { version = "0.7.0", features = ["with-uuid", "sqlx-postgres"
 strum = "0.27.2"
 strum_macros = "0.27.2"
 modql = { version = "0.4.1", features = ["with-sea-query"] }
+tower-http = { version = "0.6.6", features = ["trace", "cors", "fs"] }
+serde-email = "3.2.0"

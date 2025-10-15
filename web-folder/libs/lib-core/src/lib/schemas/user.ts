@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const loginPayload = z.object({
 	email: z.email(),
-	password: z.string().min(8, 'Password should be 8 charecters minimum.')
+	pwd: z.string().min(8, 'Password should be 8 charecters minimum.')
 });
 
 export const user = z.object({

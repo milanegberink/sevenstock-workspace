@@ -16,7 +16,7 @@
 
 		const parsed = await schema.safeParseAsync(form);
 
-		if (parsed.error) return console.error('fix');
+		if (parsed.error) return console.error(parsed.error);
 
 		onsubmit(parsed.data);
 	}

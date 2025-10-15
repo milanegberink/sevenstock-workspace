@@ -6,11 +6,9 @@ use std::{
 
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use tokio::sync::RwLock;
+use uuid::Uuid;
 
-use crate::token::{
-    KeyId,
-    jwks::{PrivateJwkSet, PublicJwkSet},
-};
+use crate::token::jwks::{PrivateJwkSet, PublicJwkSet};
 
 static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 
@@ -44,7 +42,7 @@ impl VerifyingConfig {
         let map = self.keys.read().await;
         map.get(id)
             .cloned()
-            .ok_or(Error::NoDecodingCode(id.0.into()))
+            .ok_or(Error::NoDecodingCode(id.0.clone()))
     }
     pub fn validation(&self) -> &Validation {
         &self.validation
@@ -69,7 +67,7 @@ impl SigningConfig {
     }
 }
 
-pub type Identifier = (KeyId, TokenType);
+pub type Identifier = (Uuid, TokenType);
 
 pub struct SigningConfig {
     signing: RwLock<HashMap<TokenType, Arc<JwtHeader>>>,
@@ -98,7 +96,7 @@ impl TryFrom<PublicJwkSet> for VerifyingConfig {
 
             let decoding_key = DecodingKey::from_ed_components(&jwk.metadata.x).unwrap();
 
-            let kid: KeyId = jwk.metadata.kid;
+            let kid: Uuid = jwk.metadata.kid;
 
             keys.insert((kid, token_type), Arc::new(decoding_key));
         }
@@ -130,7 +128,7 @@ impl TryFrom<PrivateJwkSet> for SigningConfig {
         for jwk in &set.keys {
             let token_type = jwk.public.metadata.token_type;
 
-            let kid: KeyId = jwk.public.metadata.kid;
+            let kid: Uuid = jwk.public.metadata.kid;
 
             let encoding_key = EncodingKey::try_from(jwk.clone()).unwrap();
 

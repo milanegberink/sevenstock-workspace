@@ -3,7 +3,6 @@ use std::hash::Hash;
 use std::str::FromStr;
 
 use crate::error::{Error, Result};
-use crate::services::Services;
 use axum::http::HeaderValue;
 use axum::{
     body::Body,
@@ -19,8 +18,9 @@ use axum_extra::{
         authorization::{Bearer, Credentials},
     },
 };
-use lib_auth::token::TokenType;
+use lib_auth::token::{Claims, TokenType};
 use lib_core::ctx::Ctx;
+use lib_core::model::ModelManager;
 use lib_core::model::permission::{Action, Permission, Permissions, Resource};
 use secrecy::{ExposeSecret, SecretString};
 use thiserror::Error;
@@ -36,7 +36,7 @@ pub async fn mw_ctx_require(ctx: Result<CtxW>, req: Request<Body>, next: Next) -
 }
 
 pub async fn mw_ctx_resolver(
-    State(mm): State<Services>,
+    State(mm): State<ModelManager>,
     token_hdr: TypedHeader<Authorization<Bearer>>,
     mut req: Request<Body>,
     next: Next,
@@ -54,26 +54,7 @@ pub async fn mw_ctx_resolver(
     next.run(req).await
 }
 
-pub async fn mw_ctx_resolver(
-    State(mm): State<Services>,
-    token_hdr: TypedHeader<Authorization<Bearer>>,
-    mut req: Request<Body>,
-    next: Next,
-) -> Response {
-    debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
-
-    let token = token_hdr.token();
-
-    debug!("{}", token);
-
-    let ctx_ext_result = ctx_resolve(mm, token).await;
-
-    req.extensions_mut().insert(ctx_ext_result);
-
-    next.run(req).await
-}
-
-async fn ctx_resolve(_services: Services, token: &str) -> CtxExtResult {
+async fn ctx_resolve(_services: ModelManager, token: &str) -> CtxExtResult {
     let claims = TokenType::Access
         .verify(token)
         .await
@@ -81,13 +62,17 @@ async fn ctx_resolve(_services: Services, token: &str) -> CtxExtResult {
 
     let mut permissions: Permissions = HashMap::new();
 
-    let scope = claims.scope();
+    let Some(scope) = claims.scope() else {
+        return Err(CtxExtError::TokenWrongFormat);
+    };
 
     for token in scope.split_whitespace() {
         if let Some((resource_str, action_str)) = token.split_once(':') {
-            let resource = Resource::from_str(resource_str)?;
+            let resource = Resource::from_str(resource_str)
+                .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
 
-            let action = Action::from_str(action_str)?;
+            let action = Action::from_str(action_str)
+                .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
 
             permissions
                 .entry(resource)
@@ -96,7 +81,11 @@ async fn ctx_resolve(_services: Services, token: &str) -> CtxExtResult {
         }
     }
 
-    Ctx::new(claims.sub().clone(), permissions)
+    let Some(sub) = claims.sub() else {
+        return Err(CtxExtError::TokenWrongFormat);
+    };
+
+    Ctx::new(sub.clone())
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }

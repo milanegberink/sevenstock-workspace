@@ -28,6 +28,7 @@ aws-sdk-elasticache = { workspace = true }
 modql.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
+serde-email.workspace = true
 
 [lints]
 workspace = true

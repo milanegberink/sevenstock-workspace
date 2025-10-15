@@ -1,9 +1,10 @@
-use crate::{error::Result, middleware::mw_auth::CtxW, services::Services};
+use crate::{error::Result, middleware::mw_auth::CtxW};
 use axum::{body::Body, extract::State, http::Request, middleware::Next, response::Response};
+use lib_core::model::ModelManager;
 use tracing::info;
 
 pub async fn mw_rate_limiter(
-    State(mm): State<Services>,
+    State(mm): State<ModelManager>,
     ctx: CtxW,
     req: Request<Body>,
     next: Next,

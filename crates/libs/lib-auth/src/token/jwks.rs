@@ -7,12 +7,11 @@ use lib_utils::b64::{b64u_decode, b64u_encode};
 use pkcs8::EncodePrivateKey;
 use rand::rngs::OsRng;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::token::{Error, Result, TokenType};
 
 pub use jsonwebtoken::EncodingKey;
-
-use crate::token::KeyId;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct JwkSet<T> {
@@ -28,7 +27,7 @@ pub struct JwkMetadata {
     #[serde(rename = "use")]
     pub public_key_use: PublicKeyUse,
     pub token_type: TokenType,
-    pub kid: KeyId,
+    pub kid: Uuid,
     pub x: String,
     alg: Algorithm,
     kty: OctetKeyPairType,
@@ -81,7 +80,7 @@ impl PrivateJwk {
         let metadata = JwkMetadata {
             public_key_use: PublicKeyUse::Signature,
             alg: Algorithm::EdDSA,
-            kid: KeyId::new(),
+            kid: Uuid::now_v7(),
             kty: OctetKeyPairType::OctetKeyPair,
             crv: EllipticCurve::Ed25519,
             x,

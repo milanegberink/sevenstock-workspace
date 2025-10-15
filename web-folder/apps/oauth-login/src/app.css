@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+@source "../node_modules/@lib/components/dist";
+
+@theme {
+	--font-sans: 'Zalando Sans', sans-serif;
+	--background-color-secondary: #f9f9f9;
+	--border-color-primary: #f2f2f2;
+	--background-color-border: #f2f2f2;
+}
+
+:root {
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}

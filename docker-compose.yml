@@ -1,27 +1,18 @@
 services:
-  authn-server:
+  web-server:
     build:
       context: .
-      dockerfile: crates/services/authn-server/Dockerfile
-    container_name: auth-server
-    ports:
-      - "50051:50051"
-  api-gateway:
-    build:
-      context: .
-      dockerfile: crates/services/api-gateway/Dockerfile
-    container_name: api-gateway
+      dockerfile: crates/services/web-server/Dockerfile
+    container_name: web-server
     depends_on:
       - db
       - valkey
-      - authn-server
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     environment:
       BACKEND_PORT: ${BACKEND_PORT}
       DATABASE_URL: postgres://postgres:password@db:5432/sevenstock
       REDIS_URL: redis://valkey:6379/
-      AUTH_GRPC_URL: http://auth-server:50051
   front-end:
     build:
       context: ./web-folder/

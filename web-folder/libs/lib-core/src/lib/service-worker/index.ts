@@ -9,7 +9,6 @@ import { post } from '$lib/better-fetch.svelte';
 export * from '../result.js';
 export * from './request.js';
 export { sendRequest } from './make-request.js';
-import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 class Config {
 	token?: string;

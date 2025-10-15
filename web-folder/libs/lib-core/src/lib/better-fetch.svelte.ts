@@ -1,5 +1,10 @@
 import type { Result, PromiseResult } from './result.js';
 import { ok, err } from './result.js';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
+
+const defaultHeaders = {
+	'Content-Type': 'application/json'
+};
 
 class HttpError extends Error {
 	constructor() {
@@ -12,16 +17,33 @@ enum Method {
 	Post = 'POST'
 }
 
-async function request<T, R>(endpoint: URL, method: Method, body?: T): PromiseResult<R> {
-	let headers = new Headers({ 'Content-Type': 'application/json' });
-	const opts: RequestInit = {
+function buildURL(url: string | URL) {
+	if (url instanceof URL) {
+		return url;
+	}
+
+	if (url.startsWith('https://')) {
+		return new URL(url);
+	}
+
+	return new URL(url, PUBLIC_BACKEND_URL);
+}
+
+async function request<T, R>(
+	endpoint: string | URL,
+	method: Method,
+	body?: T,
+	headers?: Headers
+): PromiseResult<R> {
+	const options: RequestInit = {
 		method,
-		headers,
-		credentials: 'include',
+		headers: headers ? headers : defaultHeaders,
 		body: JSON.stringify(body)
 	};
 
-	const res = await fetch(endpoint, opts);
+	endpoint = buildURL(endpoint);
+
+	const res = await fetch(endpoint, options);
 
 	if (!res.ok) {
 		console.log(res);
@@ -32,10 +54,14 @@ async function request<T, R>(endpoint: URL, method: Method, body?: T): PromiseRe
 	return ok(data);
 }
 
-export const get = async <R>(endpoint: URL): PromiseResult<R> => {
+export const get = async <R>(endpoint: string | URL): PromiseResult<R> => {
 	return request(endpoint, Method.Get);
 };
 
-export const post = async <T, R>(endpoint: URL, body?: T): PromiseResult<R> => {
+export const post = async <T, R>(
+	endpoint: string | URL,
+	body?: T,
+	opts?: RequestInfo
+): PromiseResult<R> => {
 	return request(endpoint, Method.Post, body);
 };

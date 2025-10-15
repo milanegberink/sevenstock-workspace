@@ -1,9 +1,9 @@
-use std::marker::PhantomData;
 pub mod config;
 pub mod jwks;
 
 use jsonwebtoken::{decode, decode_header, encode, get_current_timestamp};
 mod error;
+use crate::oauth2::OAuthQuery;
 use crate::token::config::{Identifier, VerifyingConfig, signing_config};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -12,30 +12,26 @@ use uuid::Uuid;
 
 pub use self::error::{Error, Result};
 
-#[derive(Serialize, Deserialize, Copy, Clone, Hash, Eq, PartialEq)]
-#[serde(transparent)]
-pub struct KeyId(Uuid);
-
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Copy, Clone, Debug, Display)]
 #[serde(rename_all = "snake_case")]
 pub enum TokenType {
-    #[strum(serialize = "Access")]
     Access,
-    #[strum(serialize = "Refresh")]
     Refresh,
+    OAuth2,
 }
 
 impl TokenType {
     fn exp(&self) -> u64 {
         match self {
-            TokenType::Access => 900,
-            TokenType::Refresh => 604_800,
+            Self::Access => 900,
+            Self::Refresh => 604_800,
+            Self::OAuth2 => 600,
         }
     }
 }
 
 impl TokenType {
-    pub async fn verify(&self, token: &str) -> Result<Claims<Sub>> {
+    pub async fn verify(&self, token: &str) -> Result<Claims> {
         let config = VerifyingConfig::get()?;
 
         let header = decode_header(token).map_err(|_| Error::InvalidToken)?;
@@ -44,60 +40,40 @@ impl TokenType {
 
         let decoding_key = config.get_decoding_key(&id).await?;
 
-        let token_data = decode::<Claims<Sub>>(token, &decoding_key, config.validation())
+        let token_data = decode::<Claims>(token, &decoding_key, config.validation())
             .map_err(|_| Error::InvalidToken)?;
 
         Ok(token_data.claims)
     }
 }
 
-impl KeyId {
-    fn new() -> Self {
-        Self(Uuid::now_v7())
-    }
-}
-
-impl Into<String> for KeyId {
-    fn into(self) -> String {
-        self.0.into()
-    }
-}
-
-impl TryFrom<String> for KeyId {
-    type Error = Error;
-    fn try_from(id: String) -> Result<Self> {
-        let uuid = Uuid::parse_str(&id).unwrap();
-        Ok(KeyId(uuid))
-    }
-}
-
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Default, Clone)]
-pub struct Claims<U> {
-    sub: U,
+pub struct Claims {
+    sub: Option<Uuid>,
     ident: Option<String>,
     avatar: Option<String>,
     exp: u64,
     iat: u64,
     iss: Option<String>,
     org: Option<String>,
-    scope: String,
+    scope: Option<String>,
+    oauth2_params: Option<OAuthQuery>,
 }
 
-impl Claims<Sub> {
-    pub fn sub(&self) -> &Uuid {
-        &self.sub.0
+impl Claims {
+    pub fn sub(&self) -> &Option<Uuid> {
+        &self.sub
     }
-    pub fn scope(&self) -> &str {
+    pub fn scope(&self) -> &Option<String> {
         &self.scope
     }
 }
 
 #[cfg(feature = "private")]
-pub struct TokenBuilder<U> {
+pub struct Token {
     token_type: TokenType,
-    claims: Claims<U>,
-    _state: PhantomData<U>,
+    claims: Claims,
 }
 
 #[derive(Default, Clone)]
@@ -107,27 +83,32 @@ pub struct NoSub;
 pub struct Sub(Uuid);
 
 #[cfg(feature = "private")]
-impl TokenBuilder<NoSub> {
+impl Token {
     pub fn access() -> Self {
         Self {
             token_type: TokenType::Access,
             claims: Claims::default(),
-            _state: PhantomData,
         }
     }
     pub fn refresh() -> Self {
         Self {
             token_type: TokenType::Refresh,
             claims: Claims::default(),
-            _state: PhantomData,
         }
     }
 
-    pub fn sub(self, sub: &Uuid) -> TokenBuilder<Sub> {
-        TokenBuilder {
+    pub fn oauth2() -> Self {
+        Self {
+            token_type: TokenType::OAuth2,
+            claims: Claims::default(),
+        }
+    }
+
+    pub fn sub(self, sub: &Uuid) -> Token {
+        Token {
             token_type: self.token_type,
             claims: Claims {
-                sub: Sub(*sub),
+                sub: Some(*sub),
                 ident: self.claims.ident,
                 avatar: self.claims.avatar,
                 exp: self.claims.exp,
@@ -135,21 +116,21 @@ impl TokenBuilder<NoSub> {
                 org: self.claims.org,
                 iss: self.claims.iss,
                 scope: self.claims.scope,
+                oauth2_params: self.claims.oauth2_params,
             },
-            _state: PhantomData,
         }
     }
 }
 
 #[cfg(feature = "private")]
-impl TokenBuilder<Sub> {
+impl Token {
     pub fn ident<S: Into<String>>(mut self, ident: S) -> Self {
         self.claims.ident = Some(ident.into());
         self
     }
 
     pub fn scope<S: Into<String>>(mut self, scope: S) -> Self {
-        self.claims.scope = scope.into();
+        self.claims.scope = Some(scope.into());
 
         self
     }
@@ -161,6 +142,11 @@ impl TokenBuilder<Sub> {
 
     pub fn org<S: Into<String>>(mut self, org: S) -> Self {
         self.claims.org = Some(org.into());
+        self
+    }
+
+    pub fn oauth2_params(mut self, params: OAuthQuery) -> Self {
+        self.claims.oauth2_params = Some(params);
         self
     }
 
@@ -178,10 +164,11 @@ impl TokenBuilder<Sub> {
             ident: self.claims.ident,
             avatar: self.claims.avatar,
             exp: current_timestamp + self.token_type.exp(),
-            iat: current_timestamp,
             org: self.claims.org,
             scope: self.claims.scope,
             iss: self.claims.iss,
+            iat: self.claims.iat,
+            oauth2_params: self.claims.oauth2_params,
         };
 
         let jwt_header = config

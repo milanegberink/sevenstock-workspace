@@ -1,4 +1,5 @@
 use thiserror::Error;
+use uuid::Uuid;
 
 use crate::token::TokenType;
 
@@ -28,7 +29,7 @@ pub enum Error {
     NoConfigFound,
 
     #[error("No decoding key found for key id: {0}")]
-    NoDecodingCode(String),
+    NoDecodingCode(Uuid),
 
     #[error("No header was found for token type: {token_type}")]
     NoHeaderFound { token_type: TokenType },

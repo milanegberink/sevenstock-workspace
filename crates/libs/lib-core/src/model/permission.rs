@@ -16,7 +16,9 @@ use crate::model::{ModelManager, base::DbBmc};
 
 pub type Permissions = HashMap<Resource, HashSet<Action>>;
 
-#[derive(EnumString, Clone, Display, Serialize, Deserialize, Debug, sqlx::Type)]
+#[derive(
+    EnumString, Clone, Display, Serialize, Deserialize, Debug, sqlx::Type, PartialEq, Eq, Hash,
+)]
 #[sqlx(type_name = "varchar", rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum Resource {
@@ -31,7 +33,9 @@ impl From<Resource> for sea_query::Value {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(EnumString, Clone, Display, sqlx::Type, Deserialize, Serialize, Debug)]
+#[derive(
+    EnumString, Clone, Display, sqlx::Type, Deserialize, Serialize, Debug, PartialEq, Eq, Hash,
+)]
 #[sqlx(type_name = "action_permission")]
 #[strum(serialize_all = "lowercase")]
 pub enum Action {
