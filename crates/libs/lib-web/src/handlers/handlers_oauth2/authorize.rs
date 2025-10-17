@@ -3,9 +3,13 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use axum_extra::extract::{CookieJar, cookie::Cookie};
-use lib_auth::{oauth2::OAuthQuery, token::Token};
+use lib_auth::{
+    oauth2::OAuthQuery,
+    token::{AccessClaims, AccessToken, Token, TokenType},
+};
 use lib_core::model::ModelManager;
 use serde::Deserialize;
+use uuid::Uuid;
 
 use crate::Result;
 
@@ -13,13 +17,9 @@ pub async fn oauth2_authorize_handler(
     State(mm): State<ModelManager>,
     Query(req): Query<OAuthQuery>,
 ) -> impl IntoResponse {
-    let token = Token::oauth2()
-        .oauth2_params(req)
-        .build_async()
-        .await
-        .unwrap();
-
     let login_url = format!("/login?token={}", token);
+
+    let x = AccessToken::new(Uuid::now_v7()).encode().await?;
 
     Redirect::to(&login_url)
 }

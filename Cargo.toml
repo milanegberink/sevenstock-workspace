@@ -10,7 +10,7 @@ members = [
     "crates/libs/lib-utils",
     "crates/services/web-server",
     "crates/libs/lib-grpc",
-    "crates/services/aws-lambdas",
+    "crates/services/aws-lambdas", "crates/services/auth-server",
 ]
 
 

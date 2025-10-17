@@ -1,7 +1,9 @@
 use crate::Result;
 use axum::{Json, extract::Query};
 use axum_extra::headers::authorization::Bearer;
-use lib_auth::token::{TokenType, config::VerifyingConfig, jwks::PublicJwkSet};
+use lib_auth::token::{
+    RefreshToken, Token, TokenType, config::VerifyingConfig, jwks::PublicJwkSet,
+};
 use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 
@@ -31,8 +33,9 @@ enum GrantType {
 }
 
 pub async fn api_token(Query(req): Query<TokenRequest>) -> Result<Json<TokenResponse>> {
-    let refresh_token = req.refresh_token.expose_secret();
-    TokenType::Refresh.verify(refresh_token).await?;
+    let refresh_token_str = req.refresh_token.expose_secret();
+
+    let token = RefreshToken::decode(refresh_token).await?;
 
     let res = TokenResponse {
         access_token: "meow".into(),

@@ -1,4 +1,5 @@
 use ed25519_dalek::{SigningKey, VerifyingKey};
+use jose_jwk::{Key, Okp};
 use jsonwebtoken::{
     Algorithm,
     jwk::{EllipticCurve, OctetKeyPairType, PublicKeyUse},
@@ -13,62 +14,22 @@ use crate::token::{Error, Result, TokenType};
 
 pub use jsonwebtoken::EncodingKey;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct JwkSet<T> {
-    pub keys: Vec<T>,
-}
+// impl TryFrom<PrivateJwk> for EncodingKey {
+//     type Error = Error;
+//     fn try_from(jwk: PrivateJwk) -> Result<Self> {
+//         let secret = jwk.d;
 
-pub type PrivateJwkSet = JwkSet<PrivateJwk>;
+//         let bytes: [u8; 32] = b64u_decode(&secret).unwrap().try_into().unwrap();
 
-pub type PublicJwkSet = JwkSet<PublicJwk>;
+//         let der = ed25519_dalek::SigningKey::from_bytes(&bytes)
+//             .to_pkcs8_der()
+//             .unwrap();
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct JwkMetadata {
-    #[serde(rename = "use")]
-    pub public_key_use: PublicKeyUse,
-    pub token_type: TokenType,
-    pub kid: Uuid,
-    pub x: String,
-    alg: Algorithm,
-    kty: OctetKeyPairType,
-    crv: EllipticCurve,
-}
+//         let encoding_key = EncodingKey::from_ed_der(der.as_bytes());
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct PrivateJwk {
-    #[serde(flatten)]
-    pub public: PublicJwk,
-    pub d: String,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct PublicJwk {
-    #[serde(flatten)]
-    pub metadata: JwkMetadata,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum Jwk {
-    Public(PublicJwk),
-    Private(PrivateJwk),
-}
-
-impl TryFrom<PrivateJwk> for EncodingKey {
-    type Error = Error;
-    fn try_from(jwk: PrivateJwk) -> Result<Self> {
-        let secret = jwk.d;
-
-        let bytes: [u8; 32] = b64u_decode(&secret).unwrap().try_into().unwrap();
-
-        let der = ed25519_dalek::SigningKey::from_bytes(&bytes)
-            .to_pkcs8_der()
-            .unwrap();
-
-        let encoding_key = EncodingKey::from_ed_der(der.as_bytes());
-
-        Ok(encoding_key)
-    }
-}
+//         Ok(encoding_key)
+//     }
+// }
 
 impl PrivateJwk {
     pub fn new(token_type: TokenType) -> Self {
