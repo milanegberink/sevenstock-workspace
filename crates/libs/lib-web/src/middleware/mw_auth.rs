@@ -18,7 +18,7 @@ use axum_extra::{
         authorization::{Bearer, Credentials},
     },
 };
-use lib_auth::token::{Claims, TokenType};
+use lib_auth::token::{AccessToken, Claims, Token, TokenType};
 use lib_core::ctx::Ctx;
 use lib_core::model::ModelManager;
 use lib_core::model::permission::{Action, Permission, Permissions, Resource};
@@ -55,10 +55,7 @@ pub async fn mw_ctx_resolver(
 }
 
 async fn ctx_resolve(_services: ModelManager, token: &str) -> CtxExtResult {
-    let claims = TokenType::Access
-        .verify(token)
-        .await
-        .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
+    let claims = AccessToken::decode(token).await?;
 
     let mut permissions: Permissions = HashMap::new();
 
@@ -81,11 +78,7 @@ async fn ctx_resolve(_services: ModelManager, token: &str) -> CtxExtResult {
         }
     }
 
-    let Some(sub) = claims.sub() else {
-        return Err(CtxExtError::TokenWrongFormat);
-    };
-
-    Ctx::new(sub.clone())
+    Ctx::new(claims.sub)
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }

@@ -9,15 +9,17 @@ pub use self::error::{Error, Result};
 #[derive(Clone, Debug)]
 pub struct Ctx {
     user_id: Uuid,
+    org_id: Option<Uuid>,
 }
 
 impl Ctx {
-    pub fn new(user_id: Uuid) -> Result<Self> {
-        Ok(Self { user_id })
+    pub fn new(user_id: Uuid, org_id: Option<Uuid>) -> Result<Self> {
+        Ok(Self { user_id, org_id })
     }
     pub fn root_ctx() -> Self {
         Ctx {
             user_id: Uuid::nil(),
+            org_id: None,
         }
     }
 }

@@ -82,4 +82,26 @@ CREATE TABLE "oauth_client" (
 CREATE TABLE "user_session" (
     id uuid DEFAULT uuidv7() PRIMARY KEY,
     user_id uuid REFERENCES "user"(id) ON DELETE cascade
-)
+);
+
+CREATE TABLE "token_base" (
+    id uuid DEFAULT uuidv7() PRIMARY KEY,
+    hash bytea NOT NULL unique,
+    user_id uuid NOT NULL,
+    is_revoked boolean NOT NULL default FALSE,
+
+    expires_at timestamp with time zone NOT NULL,
+
+    -- Timestamps
+    cid uuid NOT NULL,
+    ctime timestamp with time zone NOT NULL,
+    mid uuid NOT NULL,
+    mtime timestamp with time zone NOT NULL,
+
+    expires_at timestamp with time zone NOT NULL,
+);
+
+CREATE TABLE "refresh_token" () INHERITS (token_base);
+CREATE TABLE "authorization_code" () INHERITS (token_base);
+
+CREATE INDEX idx_token_hash ON refresh_token(token_hash);

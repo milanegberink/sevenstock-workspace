@@ -3,6 +3,7 @@ pub mod base;
 pub mod error;
 pub mod organisation;
 pub mod permission;
+pub mod refresh_token;
 pub mod role;
 pub mod store;
 pub mod user;

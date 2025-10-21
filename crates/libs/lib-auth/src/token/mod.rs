@@ -9,6 +9,7 @@ use strum_macros::Display;
 use uuid::Uuid;
 mod config;
 mod error;
+pub mod jwks;
 
 pub use self::error::{Error, Result};
 
@@ -20,16 +21,18 @@ pub const REFRESH_TOKEN_TTL: u64 = 9000;
 #[derive(Clone, Hash, PartialEq, Eq, Debug, Display, Deserialize, Copy)]
 pub enum TokenType {
     Access,
-    Refresh,
+    IDToken,
 }
 
-pub trait Token: Serialize + DeserializeOwned + Sized {
-    const TOKEN_TYPE: TokenType;
+pub trait Jwt: Serialize + DeserializeOwned + Sized {
     async fn encode(&self) -> Result<String> {
         let config = SigningConfig::get()?;
 
-        let jwt_header = config.get_encoding_key(Self::TOKEN_TYPE).await?;
-        let token = encode(jwt_header.header(), &self, jwt_header.encoding_key())?;
+        let encoding_key = config.encoding_key();
+
+        let header = config.header();
+
+        let token = encode(header, &self, encoding_key)?;
 
         Ok(token)
     }
@@ -42,7 +45,7 @@ pub trait Token: Serialize + DeserializeOwned + Sized {
 
         let kid = Uuid::parse_str(&kid_string).map_err(|_| Error::InvalidToken)?;
 
-        let decoding_key = config.get_decoding_key(&(kid, Self::TOKEN_TYPE)).await?;
+        let decoding_key = config.get_decoding_key(kid).await?;
 
         let token_date = decode::<Self>(token, &decoding_key, config.validation())?;
 
@@ -52,13 +55,9 @@ pub trait Token: Serialize + DeserializeOwned + Sized {
 
 #[derive(Clone, Hash, PartialEq, Eq, Debug, Serialize, Deserialize, Copy)]
 pub struct AccessToken {
-    sub: Uuid,
+    pub sub: Uuid,
     #[serde(flatten)]
     std_claims: StandardClaims,
-}
-
-impl Token for AccessToken {
-    const TOKEN_TYPE: TokenType = TokenType::Access;
 }
 
 #[derive(Clone, Hash, PartialEq, Eq, Debug, Serialize, Deserialize, Copy)]
@@ -74,6 +73,9 @@ impl AccessToken {
             std_claims: StandardClaims::new(ACCESS_TOKEN_TTL),
         }
     }
+    pub fn expires_at(&self) -> u64 {
+        self.std_claims.exp
+    }
 }
 
 impl StandardClaims {
@@ -87,21 +89,17 @@ impl StandardClaims {
 }
 
 #[derive(Clone, Hash, PartialEq, Eq, Debug, Serialize, Copy, Deserialize)]
-pub struct RefreshToken {
-    sub: Uuid,
+pub struct IDToken {
+    pub sub: Uuid,
     #[serde(flatten)]
     std_claims: StandardClaims,
 }
 
-impl RefreshToken {
+impl IDToken {
     pub fn new(sub: Uuid) -> Self {
-        RefreshToken {
+        IDToken {
             sub,
-            std_claims: StandardClaims::new(ACCESS_TOKEN_TTL),
+            std_claims: StandardClaims::new(REFRESH_TOKEN_TTL),
         }
     }
-}
-
-impl Token for RefreshToken {
-    const TOKEN_TYPE: TokenType = TokenType::Refresh;
 }

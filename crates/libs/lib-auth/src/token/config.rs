@@ -4,10 +4,10 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, jwk::JwkSet};
+use jose_jwk::{jose_b64::base64ct::Encoding, JwkSet as PrivateJwkSet};
+use jsonwebtoken::{jwk::{Jwk, JwkSet}, DecodingKey, EncodingKey, Header, Validation};
 use tokio::sync::RwLock;
 use uuid::Uuid;
-
 
 static PUBLIC_INSTANCE: OnceLock<VerifyingConfig> = OnceLock::new();
 
@@ -21,7 +21,7 @@ pub fn signing_config() -> Result<&'static SigningConfig> {
 
 pub struct VerifyingConfig {
     validation: Validation,
-    keys: RwLock<HashMap<Identifier, Arc<DecodingKey>>>,
+    keys: RwLock<HashMap<Uuid, Arc<DecodingKey>>>,
 }
 
 impl VerifyingConfig {
@@ -36,20 +36,22 @@ impl VerifyingConfig {
     pub fn get() -> Result<&'static Self> {
         PUBLIC_INSTANCE.get().ok_or(Error::NoConfigFound)
     }
-    pub async fn get_decoding_key(&self, id: &Identifier) -> Result<Arc<DecodingKey>> {
+    pub async fn get_decoding_key(&self, id: Uuid) -> Result<Arc<DecodingKey>> {
         let map = self.keys.read().await;
-        let id = map.get(id).cloned().ok_or(Error::NoDecodingCode(id.0.clone()))?;
+        let id = map
+            .get(&id)
+            .cloned()
+            .ok_or(Error::NoDecodingCode(id))?;
 
         Ok(id)
     }
     pub fn validation(&self) -> &Validation {
         &self.validation
     }
-
 }
 
 impl SigningConfig {
-    pub fn init(set: PrivateJwkSet) -> Result<()> {
+    pub fn init(set: JwkSet) -> Result<()> {
         let private_config = SigningConfig::try_from(set)?;
         PRIVATE_INSTANCE
             .set(private_config)
@@ -60,76 +62,47 @@ impl SigningConfig {
     pub fn get() -> Result<&'static Self> {
         PRIVATE_INSTANCE.get().ok_or(Error::NoConfigFound)
     }
-    pub async fn get_encoding_key(&self, token_type: TokenType) -> Result<Arc<JwtHeader>> {
-        let map = self.signing.read().await;
-        map.get(&token_type).cloned().ok_or(Error::NoHeaderFound { token_type })
-    }
-}
-
-pub type Identifier = (Uuid, TokenType);
-
-pub struct SigningConfig {
-    signing: RwLock<HashMap<TokenType, Arc<JwtHeader>>>,
-}
-
-pub struct JwtHeader {
-    encoding_key: Arc<EncodingKey>,
-    header: Arc<Header>,
-}
-
-impl JwtHeader {
-    pub(crate) fn header(&self) -> &Header {
-        &self.header
-    }
-    pub(crate) fn encoding_key(&self) -> &EncodingKey {
+    pub fn encoding_key(&self) -> &EncodingKey {
         &self.encoding_key
     }
+    pub fn header(&self) -> &Header {
+        &self.header
+    }
 }
+
+pub struct SigningConfig {
+    encoding_key: EncodingKey,
+    header: Header
+}
+
 
 impl TryFrom<JwkSet> for VerifyingConfig {
     type Error = Error;
     fn try_from(set: JwkSet) -> Result<Self> {
         let mut keys = HashMap::new();
-        for jwk in &set.keys {
-            let token_type = jwk.common.tok
+        for jwk in set.keys {
+            let decoding_key = DecodingKey::from_jwk(&jwk)?;
 
-            let decoding_key = DecodingKey::from_ed_components(&jwk.metadata.x).unwrap();
+            let kid_str = jwk.common.key_id.ok_or(Error::InvalidJwkSet)?;
 
-            let kid: Uuid = jwk.metadata.kid;
+            let kid = Uuid::parse_str(&kid_str).map_err(|_| Error::InvalidToken)?;
 
-            keys.insert((kid, token_type), Arc::new(decoding_key));
+            keys.insert(kid, Arc::new(decoding_key));
         }
 
         Ok(Self {
             validation: Validation::new(jsonwebtoken::Algorithm::EdDSA),
             keys: RwLock::new(keys),
-            jwk_set: set,
         })
     }
 }
 
-impl From<PrivateJwkSet> for PublicJwkSet {
-    fn from(set: PrivateJwkSet) -> Self {
-        let public_keys = set
-            .keys
-            .into_iter()
-            .map(|private_jwk| private_jwk.public)
-            .collect();
-
-        Self { keys: public_keys }
-    }
-}
-
-impl TryFrom<PrivateJwkSet> for SigningConfig {
+impl TryFrom<Jwk> for SigningConfig {
     type Error = Error;
-    fn try_from(set: PrivateJwkSet) -> Result<Self> {
+    fn try_from(set: Jwk) -> Result<Self> {
         let mut keys = HashMap::new();
-        for jwk in &set.keys {
-            let token_type = jwk.public.metadata.token_type;
-
-            let kid: Uuid = jwk.public.metadata.kid;
-
-            let encoding_key = EncodingKey::try_from(jwk.clone()).unwrap();
+        for jwk in set.keys {
+            let encoding_key = EncodingKey::from
 
             let mut header = Header::new(jsonwebtoken::Algorithm::EdDSA);
 
