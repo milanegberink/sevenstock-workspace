@@ -1,9 +1,7 @@
 mod error;
-
-use blake3::Hash;
 use lib_utils::b64::b64u_encode;
 use rand::{RngCore, rngs::OsRng};
-use secrecy::{ExposeSecret, SecretString};
+use secrecy::SecretString;
 
 use self::error::{Error, Result};
 

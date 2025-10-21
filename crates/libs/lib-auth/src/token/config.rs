@@ -4,7 +4,6 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use jose_jwk::{jose_b64::base64ct::Encoding, JwkSet as PrivateJwkSet};
 use jsonwebtoken::{jwk::{Jwk, JwkSet}, DecodingKey, EncodingKey, Header, Validation};
 use tokio::sync::RwLock;
 use uuid::Uuid;
@@ -21,7 +20,12 @@ pub fn signing_config() -> Result<&'static SigningConfig> {
 
 pub struct VerifyingConfig {
     validation: Validation,
-    keys: RwLock<HashMap<Uuid, Arc<DecodingKey>>>,
+    keys: HashMap<Uuid, DecodingKey>,
+}
+
+pub struct SigningConfig {
+    encoding_key: EncodingKey,
+    header: Header
 }
 
 impl VerifyingConfig {
@@ -70,10 +74,6 @@ impl SigningConfig {
     }
 }
 
-pub struct SigningConfig {
-    encoding_key: EncodingKey,
-    header: Header
-}
 
 
 impl TryFrom<JwkSet> for VerifyingConfig {
