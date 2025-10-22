@@ -23,7 +23,7 @@
 
 {#if visible}
 	<div
-		class="fixed top-0 left-0 h-1 w-full origin-left bg-orange-700"
+		class="fixed top-0 left-0 z-999 h-1 w-full origin-left bg-orange-700"
 		style="transform: scaleX({progress.current / 100});"
 	></div>
 {/if}

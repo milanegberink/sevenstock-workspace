@@ -4,7 +4,7 @@
 	import HouseBold from '~icons/ph/house-bold';
 	import ShoppingCart from '~icons/ph/shopping-cart-simple-bold';
 
-	import { Header, SubMenu } from 'lib-components';
+	import { Header, SubMenu } from '@lib/components';
 
 	let spaces = [
 		{

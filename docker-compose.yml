@@ -25,6 +25,7 @@ services:
     volumes:
       - ./web-folder:/app
       - /app/node_modules
+      - /app/apps/front-end/node_modules
 
     environment:
       BACKEND_URL: http://localhost:${BACKEND_PORT}

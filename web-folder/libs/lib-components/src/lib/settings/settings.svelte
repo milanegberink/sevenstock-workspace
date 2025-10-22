@@ -79,9 +79,9 @@
 </div>
 
 {#snippet account()}
-	{@render setting_info('Account', 'Change account information')}
+	<!-- {@render setting_info('Account', 'Change account information')}
 	<Input bind:value={userStore.user.email} readonly></Input>
-	<Input bind:value={userStore.user.ident} readonly></Input>
+	<Input bind:value={userStore.user.ident} readonly></Input> -->
 {/snippet}
 
 {#snippet setting_info(title: string, description: string)}

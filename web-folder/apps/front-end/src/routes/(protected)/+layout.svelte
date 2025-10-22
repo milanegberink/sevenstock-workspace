@@ -13,7 +13,7 @@
 	import ChartLineUp from '~icons/ph/chart-line-up-bold';
 	import TrendUp from '~icons/ph/trend-up-bold';
 
-	let loading = $state<boolean>(true);
+	let loading = $state<boolean>(false);
 
 	$effect(() => {
 		(async () => {

@@ -1,6 +1,15 @@
 <script lang="ts">
 	import NavItem from './link.svelte';
 	import { HorizontalSeparator, VerticalSeparator, AlertDialog, Settings } from '$lib/index.js';
+	import { Spring } from 'svelte/motion';
+
+	const width = new Spring(256, {
+		stiffness: 0.06,
+		damping: 0.2
+	});
+	$effect(() => {
+		width.set(open ? 256 : 52);
+	});
 
 	import { setSidebarContext } from './context.js';
 	import Profile from './profile.svelte';
@@ -20,23 +29,11 @@
 
 <nav
 	bind:this={sidebar}
-	class={[
-		'bg-secondary flex h-full flex-col items-center justify-between transition-[width]',
-		open && 'w-64',
-		!open && 'w-13'
-	]}
+	class="bg-secondary group/nav relative flex h-full flex-col items-center justify-between"
+	style="width: {width.current}px"
 >
 	<div class="h-full w-full">
-		<div class="flex h-14 w-full items-center justify-between">
-			<button
-				class="flex aspect-square w-8 items-center justify-center rounded-xl hover:bg-gray-200"
-				onclick={() => (open = !open)}
-			>
-				{#if open}
-					<ArrowLineRight />
-				{/if}
-			</button>
-		</div>
+		<div class="flex h-14 w-full items-center justify-between"></div>
 
 		<HorizontalSeparator />
 		{#each spaces as space}
@@ -77,6 +74,10 @@
 		<!-- Profile section -->
 		<Profile />
 	</div>
+	<div
+		onclick={() => (open = !open)}
+		class="absolute top-1/2 right-1.5 h-10 w-2.5 -translate-y-1/2 rounded-full transition-all group-hover/nav:bg-black/10 hover:h-14 hover:cursor-pointer active:h-10"
+	></div>
 </nav>
 
 <VerticalSeparator />
