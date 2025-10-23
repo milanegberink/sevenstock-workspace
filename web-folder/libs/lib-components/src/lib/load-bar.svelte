@@ -2,6 +2,7 @@
 	import { navigating } from '$app/state';
 	import { cubicOut } from 'svelte/easing';
 	import { Tween } from 'svelte/motion';
+	import { fly } from 'svelte/transition';
 
 	let progress = new Tween(0, { duration: 300, easing: cubicOut });
 
@@ -10,20 +11,23 @@
 	$effect(() => {
 		if (navigating.to) {
 			visible = true;
-			progress.set(80);
+			progress.set(70);
 		} else {
 			progress.set(100);
-			const reset = setTimeout(() => {
+			setTimeout(() => {
 				progress.set(0);
 				visible = false;
-			}, 300);
+			}, 500);
 		}
 	});
 </script>
 
 {#if visible}
-	<div
-		class="fixed top-0 left-0 z-999 h-1 w-full origin-left bg-orange-700"
-		style="transform: scaleX({progress.current / 100});"
-	></div>
+	<div transition:fly={{ y: -20 }}>
+		<div
+			class="fixed top-2 left-1/2 z-999 h-2 w-18 origin-left rounded-full bg-blue-400"
+			style="transform: scaleX({progress.current / 100});"
+		></div>
+		<div class="fixed top-2 left-1/2 z-999 h-2 w-18 origin-left rounded-full bg-black/20"></div>
+	</div>
 {/if}

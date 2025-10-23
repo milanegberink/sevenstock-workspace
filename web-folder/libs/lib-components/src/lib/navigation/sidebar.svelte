@@ -14,7 +14,6 @@
 	import { setSidebarContext } from './context.js';
 	import Profile from './profile.svelte';
 	let { spaces } = $props();
-	import ArrowLineRight from '~icons/ph/arrow-line-right-bold';
 	import SettingsIcon from '~icons/ph/gear-six-bold';
 	import SidebarSpace from './sidebar-space.svelte';
 
@@ -55,20 +54,7 @@
 	</div>
 	<div class="w-full">
 		<SidebarSpace>
-			<ul class="border-primary flex flex-1 flex-col gap-0.5">
-				<AlertDialog>
-					{#snippet trigger({ onclick, isOpen })}
-						<NavItem {onclick} active={isOpen} text={'Settings'}>
-							{#snippet icon()}
-								<SettingsIcon />
-							{/snippet}
-						</NavItem>
-					{/snippet}
-					{#snippet content({ close })}
-						<Settings {close} />
-					{/snippet}
-				</AlertDialog>
-			</ul>
+			<ul class="border-primary flex flex-1 flex-col gap-0.5"></ul>
 		</SidebarSpace>
 
 		<!-- Profile section -->
@@ -76,7 +62,7 @@
 	</div>
 	<div
 		onclick={() => (open = !open)}
-		class="absolute top-1/2 right-1.5 h-10 w-2.5 -translate-y-1/2 rounded-full transition-all group-hover/nav:bg-black/10 hover:h-14 hover:cursor-pointer active:h-10"
+		class="absolute top-1/2 right-1.5 h-10 w-2.5 -translate-y-1/2 rounded-full transition-all group-hover/nav:bg-black/10 hover:h-14 hover:cursor-pointer hover:bg-black/20 active:h-10"
 	></div>
 </nav>
 

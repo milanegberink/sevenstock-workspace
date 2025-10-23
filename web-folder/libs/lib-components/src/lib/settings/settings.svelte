@@ -49,7 +49,7 @@
 	];
 </script>
 
-<div class="h-[70vh] w-[70vw] overflow-hidden rounded-2xl bg-white">
+<div class="h-[70vh] w-[70vw] overflow-hidden rounded-md bg-white">
 	<Header name="Settings">
 		<CloseButton onclick={close} />
 	</Header>

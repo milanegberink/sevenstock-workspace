@@ -1,13 +1,8 @@
 <script>
 	import { userStore } from '@lib/core/stores';
 	import { Header } from '@lib/components';
-	import { Popover } from '@lib/components';
-
-	async function onclick() {
-		console.log(userStore.user);
-	}
+	import ArrowLineRight from '~icons/ph/arrow-line-right-bold';
+	import SettingsIcon from '~icons/ph/gear-six-bold';
 </script>
 
 <Header name="Products" />
-
-<Popover />
