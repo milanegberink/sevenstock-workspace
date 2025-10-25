@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { fade } from 'svelte/transition';
 	let { onclick, href, active, text, icon, ...props } = $props();
 
 	import { getSidebarContext } from './context.js';
@@ -12,9 +10,9 @@
 
 <li
 	class={[
-		'group rounded-xl transition-colors hover:bg-gray-100',
-		active && 'bg-gray-100 text-black',
-		!active && 'text-gray-700'
+		'group hover:bg-tertiary rounded-xl',
+		active && 'bg-tertiary text-primary',
+		!active && 'text-secondary'
 	]}
 >
 	<svelte:element
@@ -29,12 +27,10 @@
 		</div>
 
 		{#if open()}
-			<span transition:fade={{ duration: 50 }} class="text-shadow-2xs text-shadow-white"
-				>{text}</span
-			>
+			<span>{text}</span>
 		{:else}
 			<span
-				class="invisible absolute left-12 rounded-md bg-black px-2 py-1 text-sm font-medium text-white group-hover:visible"
+				class="bg-primary border-primary text-primary invisible ml-1 -translate-x-2 rounded-md border px-2 py-1 text-sm font-medium opacity-0 transition-all group-hover:visible group-hover:translate-x-0 group-hover:opacity-100"
 			>
 				{text}
 			</span>

@@ -30,9 +30,9 @@
 
 <Dropdown {items}>
 	{#snippet trigger({ popovertarget, anchor })}
-		<button style:anchor-name={anchor} {popovertarget} class="flex h-14 w-full items-center gap-2">
+		<button style:anchor-name={anchor} {popovertarget} class="flex h-13 w-full items-center gap-2">
 			<div class="flex aspect-square h-full items-center justify-center">
-				<Avatar url={'meow'} letter="M" />
+				<Avatar letter="M" />
 			</div>
 
 			{#if open()}
@@ -47,9 +47,3 @@
 <!-- {#if userStore.user} -->
 
 <!-- {/if} -->
-
-<AlertDialog isOpen={settings}>
-	{#snippet content()}
-		<Settings close={() => (settings = false)} />
-	{/snippet}
-</AlertDialog>

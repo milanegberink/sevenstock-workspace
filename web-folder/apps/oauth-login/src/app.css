@@ -3,8 +3,11 @@
 
 @theme {
 	--font-sans: 'Zalando Sans', sans-serif;
-	--background-color-secondary: #f9f9f9;
+	--background-color-primary: white;
+	--background-color-secondary: green;
+	--background-color-tertiary: #f0f0f0;
 	--border-color-primary: #f2f2f2;
+
 	--background-color-border: #f2f2f2;
 }
 
@@ -14,3 +17,10 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+
+/*html[data-theme='dark'] {
+	color-scheme: dark;
+	--background-color-secondary: #f9f9f9;
+	--border-color-primary: #f2f2f2;
+	--background-color-border: #f2f2f2;
+}*/

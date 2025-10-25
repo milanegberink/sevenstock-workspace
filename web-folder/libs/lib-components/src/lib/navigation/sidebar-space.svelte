@@ -8,9 +8,13 @@
 </script>
 
 <div class="flex w-full flex-col p-1.5">
-	{#if open() && name}
-		<span transition:slide={{ duration: 200 }} class="p-2 text-sm select-none">{name}</span>
-	{/if}
+	<ul class="flex flex-1 flex-col gap-0.5">
+		{#if open() && name}
+			<span transition:slide={{ duration: 200 }} class="text-secondary p-2 text-sm select-none"
+				>{name}</span
+			>
+		{/if}
 
-	{@render children()}
+		{@render children()}
+	</ul>
 </div>

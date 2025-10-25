@@ -25,9 +25,9 @@
 {#if visible}
 	<div transition:fly={{ y: -20 }}>
 		<div
-			class="fixed top-2 left-1/2 z-999 h-2 w-18 origin-left rounded-full bg-blue-400"
+			class="fixed top-2 left-1/2 z-999 h-1.5 w-18 origin-left rounded-full bg-blue-500"
 			style="transform: scaleX({progress.current / 100});"
 		></div>
-		<div class="fixed top-2 left-1/2 z-999 h-2 w-18 origin-left rounded-full bg-black/20"></div>
+		<div class="bg-tertiary fixed top-2 left-1/2 h-1.5 w-18 origin-left rounded-full"></div>
 	</div>
 {/if}
