@@ -10,8 +10,8 @@
 	import { Spring } from 'svelte/motion';
 
 	const width = new Spring(256, {
-		stiffness: 0.06,
-		damping: 0.2
+		stiffness: 0.08,
+		damping: 0.3
 	});
 	$effect(() => {
 		width.set(open ? 256 : 52);
