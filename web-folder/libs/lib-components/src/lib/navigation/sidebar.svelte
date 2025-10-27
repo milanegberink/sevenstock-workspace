@@ -9,12 +9,14 @@
 	} from '$lib/index.js';
 	import { Spring } from 'svelte/motion';
 
+	const openWidth = $state(256);
+
 	const width = new Spring(256, {
 		stiffness: 0.06,
 		damping: 0.2
 	});
 	$effect(() => {
-		width.set(open ? 256 : 52);
+		width.set(open ? openWidth : 52);
 	});
 
 	import { setSidebarContext } from './context.js';
@@ -28,7 +30,6 @@
 	setSidebarContext(() => open);
 
 	import { page } from '$app/state';
-	import Header from '$lib/header.svelte';
 </script>
 
 <nav class="bg-secondary group/nav relative flex h-full flex-col" style="width: {width.current}px">
@@ -89,5 +90,9 @@
 		class="group-hover/nav:bg-tertiary hover:bg-color-border absolute top-1/2 right-1.5 h-10 w-2 -translate-y-1/2 rounded-full transition-all hover:h-18 hover:cursor-pointer active:h-10"
 	></div>
 </nav>
+<div
+	onclick={() => (open = !open)}
+	class="bg-border relative h-full w-px cursor-pointer transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:bg-blue-500"
+></div>
 
-<VerticalSeparator />
+<!-- <VerticalSeparator /> -->
