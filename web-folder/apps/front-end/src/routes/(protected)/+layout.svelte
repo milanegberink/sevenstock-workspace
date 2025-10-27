@@ -55,6 +55,10 @@
 		{
 			name: 'Automations',
 			links: [{ href: '/leads', icon: ChartLineUp, text: 'Executions' }]
+		},
+		{
+			name: 'Suppliers',
+			links: [{ href: '/suppliers', icon: ChartLineUp, text: 'Invoices' }]
 		}
 	];
 </script>

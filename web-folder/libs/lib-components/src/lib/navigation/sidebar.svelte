@@ -92,7 +92,7 @@
 </nav>
 <div
 	onclick={() => (open = !open)}
-	class="bg-border relative h-full w-px cursor-pointer transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:bg-blue-500"
+	class="bg-border relative h-full w-px transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
 ></div>
 
 <!-- <VerticalSeparator /> -->
