@@ -49,7 +49,7 @@
 	];
 </script>
 
-<div class="bg-primary border-primary h-[70vh] w-[70vw] overflow-hidden rounded-md border">
+<div class="bg-primary border-primary h-[70vh] w-[70vw] overflow-hidden rounded-xl border">
 	<Header name="Settings">
 		<CloseButton onclick={close} />
 	</Header>

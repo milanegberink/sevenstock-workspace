@@ -51,6 +51,10 @@
 				{ href: '/leads', icon: ChartLineUp, text: 'Leads' },
 				{ href: '/insights', icon: ChartPie, text: 'Insights' }
 			]
+		},
+		{
+			name: 'Automations',
+			links: [{ href: '/leads', icon: ChartLineUp, text: 'Executions' }]
 		}
 	];
 </script>

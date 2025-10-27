@@ -2,6 +2,7 @@ export { default as Dialog } from './dialogs/dialog.svelte';
 export { default as AlertDialog } from './dialogs/alert-dialog.svelte';
 export { default as LoadBar } from './load-bar.svelte';
 export { default as Header } from './header.svelte';
+export { default as Profile } from './profile.svelte';
 export { default as Settings } from './settings/settings.svelte';
 export { default as Dropdown } from './dropdown.svelte';
 

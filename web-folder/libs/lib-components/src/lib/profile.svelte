@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { userStore } from '@lib/core/stores';
-	import Avatar from '../avatar.svelte';
-	import Dropdown from '../dropdown.svelte';
+	import Avatar from './avatar.svelte';
+	import Dropdown from './dropdown.svelte';
 	import ArrowLineRight from '~icons/ph/arrow-line-right-bold';
 	import SettingsIcon from '~icons/ph/gear-six-bold';
 
-	import { getSidebarContext } from './context.js';
 	import Dialog from '$lib/dialogs/dialog.svelte';
 	import AlertDialog from '$lib/dialogs/alert-dialog.svelte';
 	import Settings from '$lib/settings/settings.svelte';
-
-	const open = getSidebarContext();
 
 	let settings = $state(false);
 

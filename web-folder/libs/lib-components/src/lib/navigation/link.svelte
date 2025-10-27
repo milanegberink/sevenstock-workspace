@@ -6,34 +6,46 @@
 	const open = getSidebarContext();
 
 	const tag = href ? 'a' : 'button';
+
+	let tooltip: HTMLElement;
+	const id = crypto.randomUUID();
 </script>
 
 <li
 	class={[
-		'group hover:bg-tertiary rounded-xl',
+		'group hover:bg-tertiary rounded-xl transition-all active:opacity-80',
 		active && 'bg-tertiary text-primary',
 		!active && 'text-secondary'
 	]}
 >
 	<svelte:element
 		this={tag}
+		title={text}
 		{onclick}
 		{href}
 		role={tag === 'a' ? 'link' : 'button'}
-		class="group flex h-9 w-full items-center transition-transform group-active:scale-[.98]"
+		class="group flex h-9 w-full items-center"
+		onmouseenter={() => !open() && tooltip.showPopover()}
+		onmouseleave={() => tooltip.hidePopover()}
+		style:anchor-name="--anchor-nav-{id}"
 	>
-		<div class="flex w-10 shrink-0 grow-0 items-center justify-center">
+		<div
+			class="flex w-10 shrink-0 items-center justify-center transition-transform group-active:scale-95"
+		>
 			{@render icon()}
 		</div>
 
 		{#if open()}
 			<span>{text}</span>
-		{:else}
-			<span
-				class="bg-primary border-primary text-primary invisible ml-1 -translate-x-2 rounded-md border px-2 py-1 text-sm font-medium opacity-0 transition-all group-hover:visible group-hover:translate-x-0 group-hover:opacity-100"
-			>
-				{text}
-			</span>
 		{/if}
 	</svelte:element>
 </li>
+
+<span
+	popover
+	style:position-anchor="--anchor-nav-{id}"
+	bind:this={tooltip}
+	class="bg-primary anchored-right-center left-anchor-right border-primary text-primary left-1 hidden -translate-x-2 rounded-md border p-1 px-2 py-1 text-sm font-medium opacity-0 transition-all transition-discrete duration-100 open:block open:-translate-x-0 open:opacity-100 starting:open:-translate-x-2 starting:open:opacity-0"
+>
+	{text}
+</span>
