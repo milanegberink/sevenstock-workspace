@@ -9,7 +9,7 @@
 	} from '$lib/index.js';
 	import { Spring } from 'svelte/motion';
 
-	const openWidth = $state(256);
+	let openWidth = $state(256);
 
 	const width = new Spring(256, {
 		stiffness: 0.06,
@@ -28,6 +28,44 @@
 	let open: boolean = $state(true);
 
 	setSidebarContext(() => open);
+
+	const minWidth = 160;
+	const maxWidth = 300;
+
+	function handleMouseDown(e) {
+		e.preventDefault();
+
+		let isDragging = false;
+
+		const handleMouseMove = (e) => {
+			isDragging = true;
+
+			const newWidth = e.clientX;
+
+			if (newWidth >= minWidth) {
+				open = true;
+			}
+
+			if (newWidth <= minWidth) {
+				open = false;
+			}
+			if (newWidth >= minWidth && newWidth <= maxWidth) {
+				openWidth = newWidth;
+			}
+		};
+
+		const handleMouseUp = () => {
+			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('mouseup', handleMouseUp);
+
+			if (!isDragging) {
+				open = !open;
+			}
+		};
+
+		window.addEventListener('mousemove', handleMouseMove);
+		window.addEventListener('mouseup', handleMouseUp);
+	}
 
 	import { page } from '$app/state';
 </script>
@@ -85,14 +123,8 @@
 			{/snippet}
 		</AlertDialog>
 	</SidebarSpace>
-	<div
-		onclick={() => (open = !open)}
-		class="group-hover/nav:bg-tertiary hover:bg-color-border absolute top-1/2 right-1.5 h-10 w-2 -translate-y-1/2 rounded-full transition-all hover:h-18 hover:cursor-pointer active:h-10"
-	></div>
 </nav>
 <div
-	onclick={() => (open = !open)}
+	onmousedown={handleMouseDown}
 	class="bg-border relative h-full w-px transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
 ></div>
-
-<!-- <VerticalSeparator /> -->

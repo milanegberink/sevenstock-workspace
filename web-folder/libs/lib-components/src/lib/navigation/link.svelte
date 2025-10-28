@@ -36,7 +36,7 @@
 		</div>
 
 		{#if open()}
-			<span>{text}</span>
+			<span class="truncate text-nowrap">{text}</span>
 		{/if}
 	</svelte:element>
 </li>

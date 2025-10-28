@@ -11,6 +11,7 @@
 	import ChartPie from '~icons/ph/chart-pie-slice-bold';
 	import ShoppingCart from '~icons/ph/shopping-cart-simple-bold';
 	import Barcode from '~icons/ph/barcode-bold';
+	import Invoice from '~icons/ph/invoice-bold';
 
 	import ChartLineUp from '~icons/ph/chart-line-up-bold';
 	import TrendUp from '~icons/ph/trend-up-bold';
@@ -35,7 +36,8 @@
 			links: [
 				{ href: '/overview', icon: HouseBold, text: 'Overview' },
 				{ href: '/orders', icon: ShoppingCart, text: 'Orders' },
-				{ href: '/products', icon: Barcode, text: 'Products' }
+				{ href: '/products', icon: Barcode, text: 'Products' },
+				{ href: '/products', icon: Barcode, text: 'Purchase Orders' }
 			]
 		},
 		{
@@ -58,7 +60,7 @@
 		},
 		{
 			name: 'Suppliers',
-			links: [{ href: '/suppliers', icon: ChartLineUp, text: 'Invoices' }]
+			links: [{ href: '/invoices', icon: Invoice, text: 'Invoices' }]
 		}
 	];
 </script>
