@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { onclick, href, active, text, icon, ...props } = $props();
+	let { onclick, href, active, name, icon, ...props } = $props();
 
 	import { getSidebarContext } from './context.js';
 
@@ -20,7 +20,7 @@
 >
 	<svelte:element
 		this={tag}
-		title={text}
+		title={name}
 		{onclick}
 		{href}
 		role={tag === 'a' ? 'link' : 'button'}
@@ -36,7 +36,7 @@
 		</div>
 
 		{#if open()}
-			<span class="truncate text-nowrap">{text}</span>
+			<span class="truncate text-nowrap">{name}</span>
 		{/if}
 	</svelte:element>
 </li>
@@ -47,5 +47,5 @@
 	bind:this={tooltip}
 	class="bg-primary anchored-right-center left-anchor-right border-primary text-primary left-1 hidden -translate-x-2 rounded-md border p-1 px-2 py-1 text-sm font-medium opacity-0 transition-all transition-discrete duration-100 open:block open:-translate-x-0 open:opacity-100 starting:open:-translate-x-2 starting:open:opacity-0"
 >
-	{text}
+	{name}
 </span>

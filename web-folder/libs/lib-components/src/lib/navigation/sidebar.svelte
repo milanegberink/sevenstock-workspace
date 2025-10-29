@@ -77,7 +77,7 @@
 	<SidebarSpace>
 		<Dialog>
 			{#snippet trigger({ onclick, open })}
-				<NavItem {onclick} text="Search" active={open}>
+				<NavItem {onclick} name="Search" active={open}>
 					{#snippet icon()}
 						<SearchIcon />
 					{/snippet}
@@ -95,9 +95,9 @@
 		{#each spaces as space}
 			<SidebarSpace name={space.name}>
 				{#each space.links as link}
-					{@const { href, text } = link}
+					{@const { href, name } = link}
 					{@const active = page.url.pathname.startsWith(href)}
-					<NavItem {href} {text} {active}>
+					<NavItem {href} {name} {active}>
 						{#snippet icon()}
 							<link.icon />
 						{/snippet}
@@ -112,7 +112,7 @@
 	<SidebarSpace>
 		<AlertDialog>
 			{#snippet trigger({ onclick, open })}
-				<NavItem {onclick} text="Settings" active={open}>
+				<NavItem {onclick} name="Settings" active={open}>
 					{#snippet icon()}
 						<SettingsIcon />
 					{/snippet}
