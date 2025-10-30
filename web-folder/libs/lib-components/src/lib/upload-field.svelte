@@ -44,7 +44,7 @@
 	]}
 >
 	<input type="file" class="hidden" onchange={handleFileChange} />
-	<div class="bg-primary border-primary rounded-lg border p-2">
+	<div class="bg-primary border-primary pointer-events-none rounded-lg border p-2">
 		<UploadSimple />
 	</div>
 	<span class="text-secondary pointer-events-none">Click or drag a file here to upload</span>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { userStore } from '@lib/core/stores';
 	import Trash from '~icons/ph/trash-bold';
-	import FilePdf from '~icons/ph/file-pdf';
+	import FilePdf from '~icons/ph/file-pdf-bold';
+	import DotsThree from '~icons/ph/dots-three-bold';
 
 	import {
 		AlertDialog,
@@ -67,7 +68,7 @@
 									</button>
 								</div>
 
-								<div class="bg-tertiary mt-2 h-2 w-full overflow-hidden rounded-full">
+								<div class="bg-tertiary mt-2 h-1 w-full overflow-hidden rounded-full">
 									<div
 										class="h-full rounded-full bg-blue-500 transition-all duration-300"
 										style="width: {50}%"
@@ -86,24 +87,21 @@
 	<table class="w-full table-auto overflow-hidden">
 		<thead class="bg-secondary">
 			<tr>
-				<th class="border-primary border px-4 py-2 text-left font-semibold">ID</th>
 				<th class="border-primary border px-4 py-2 text-left font-semibold">EAN</th>
 				<th class="border-primary border px-4 py-2 text-left font-semibold">File</th>
-				<th class="border-primary border px-4 py-2 text-left font-semibold">Stock</th>
+				<th class="border-primary border px-4 py-2 text-left font-semibold"></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-2">Alice</td>
 				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
+				<td class="border-primary border px-4 py-2"><DotsThree /></td>
 			</tr>
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-2">Alice</td>
 				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
+				<td class="border-primary border px-4 py-2"><DotsThree /></td>
 			</tr>
 		</tbody>
 	</table>

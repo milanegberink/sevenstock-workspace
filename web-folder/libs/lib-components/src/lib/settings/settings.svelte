@@ -50,7 +50,8 @@
 </script>
 
 <div class="bg-primary border-primary h-[70vh] w-[70vw] overflow-hidden rounded-xl border">
-	<Header name="Settings">
+	<Header>
+		<span class="text-xl">Settings</span>
 		<CloseButton onclick={close} />
 	</Header>
 
