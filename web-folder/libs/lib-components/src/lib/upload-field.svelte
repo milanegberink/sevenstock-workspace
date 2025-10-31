@@ -1,7 +1,7 @@
 <script>
 	import UploadSimple from '~icons/ph/upload-simple-bold';
 
-	let { files = $bindable() } = $props();
+	let { files = $bindable(), ...props } = $props();
 
 	let isDragging = $state(false);
 
@@ -43,7 +43,7 @@
 		!isDragging && 'border-primary'
 	]}
 >
-	<input type="file" class="hidden" onchange={handleFileChange} />
+	<input type="file" class="hidden" onchange={handleFileChange} {...props} />
 	<div class="bg-primary border-primary pointer-events-none rounded-lg border p-2">
 		<UploadSimple />
 	</div>

@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { userStore } from '@lib/core/stores';
 	import Trash from '~icons/ph/trash-bold';
-	import FilePdf from '~icons/ph/file-pdf-bold';
+	import FilePdf from '~icons/ph/file-pdf';
 	import DotsThree from '~icons/ph/dots-three-bold';
 
 	import {
 		AlertDialog,
 		Button,
 		CloseButton,
+		Dropdown,
 		Header,
 		PageHeader,
 		UploadField
@@ -24,6 +25,14 @@
 		const i = Math.floor(Math.log(bytes) / Math.log(k));
 		return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
 	}
+
+	const items = [
+		{
+			name: 'Copy ID',
+			icon: FilePdf,
+			action: () => console.log('meow')
+		}
+	];
 </script>
 
 <PageHeader name="Invoices">
@@ -40,7 +49,7 @@
 					<CloseButton onclick={close} />
 				</Header>
 				<div class="flex flex-col gap-2 p-4">
-					<UploadField bind:files />
+					<UploadField bind:files multiple />
 
 					{#each files as file (file.name)}
 						<div>
@@ -96,12 +105,28 @@
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-2">Alice</td>
 				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2"><DotsThree /></td>
+				<td class="border-primary border px-4 py-2">
+					<Dropdown {items}>
+						{#snippet trigger({ popovertarget, anchor })}
+							<button {popovertarget} style:anchor-name={anchor}>
+								<DotsThree />
+							</button>
+						{/snippet}
+					</Dropdown>
+				</td>
 			</tr>
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-2">Alice</td>
 				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2"><DotsThree /></td>
+				<td class="border-primary border px-4 py-2">
+					<Dropdown {items}>
+						{#snippet trigger({ popovertarget, anchor })}
+							<button {popovertarget} style:anchor-name={anchor}>
+								<DotsThree />
+							</button>
+						{/snippet}
+					</Dropdown></td
+				>
 			</tr>
 		</tbody>
 	</table>
