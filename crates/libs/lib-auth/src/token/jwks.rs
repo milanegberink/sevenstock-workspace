@@ -29,7 +29,5 @@ pub fn generate_private_jwk() -> Jwk {
         ..Default::default()
     };
 
-    let private_jwk = Jwk { key, prm };
-
-    private_jwk
+    Jwk { key, prm }
 }

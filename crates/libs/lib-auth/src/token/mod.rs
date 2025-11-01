@@ -25,7 +25,7 @@ pub enum TokenType {
 }
 
 pub trait Jwt: Serialize + DeserializeOwned + Sized {
-    async fn encode(&self) -> Result<String> {
+    fn encode(&self) -> Result<String> {
         let config = SigningConfig::get()?;
 
         let encoding_key = config.encoding_key();
@@ -36,7 +36,7 @@ pub trait Jwt: Serialize + DeserializeOwned + Sized {
 
         Ok(token)
     }
-    async fn decode(token: &str) -> Result<Self> {
+    fn decode(token: &str) -> Result<Self> {
         let config = VerifyingConfig::get()?;
 
         let header = decode_header(token)?;
@@ -45,7 +45,7 @@ pub trait Jwt: Serialize + DeserializeOwned + Sized {
 
         let kid = Uuid::parse_str(&kid_string).map_err(|_| Error::InvalidToken)?;
 
-        let decoding_key = config.get_decoding_key(kid).await?;
+        let decoding_key = config.get_decoding_key(kid)?;
 
         let token_date = decode::<Self>(token, &decoding_key, config.validation())?;
 

@@ -4,7 +4,11 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
-use jsonwebtoken::{jwk::{Jwk, JwkSet}, DecodingKey, EncodingKey, Header, Validation};
+use ed25519_dalek::SigningKey;
+use jose_jwk::{Jwk, Key};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, jwk::JwkSet};
+use lib_utils::b64::b64u_decode;
+use pkcs8::EncodePrivateKey;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
@@ -20,12 +24,12 @@ pub fn signing_config() -> Result<&'static SigningConfig> {
 
 pub struct VerifyingConfig {
     validation: Validation,
-    keys: HashMap<Uuid, DecodingKey>,
+    keys: HashMap<Uuid, Arc<DecodingKey>>,
 }
 
 pub struct SigningConfig {
     encoding_key: EncodingKey,
-    header: Header
+    header: Header,
 }
 
 impl VerifyingConfig {
@@ -40,22 +44,48 @@ impl VerifyingConfig {
     pub fn get() -> Result<&'static Self> {
         PUBLIC_INSTANCE.get().ok_or(Error::NoConfigFound)
     }
-    pub async fn get_decoding_key(&self, id: Uuid) -> Result<Arc<DecodingKey>> {
-        let map = self.keys.read().await;
-        let id = map
-            .get(&id)
-            .cloned()
-            .ok_or(Error::NoDecodingCode(id))?;
+    pub fn get_decoding_key(&self, id: Uuid) -> Result<Arc<DecodingKey>> {
+        let key = self.keys.get(&id).cloned().ok_or(Error::InvalidToken)?;
 
-        Ok(id)
+        Ok(key)
     }
     pub fn validation(&self) -> &Validation {
         &self.validation
     }
 }
 
+impl TryFrom<Jwk> for SigningConfig {
+    type Error = Error;
+    fn try_from(jwk: Jwk) -> Result<Self> {
+        let Key::Okp(okp_key) = &jwk.key else {
+            return Err(Error::InvalidJwkSet);
+        };
+
+        let d = okp_key.d.as_ref().ok_or(Error::InvalidJwkSet)?;
+
+        let bytes: [u8; 32] = d.as_ref().try_into().map_err(|_| Error::InvalidJwkSet)?;
+
+        let secret = SigningKey::from_bytes(&bytes)
+            .to_pkcs8_der()
+            .map_err(|_| Error::InvalidToken)?;
+
+        let encoding_key = EncodingKey::from_ed_der(secret.as_bytes());
+
+        let mut header = Header::new(jsonwebtoken::Algorithm::EdDSA);
+
+        let kid = jwk.prm.kid.ok_or(Error::InvalidJwkSet)?;
+
+        header.kid = Some(kid);
+
+        Ok(Self {
+            encoding_key,
+            header,
+        })
+    }
+}
+
 impl SigningConfig {
-    pub fn init(set: JwkSet) -> Result<()> {
+    pub fn init(set: Jwk) -> Result<()> {
         let private_config = SigningConfig::try_from(set)?;
         PRIVATE_INSTANCE
             .set(private_config)
@@ -74,8 +104,6 @@ impl SigningConfig {
     }
 }
 
-
-
 impl TryFrom<JwkSet> for VerifyingConfig {
     type Error = Error;
     fn try_from(set: JwkSet) -> Result<Self> {
@@ -92,32 +120,7 @@ impl TryFrom<JwkSet> for VerifyingConfig {
 
         Ok(Self {
             validation: Validation::new(jsonwebtoken::Algorithm::EdDSA),
-            keys: RwLock::new(keys),
-        })
-    }
-}
-
-impl TryFrom<Jwk> for SigningConfig {
-    type Error = Error;
-    fn try_from(set: Jwk) -> Result<Self> {
-        let mut keys = HashMap::new();
-        for jwk in set.keys {
-            let encoding_key = EncodingKey::from
-
-            let mut header = Header::new(jsonwebtoken::Algorithm::EdDSA);
-
-            header.kid = Some(kid.into());
-
-            let jwt_header = JwtHeader {
-                encoding_key: Arc::new(encoding_key),
-                header: Arc::new(header),
-            };
-
-            keys.insert(token_type, Arc::new(jwt_header));
-        }
-
-        Ok(Self {
-            signing: RwLock::new(keys),
+            keys,
         })
     }
 }

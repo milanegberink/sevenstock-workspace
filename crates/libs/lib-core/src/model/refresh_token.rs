@@ -7,6 +7,7 @@ use lib_auth::secret::generate_secret_key_b64u;
 use lib_auth::secret::hash_secret_key;
 use modql::field::{Fields, HasSeaFields};
 use sea_query::Expr;
+use sea_query::Iden;
 use secrecy::ExposeSecret;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
@@ -19,9 +20,7 @@ pub trait RefreshTokenBy: HasSeaFields + for<'r> FromRow<'r, PgRow> + Unpin + Se
 
 impl RefreshTokenBy for RefreshToken {}
 
-pub struct RefreshTokenBmc;
-
-#[derive(Debug, Serialize, Deserialize, Fields, FromRow)]
+#[derive(Debug, Fields, FromRow)]
 pub struct RefreshToken {
     pub user_id: Uuid,
     id: Uuid,
@@ -58,7 +57,7 @@ enum RefreshIden {
 
 impl RefreshTokenBmc {
     pub async fn generate_new(ctx: &Ctx, mm: &ModelManager) -> Result<SecretString> {
-        let refresh_token_raw: SecretString = generate_secret_key_b64u();
+        let refresh_token_raw = generate_secret_key_b64u();
 
         let refresh_token_c = RefreshTokenForCreate {
             token_hash: hash_secret_key(&refresh_token_raw.expose_secret()),
