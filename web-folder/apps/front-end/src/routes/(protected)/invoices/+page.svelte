@@ -103,9 +103,9 @@
 		</thead>
 		<tbody>
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">
 					<Dropdown {items}>
 						{#snippet trigger({ popovertarget, anchor })}
 							<button {popovertarget} style:anchor-name={anchor}>
@@ -116,9 +116,9 @@
 				</td>
 			</tr>
 			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">Alice</td>
-				<td class="border-primary border px-4 py-2">
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">
 					<Dropdown {items}>
 						{#snippet trigger({ popovertarget, anchor })}
 							<button {popovertarget} style:anchor-name={anchor}>

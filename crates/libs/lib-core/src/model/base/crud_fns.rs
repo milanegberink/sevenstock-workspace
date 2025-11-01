@@ -73,24 +73,24 @@ where
     Ok(entity)
 }
 
-pub async fn get_with_redis<MC, E>(ctx: &Ctx, mm: &ModelManager, id: Uuid) -> Result<E>
-where
-    MC: DbBmc,
-    E: for<'r> FromRow<'r, PgRow> + Unpin + Send,
-    E: HasSeaFields,
-{
-    let key = format!("{}:{}", MC::TABLE, id);
-    match mm.redis().get::<E>(key).await {
-        Ok(e) => Ok(e),
-        Err(_) => {
-            let e = get::<MC, E>(&ctx, &mm, id).await?;
+// pub async fn get_with_redis<MC, E>(ctx: &Ctx, mm: &ModelManager, id: Uuid) -> Result<E>
+// where
+//     MC: DbBmc,
+//     E: for<'r> FromRow<'r, PgRow> + Unpin + Send,
+//     E: HasSeaFields,
+// {
+//     let key = format!("{}:{}", MC::TABLE, id);
+//     match mm.redis().get::<E>(key).await {
+//         Ok(e) => Ok(e),
+//         Err(_) => {
+//             let e = get::<MC, E>(&ctx, &mm, id).await?;
 
-            mm.redis().set(key, &e).await;
+//             mm.redis().set(key, &e).await;
 
-            Ok(e)
-        }
-    }
-}
+//             Ok(e)
+//         }
+//     }
+// }
 
 pub async fn create_many<MC, E>(ctx: &Ctx, mm: &ModelManager, data: Vec<E>) -> Result<Vec<Uuid>>
 where
