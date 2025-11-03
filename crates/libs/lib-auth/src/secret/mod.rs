@@ -13,7 +13,7 @@ pub fn generate_secret_key_b64u() -> SecretString {
 }
 
 pub fn hash_secret_key(key: &str) -> [u8; 32] {
-    *blake3::hash(key.as_bytes()).as_bytes()
+    blake3::hash(key.as_bytes()).into()
 }
 
 pub fn verify_secret_key(api_key: &str, stored_hash: &str) -> Result<()> {

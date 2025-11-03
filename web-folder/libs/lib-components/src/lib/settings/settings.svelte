@@ -92,6 +92,9 @@
 
 {#snippet appearance()}
 	{@render setting_info('Account', 'Change account information')}
+	<button onclick={() => document.documentElement.setAttribute('data-theme', 'dark')}
+		>Change theme</button
+	>
 {/snippet}
 
 {#snippet organisation()}

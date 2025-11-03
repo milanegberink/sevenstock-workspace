@@ -3,6 +3,7 @@
 	import Trash from '~icons/ph/trash-bold';
 	import FilePdf from '~icons/ph/file-pdf';
 	import DotsThree from '~icons/ph/dots-three-bold';
+	import Plus from '~icons/ph/plus-bold';
 
 	import {
 		AlertDialog,
@@ -30,7 +31,7 @@
 		{
 			name: 'Copy ID',
 			icon: FilePdf,
-			action: () => console.log('meow')
+			action: () => navigator.clipboard.writeText('Some id')
 		}
 	];
 </script>
@@ -38,7 +39,10 @@
 <PageHeader name="Invoices">
 	<AlertDialog>
 		{#snippet trigger({ onclick })}
-			<Button {onclick}>New Invoice</Button>
+			<Button {onclick}>
+				{#snippet icon()}<Plus />{/snippet}
+				New Invoice
+			</Button>
 		{/snippet}
 		{#snippet content({ close })}
 			<div
@@ -96,7 +100,7 @@
 	<table class="w-full table-auto overflow-hidden">
 		<thead class="bg-secondary">
 			<tr>
-				<th class="border-primary border px-4 py-2 text-left font-semibold">EAN</th>
+				<th class="border-primary border px-4 py-2 text-left font-semibold">Date</th>
 				<th class="border-primary border px-4 py-2 text-left font-semibold">File</th>
 				<th class="border-primary border px-4 py-2 text-left font-semibold"></th>
 			</tr>

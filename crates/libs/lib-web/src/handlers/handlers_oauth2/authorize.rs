@@ -5,7 +5,7 @@ use axum::{
 use axum_extra::extract::{CookieJar, cookie::Cookie};
 use lib_auth::{
     oauth2::OAuthQuery,
-    token::{AccessClaims, AccessToken, Token, TokenType},
+    token::{AccessToken, TokenType},
 };
 use lib_core::model::ModelManager;
 use serde::Deserialize;
@@ -17,9 +17,7 @@ pub async fn oauth2_authorize_handler(
     State(mm): State<ModelManager>,
     Query(req): Query<OAuthQuery>,
 ) -> impl IntoResponse {
-    let login_url = format!("/login?token={}", token);
-
-    let x = AccessToken::new(Uuid::now_v7()).encode().await?;
+    let login_url = format!("/login?token={}", "X");
 
     Redirect::to(&login_url)
 }

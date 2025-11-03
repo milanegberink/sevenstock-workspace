@@ -4,15 +4,39 @@
 @import '@toolwind/anchors';
 
 @theme {
-	--text-color-primary: black;
-	--text-color-secondary: black;
-
 	--font-sans: 'Geist', sans-serif;
+
+	--text-color-primary: var(--text-primary);
+	--text-color-secondary: var(--text-secondary);
+
 	--background-color-tertiary: #f0f0f0;
-	--background-color-primary: white;
+	--background-color-primary: rgb(var(--bg-primary));
 	--background-color-secondary: #f9f9f9;
 	--border-color-primary: #f2f2f2;
 	--background-color-border: #f2f2f2;
+}
+
+html {
+	color-scheme: light;
+	--text-primary: black;
+	--text-secondary: #646464;
+
+	--background-color-tertiary: #f0f0f0;
+	--bg-primary: 255 255 255;
+	--background-color-secondary: #f9f9f9;
+	--border-color-primary: #f2f2f2;
+	--background-color-border: #f2f2f2;
+}
+
+html[data-theme='dark'] {
+	color-scheme: dark;
+	--text-primary: white;
+	--text-secondary: #b8b8b8;
+	--background-color-tertiary: #272729;
+	--bg-primary: 27 27 29;
+	--background-color-secondary: #151517;
+	--border-color-primary: #272729;
+	--background-color-border: #272729;
 }
 
 :root {
@@ -20,15 +44,4 @@
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-}
-
-html[data-theme='dark'] {
-	color-scheme: dark;
-	--text-color-primary: white;
-	--text-color-secondary: #b8b8b8;
-	--background-color-tertiary: #272729;
-	--background-color-primary: #1b1b1d;
-	--background-color-secondary: #151517;
-	--border-color-primary: #272729;
-	--background-color-border: #272729;
 }

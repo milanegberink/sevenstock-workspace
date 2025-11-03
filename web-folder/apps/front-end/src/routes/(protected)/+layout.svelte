@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Sidebar, LoadBar, Header, Breadcrumbs } from '@lib/components';
 	import CircleNotch from '~icons/ph/circle-notch-bold';
+	import SidebarIcon from '~icons/ph/sidebar-simple-bold';
 
 	import { spaces } from '$lib/spaces.svelte';
 	import { goto } from '$app/navigation';
@@ -22,6 +23,8 @@
 			// }
 		})();
 	});
+
+	let open = $state(true);
 </script>
 
 {#if loading}
@@ -33,10 +36,16 @@
 {:else}
 	<LoadBar />
 	<div class="flex size-full">
-		<Sidebar {spaces} />
+		<Sidebar bind:open {spaces} />
 		<div class="flex-1">
 			<Header>
-				<Breadcrumbs {spaces} />
+				<div class="-ml-2 flex items-center gap-2">
+					<button
+						class="text-secondary hover:bg-secondary rounded-xl p-2 transition-transform active:scale-90"
+						onclick={() => (open = !open)}><SidebarIcon /></button
+					>
+					<Breadcrumbs {spaces} />
+				</div>
 			</Header>
 			{@render children()}
 		</div>

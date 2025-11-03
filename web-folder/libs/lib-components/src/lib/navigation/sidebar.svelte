@@ -1,5 +1,7 @@
 <script lang="ts">
 	import NavItem from './link.svelte';
+	let { spaces, open = $bindable(false) } = $props();
+
 	import {
 		HorizontalSeparator,
 		VerticalSeparator,
@@ -19,15 +21,10 @@
 		width.set(open ? openWidth : 52);
 	});
 
-	import { setSidebarContext } from './context.js';
-	let { spaces } = $props();
 	import SettingsIcon from '~icons/ph/gear-six-bold';
+
 	import SidebarSpace from './sidebar-space.svelte';
 	import SearchIcon from '~icons/ph/magnifying-glass-bold';
-
-	let open: boolean = $state(true);
-
-	setSidebarContext(() => open);
 
 	const minWidth = 160;
 	const maxWidth = 300;
@@ -70,14 +67,17 @@
 	import { page } from '$app/state';
 </script>
 
-<nav class="bg-secondary group/nav relative flex h-full flex-col" style="width: {width.current}px">
+<nav
+	class="bg-secondary group/nav fixed relative hidden h-full flex-col lg:flex"
+	style="width: {width.current}px"
+>
 	<div class="flex h-13 items-center justify-between px-4"></div>
 	<HorizontalSeparator />
 
-	<SidebarSpace>
+	<SidebarSpace bind:open>
 		<Dialog>
-			{#snippet trigger({ onclick, open })}
-				<NavItem {onclick} name="Search" active={open}>
+			{#snippet trigger({ onclick, open: searchModalOpen })}
+				<NavItem {onclick} name="Search" bind:open active={searchModalOpen}>
 					{#snippet icon()}
 						<SearchIcon />
 					{/snippet}
@@ -89,15 +89,13 @@
 		</Dialog>
 	</SidebarSpace>
 	<HorizontalSeparator />
-	<div
-		class="min-h-0 flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-	>
+	<div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
 		{#each spaces as space}
-			<SidebarSpace name={space.name}>
+			<SidebarSpace bind:open name={space.name}>
 				{#each space.links as link}
 					{@const { href, name } = link}
 					{@const active = page.url.pathname.startsWith(href)}
-					<NavItem {href} {name} {active}>
+					<NavItem {href} {name} {active} bind:open>
 						{#snippet icon()}
 							<link.icon />
 						{/snippet}
@@ -109,10 +107,10 @@
 	</div>
 	<HorizontalSeparator />
 
-	<SidebarSpace>
+	<SidebarSpace bind:open>
 		<AlertDialog>
-			{#snippet trigger({ onclick, open })}
-				<NavItem {onclick} name="Settings" active={open}>
+			{#snippet trigger({ onclick, open: settingsModalOpen })}
+				<NavItem {onclick} name="Settings" active={settingsModalOpen} bind:open>
 					{#snippet icon()}
 						<SettingsIcon />
 					{/snippet}

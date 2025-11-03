@@ -1,15 +1,19 @@
-use crate::{Result, handlers::handlers_oauth2::token};
-use axum::{Json, extract::Query};
+use crate::{Error, Result, handlers::handlers_oauth2::token};
+use axum::{
+    Json,
+    extract::{Query, State},
+};
 use axum_extra::headers::authorization::Bearer;
 use lib_auth::{
-    secret::{generate_secret_key, hash_secret_key},
-    token::{
-        AccessToken, Jwt, RefreshToken, TokenType, config::VerifyingConfig, jwks::PublicJwkSet,
-    },
+    secret::hash_secret_key,
+    token::{AccessToken, Jwt, TokenType},
 };
 use lib_core::{
     ctx::Ctx,
-    model::refresh_token::{RefreshToken, RefreshTokenBmc, RefreshTokenForCreate},
+    model::{
+        ModelManager,
+        refresh_token::{RefreshToken, RefreshTokenBmc, RefreshTokenForCreate},
+    },
 };
 use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
@@ -40,31 +44,44 @@ enum GrantType {
     AuthorizationCode,
 }
 
-pub async fn api_token(Query(req): Query<TokenRequest>) -> Result<Json<TokenResponse>> {
+pub async fn api_token(
+    State(mm): State<ModelManager>,
+    Query(req): Query<TokenRequest>,
+) -> Result<Json<TokenResponse>> {
     match req.grant_type {
         GrantType::RefreshToken => {
             let ctx = Ctx::root_ctx();
 
-            let token_hash = hash_secret_key(&req.refresh_token.expose_secret())?;
+            let token_hash = hash_secret_key(&req.refresh_token.expose_secret());
 
-            let refresh_token: RefreshToken =
+            let refresh_token_old: RefreshToken =
                 RefreshTokenBmc::get_by_hash(&ctx, &mm, &token_hash).await?;
 
-            let access_token = AccessToken::new(refresh_token.user_id).encode().await?;
+            let access_token = AccessToken::new(refresh_token_old.user_id);
+
+            let refresh_token = RefreshTokenBmc::generate_new(&ctx, &mm).await?;
+
+            let res = TokenResponse {
+                access_token: access_token.encode()?,
+                token_type: "Bearer".into(),
+                refresh_token: Some(refresh_token.expose_secret().into()),
+                expires_in: access_token.expires_at(),
+                id_token: None,
+            };
+
+            Ok(Json(res))
         }
         GrantType::AuthorizationCode => {
             let ctx = Ctx::root_ctx();
 
-            let token_hash = hash_secret_key(&req.refresh_token.expose_secret())?;
+            let token_hash = hash_secret_key(&req.refresh_token.expose_secret());
 
             let old_token: RefreshToken =
-                RefreshTokenBmc::get_by_hash(&ctx, &mm, token_hash).await?;
-
-            let ctx = Ctx::new(old_token.user_id, None)?;
+                RefreshTokenBmc::get_by_hash(&ctx, &mm, &token_hash).await?;
 
             let refresh_token = RefreshTokenBmc::generate_new(&ctx, &mm).await?;
 
-            let ctx = Ctx::new(user_id, org_id)?;
+            let ctx = Ctx::new(ctx.user_id(), None).map_err(|_| Error::NoRefreshTokenFound)?;
 
             let raw_token = RefreshTokenBmc::generate_new(&ctx, &mm).await?;
 
@@ -73,7 +90,7 @@ pub async fn api_token(Query(req): Query<TokenRequest>) -> Result<Json<TokenResp
             let res = TokenResponse {
                 access_token: access_token.encode()?,
                 token_type: "Bearer".into(),
-                refresh_token: refresh_token.expose_secret(),
+                refresh_token: Some(refresh_token.expose_secret().into()),
                 expires_in: access_token.expires_at(),
                 id_token: None,
             };
@@ -81,13 +98,4 @@ pub async fn api_token(Query(req): Query<TokenRequest>) -> Result<Json<TokenResp
             Ok(Json(res))
         }
     }
-
-    let res = TokenResponse {
-        access_token: "meow".into(),
-        token_type: "Bearer".into(),
-        expires_in: 64,
-        refresh_token: "meow".into(),
-        id_token: "meow".into(),
-    };
-    Ok(Json(res))
 }

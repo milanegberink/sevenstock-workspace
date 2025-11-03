@@ -1,9 +1,5 @@
 <script lang="ts">
-	let { onclick, href, active, name, icon, ...props } = $props();
-
-	import { getSidebarContext } from './context.js';
-
-	const open = getSidebarContext();
+	let { onclick, href, active, name, icon, open = $bindable(false), ...props } = $props();
 
 	const tag = href ? 'a' : 'button';
 
@@ -25,7 +21,7 @@
 		{href}
 		role={tag === 'a' ? 'link' : 'button'}
 		class="group flex h-9 w-full items-center"
-		onmouseenter={() => !open() && tooltip.showPopover()}
+		onmouseenter={() => !open && tooltip.showPopover()}
 		onmouseleave={() => tooltip.hidePopover()}
 		style:anchor-name="--anchor-nav-{id}"
 	>
@@ -35,7 +31,7 @@
 			{@render icon()}
 		</div>
 
-		{#if open()}
+		{#if open}
 			<span class="truncate text-nowrap">{name}</span>
 		{/if}
 	</svelte:element>

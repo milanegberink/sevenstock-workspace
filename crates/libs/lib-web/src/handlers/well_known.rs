@@ -1,5 +1,5 @@
 use axum::{Json, extract::State};
-use lib_auth::token::{config::VerifyingConfig, jwks::PublicJwkSet};
+use lib_auth::token::VerifyingConfig;
 use lib_core::model::ModelManager;
 
 use crate::Result;
@@ -24,16 +24,16 @@ pub struct OpenIDConfig {
     code_challenge_methods_supported: Vec<String>,
 }
 
-pub async fn api_public_jwks() -> Result<Json<PublicJwkSet>> {
-    let config = VerifyingConfig::get()?;
-    let jwks = config.pub_jwk_set();
+// pub async fn api_public_jwks() -> Result<Json<JwkSet>> {
+//     let config = VerifyingConfig::get()?;
+//     let jwks = config.pub_jwk_set();
 
-    Ok(Json(jwks.clone()))
-}
+//     Ok(Json(jwks.clone()))
+// }
 
-pub fn api_openid_config(State(mm): State<ModelManager>) -> Result<Json<PublicJwkSet>> {
-    let config = VerifyingConfig::get()?;
-    let jwks = config.pub_jwk_set();
+// pub fn api_openid_config(State(mm): State<ModelManager>) -> Result<Json<PublicJwkSet>> {
+//     let config = VerifyingConfig::get()?;
+//     let jwks = config.pub_jwk_set();
 
-    Ok(Json(jwks.clone()))
-}
+//     Ok(Json(jwks.clone()))
+// }

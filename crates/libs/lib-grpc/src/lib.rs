@@ -8,7 +8,7 @@ pub use crate::error::{Error, Result};
 use crate::proto::SignUpResponse;
 pub use crate::proto::{LoginRequest, LoginResponse};
 use lib_auth::pwd::verify_password;
-use lib_auth::token::{TokenBuilder, TokenType};
+use lib_auth::token::TokenType;
 use lib_core::ctx::Ctx;
 use lib_core::model::permission::{Action, Resource};
 use lib_core::model::user::{UserBmc, UserForCreate, UserForLogin};

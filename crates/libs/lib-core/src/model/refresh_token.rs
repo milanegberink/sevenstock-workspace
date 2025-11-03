@@ -8,6 +8,9 @@ use lib_auth::secret::hash_secret_key;
 use modql::field::{Fields, HasSeaFields};
 use sea_query::Expr;
 use sea_query::Iden;
+use sea_query::PostgresQueryBuilder;
+use sea_query::Query;
+use sea_query_binder::SqlxBinder;
 use secrecy::ExposeSecret;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};
@@ -52,7 +55,6 @@ pub struct RefreshTokenBmc;
 enum RefreshIden {
     UserId,
     TokenHash,
-    Id,
 }
 
 impl RefreshTokenBmc {
@@ -60,11 +62,11 @@ impl RefreshTokenBmc {
         let refresh_token_raw = generate_secret_key_b64u();
 
         let refresh_token_c = RefreshTokenForCreate {
-            token_hash: hash_secret_key(&refresh_token_raw.expose_secret()),
+            token_hash: hash_secret_key(&refresh_token_raw.expose_secret()).to_vec(),
             user_id: ctx.user_id(),
         };
 
-        let id = Self::create(&ctx, &mm, entity_c).await?;
+        let id = Self::create(&ctx, &mm, refresh_token_c).await?;
 
         Ok(refresh_token_raw)
     }

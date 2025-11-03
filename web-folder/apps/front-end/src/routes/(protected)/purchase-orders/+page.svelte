@@ -2,4 +2,4 @@
 	import { PageHeader } from '@lib/components';
 </script>
 
-<PageHeader name="Orders" />
+<PageHeader name="Purchase Orders" />

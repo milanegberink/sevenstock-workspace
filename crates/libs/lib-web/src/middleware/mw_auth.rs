@@ -18,7 +18,7 @@ use axum_extra::{
         authorization::{Bearer, Credentials},
     },
 };
-use lib_auth::token::{AccessToken, Claims, Token, TokenType};
+use lib_auth::token::{AccessToken, Jwt};
 use lib_core::ctx::Ctx;
 use lib_core::model::ModelManager;
 use lib_core::model::permission::{Action, Permission, Permissions, Resource};
@@ -55,30 +55,9 @@ pub async fn mw_ctx_resolver(
 }
 
 async fn ctx_resolve(_services: ModelManager, token: &str) -> CtxExtResult {
-    let claims = AccessToken::decode(token).await?;
+    let claims = AccessToken::decode(token).map_err(|_| CtxExtError::CtxNotInRequestExt)?;
 
-    let mut permissions: Permissions = HashMap::new();
-
-    let Some(scope) = claims.scope() else {
-        return Err(CtxExtError::TokenWrongFormat);
-    };
-
-    for token in scope.split_whitespace() {
-        if let Some((resource_str, action_str)) = token.split_once(':') {
-            let resource = Resource::from_str(resource_str)
-                .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
-
-            let action = Action::from_str(action_str)
-                .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))?;
-
-            permissions
-                .entry(resource)
-                .or_insert_with(HashSet::new)
-                .insert(action);
-        }
-    }
-
-    Ctx::new(claims.sub)
+    Ctx::new(claims.sub, None)
         .map(CtxW)
         .map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()))
 }

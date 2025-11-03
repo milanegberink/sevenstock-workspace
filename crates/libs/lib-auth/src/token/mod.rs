@@ -53,6 +53,10 @@ pub trait Jwt: Serialize + DeserializeOwned + Sized {
     }
 }
 
+impl Jwt for AccessToken {}
+
+impl Jwt for IDToken {}
+
 #[derive(Clone, Hash, PartialEq, Eq, Debug, Serialize, Deserialize, Copy)]
 pub struct AccessToken {
     pub sub: Uuid,
