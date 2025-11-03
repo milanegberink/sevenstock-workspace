@@ -1,10 +1,10 @@
 <script>
 	import { userStore } from '@lib/core/stores';
-	import { Header } from '@lib/components';
+	import { PageHeader } from '@lib/components';
 	import { goto } from '$app/navigation';
 </script>
 
-<Header name="Products" />
+<PageHeader name="Products" />
 
 <div class=" border-primary m-4 h-full flex-1 overflow-hidden rounded-2xl border">
 	<table class="  w-full table-auto rounded-md">

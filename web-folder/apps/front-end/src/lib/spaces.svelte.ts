@@ -15,7 +15,7 @@ export const spaces = [
 			{ href: '/overview', icon: HouseBold, name: 'Overview' },
 			{ href: '/orders', icon: ShoppingCart, name: 'Orders' },
 			{ href: '/products', icon: Barcode, name: 'Products' },
-			{ href: '/products', icon: Barcode, name: 'Purchase Orders' }
+			{ href: '/purchase-orders', icon: Barcode, name: 'Purchase Orders' }
 		]
 	},
 	{
