@@ -1,5 +1,4 @@
 use axum::{Json, extract::State};
-use lib_auth::token::VerifyingConfig;
 use lib_core::model::ModelManager;
 
 use crate::Result;

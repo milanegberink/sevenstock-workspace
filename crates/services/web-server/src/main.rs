@@ -59,7 +59,7 @@ async fn main() -> Result<()> {
     let mm = ModelManager::new().await?;
 
     let manifest_sir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    //
+
     let workspace_root = manifest_sir
         .parent()
         .unwrap()
@@ -90,7 +90,6 @@ async fn main() -> Result<()> {
             ServeDir::new(static_files_path).append_index_html_on_directories(true),
         )
         .nest("/api", routes_login::routes(mm))
-        .merge(routes_well_known::routes())
         .layer(TraceLayer::new_for_http())
         // .layer(middleware::from_fn_with_state(mm.clone(), mw_rate_limiter))
         // .layer(middleware::from_fn(mw_ctx_require))
