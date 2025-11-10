@@ -6,28 +6,25 @@
 
 <PageHeader name="Products" />
 
-<div class=" border-primary m-4 h-full flex-1 overflow-hidden rounded-2xl border">
-	<table class="  w-full table-auto rounded-md">
-		<thead class="bg-secondary border-primary h-10 border-collapse rounded-md border-b text-left">
+<div class="m-4 h-full flex-1 overflow-y-auto">
+	<table class="w-full table-auto overflow-hidden">
+		<thead class="bg-secondary">
 			<tr>
-				<th class="border-primary border">Name</th>
-				<th class="border-primary border">EAN</th>
-				<th class="border-primary border">Price</th>
-				<th class="border-primary border">Stock</th>
+				<th class="border-primary border px-4 py-2 text-left font-semibold">Date</th>
+				<th class="border-primary border px-4 py-2 text-left font-semibold">File</th>
+				<th class="border-primary border px-4 py-2 text-left font-semibold"></th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr ondblclick={() => goto('/products/1')}>
-				<td>Alice</td>
-				<td>25</td>
-				<td>Alice</td>
-				<td>25</td>
+			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5"> </td>
 			</tr>
-			<tr>
-				<td>Alice</td>
-				<td>25</td>
-				<td>Alice</td>
-				<td>25</td>
+			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5">Alice</td>
+				<td class="border-primary border px-4 py-1.5"> </td>
 			</tr>
 		</tbody>
 	</table>
