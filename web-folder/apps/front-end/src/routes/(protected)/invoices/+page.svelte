@@ -12,7 +12,8 @@
 		Dropdown,
 		Header,
 		PageHeader,
-		UploadField
+		UploadField,
+		ImagePreview
 	} from '@lib/components';
 	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
@@ -32,6 +33,23 @@
 			name: 'Copy ID',
 			icon: FilePdf,
 			action: () => navigator.clipboard.writeText('Some id')
+		}
+	];
+
+	const invoices = [
+		{
+			id: '1',
+			name: 'Invoice 1',
+			date: '2023-01-01',
+			amount: 100,
+			status: 'paid'
+		},
+		{
+			id: '2',
+			name: 'Invoice 2',
+			date: '2023-02-01',
+			amount: 200,
+			status: 'pending'
 		}
 	];
 </script>
@@ -106,32 +124,25 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
-				<td class="border-primary border px-4 py-1.5">Alice</td>
-				<td class="border-primary border px-4 py-1.5">Alice</td>
-				<td class="border-primary border px-4 py-1.5">
-					<Dropdown {items}>
-						{#snippet trigger({ popovertarget, anchor })}
-							<button {popovertarget} style:anchor-name={anchor}>
-								<DotsThree />
-							</button>
-						{/snippet}
-					</Dropdown>
-				</td>
-			</tr>
-			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
-				<td class="border-primary border px-4 py-1.5">Alice</td>
-				<td class="border-primary border px-4 py-1.5">Alice</td>
-				<td class="border-primary border px-4 py-1.5">
-					<Dropdown {items}>
-						{#snippet trigger({ popovertarget, anchor })}
-							<button {popovertarget} style:anchor-name={anchor}>
-								<DotsThree />
-							</button>
-						{/snippet}
-					</Dropdown></td
-				>
-			</tr>
+			{#each invoices as invoice}
+				<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+					<td class="border-primary border px-4 py-1.5">
+						<ImagePreview
+							url="https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?cs=srgb&dl=pexels-pixabay-417173.jpg&fm=jpg"
+						/>
+					</td>
+					<td class="border-primary border px-4 py-1.5">Some file</td>
+					<td class="border-primary border px-4 py-1.5">
+						<Dropdown {items}>
+							{#snippet trigger({ popovertarget, anchor })}
+								<button {popovertarget} style:anchor-name={anchor}>
+									<DotsThree />
+								</button>
+							{/snippet}
+						</Dropdown>
+					</td>
+				</tr>
+			{/each}
 		</tbody>
 	</table>
 </div>

@@ -6,6 +6,7 @@ export { default as Settings } from './settings/settings.svelte';
 export { default as Dropdown } from './dropdown.svelte';
 export { default as Breadcrumbs } from './breadcrumbs.svelte';
 export { default as UploadField } from './upload-field.svelte';
+export { default as ImagePreview } from './image-preview.svelte';
 
 export { default as Qr } from './qr.svelte';
 export * from './navigation/index.js';

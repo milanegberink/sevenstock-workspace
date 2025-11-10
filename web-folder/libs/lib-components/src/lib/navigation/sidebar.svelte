@@ -2,13 +2,7 @@
 	import NavItem from './link.svelte';
 	let { spaces, open = $bindable(false) } = $props();
 
-	import {
-		HorizontalSeparator,
-		VerticalSeparator,
-		Dialog,
-		Settings,
-		AlertDialog
-	} from '$lib/index.js';
+	import { HorizontalSeparator, Dialog, Settings, AlertDialog } from '$lib/index.js';
 	import { Spring } from 'svelte/motion';
 
 	let openWidth = $state(256);
