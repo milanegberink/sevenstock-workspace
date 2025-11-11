@@ -49,7 +49,9 @@
 			name: 'Invoice 2',
 			date: '2023-02-01',
 			amount: 200,
-			status: 'pending'
+			status: 'pending',
+			image:
+				'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?cs=srgb&dl=pexels-pixabay-417173.jpg&fm=jpg'
 		}
 	];
 </script>
@@ -127,9 +129,7 @@
 			{#each invoices as invoice}
 				<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
 					<td class="border-primary border px-4 py-1.5">
-						<ImagePreview
-							url="https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?cs=srgb&dl=pexels-pixabay-417173.jpg&fm=jpg"
-						/>
+						<ImagePreview url={invoice.image} />
 					</td>
 					<td class="border-primary border px-4 py-1.5">Some file</td>
 					<td class="border-primary border px-4 py-1.5">
