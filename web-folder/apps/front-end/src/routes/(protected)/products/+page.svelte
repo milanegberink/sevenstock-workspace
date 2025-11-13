@@ -16,12 +16,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+			<tr ondblclick={() => goto('/products/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-1.5">Alice</td>
 				<td class="border-primary border px-4 py-1.5">Alice</td>
 				<td class="border-primary border px-4 py-1.5"> </td>
 			</tr>
-			<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+			<tr ondblclick={() => goto('/products/1')} class="hover:bg-tertiary">
 				<td class="border-primary border px-4 py-1.5">Alice</td>
 				<td class="border-primary border px-4 py-1.5">Alice</td>
 				<td class="border-primary border px-4 py-1.5"> </td>

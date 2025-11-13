@@ -6,7 +6,7 @@
 	$effect(() => (open ? popover.showPopover() : popover.hidePopover()));
 </script>
 
-{@render trigger({ onclick: () => (open = true), open })}
+{@render trigger?.({ onclick: () => (open = true), open })}
 
 <div
 	popover

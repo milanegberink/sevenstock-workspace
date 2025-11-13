@@ -39,9 +39,9 @@
 		<Sidebar bind:open {spaces} />
 		<div class="flex-1">
 			<Header>
-				<div class="-ml-2 flex items-center gap-2">
+				<div class="-ml-1.5 flex items-center gap-2">
 					<button
-						class="text-secondary hover:bg-secondary rounded-xl p-2 transition-transform active:scale-90"
+						class="text-secondary hover:bg-secondary rounded-lg p-1.5 transition-transform active:scale-90"
 						onclick={() => (open = !open)}><SidebarIcon /></button
 					>
 					<Breadcrumbs {spaces} />

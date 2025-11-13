@@ -13,7 +13,8 @@
 		Header,
 		PageHeader,
 		UploadField,
-		ImagePreview
+		ImagePreview,
+		Dialog
 	} from '@lib/components';
 	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
@@ -54,6 +55,10 @@
 				'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg?cs=srgb&dl=pexels-pixabay-417173.jpg&fm=jpg'
 		}
 	];
+
+	let activeInvoice = $state();
+
+	let open = $derived(activeInvoice ? true : activeInvoice);
 </script>
 
 <PageHeader name="Invoices">
@@ -127,7 +132,7 @@
 		</thead>
 		<tbody>
 			{#each invoices as invoice}
-				<tr ondblclick={() => goto('/invoices/1')} class="hover:bg-tertiary">
+				<tr ondblclick={() => (activeInvoice = invoice)} class="hover:bg-tertiary">
 					<td class="border-primary border px-4 py-1.5">
 						<ImagePreview url={invoice.image} />
 					</td>
@@ -146,3 +151,13 @@
 		</tbody>
 	</table>
 </div>
+
+{#if activeInvoice}
+	<Dialog bind:open>
+		{#snippet content()}
+			<div class="bg-primary border-primary h-56 w-56 rounded-2xl border">
+				<h1>{activeInvoice.name}</h1>
+			</div>
+		{/snippet}
+	</Dialog>
+{/if}
