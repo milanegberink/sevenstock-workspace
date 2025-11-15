@@ -34,6 +34,17 @@
 			name: 'Copy ID',
 			icon: FilePdf,
 			action: () => navigator.clipboard.writeText('Some id')
+		},
+		{
+			name: 'Copy ID',
+			icon: FilePdf,
+			items: [
+				{
+					name: 'Copy ID',
+					icon: FilePdf,
+					action: () => navigator.clipboard.writeText('Some id')
+				}
+			]
 		}
 	];
 
@@ -58,7 +69,11 @@
 
 	let activeInvoice = $state();
 
-	let open = $derived(activeInvoice ? true : activeInvoice);
+	let open = $derived(activeInvoice ? true : false);
+
+	$effect(() => {
+		if (!open) activeInvoice = null;
+	});
 </script>
 
 <PageHeader name="Invoices">
@@ -152,12 +167,12 @@
 	</table>
 </div>
 
-{#if activeInvoice}
-	<Dialog bind:open>
-		{#snippet content()}
-			<div class="bg-primary border-primary h-56 w-56 rounded-2xl border">
+<Dialog bind:open>
+	{#snippet content()}
+		<div class="bg-primary border-primary h-56 w-56 rounded-2xl border">
+			{#if activeInvoice}
 				<h1>{activeInvoice.name}</h1>
-			</div>
-		{/snippet}
-	</Dialog>
-{/if}
+			{/if}
+		</div>
+	{/snippet}
+</Dialog>
