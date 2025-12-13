@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { onclick, href, active, name, icon, open = $bindable(false), ...props } = $props();
+	let { onclick, href, active, name, icon, open = $bindable(true), ...props } = $props();
 
 	const tag = href ? 'a' : 'button';
 

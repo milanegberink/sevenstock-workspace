@@ -1,4 +1,5 @@
-<script>
+Deprecated
+<!-- <script>
 	let { onclick, text, icon, isActive } = $props();
 </script>
 
@@ -7,4 +8,4 @@
 		{@render icon()}
 		{text}
 	</button>
-</li>
+</li> -->

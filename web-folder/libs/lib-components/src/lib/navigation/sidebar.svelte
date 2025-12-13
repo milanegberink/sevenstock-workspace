@@ -1,21 +1,46 @@
 <script lang="ts">
 	import NavItem from './link.svelte';
+	import SidebarIcon from '~icons/ph/sidebar-simple-bold';
+
 	let { spaces, open = $bindable(false) } = $props();
 
 	import { HorizontalSeparator, Dialog, Settings, AlertDialog } from '$lib/index.js';
 	import { Spring } from 'svelte/motion';
+	import SettingsIcon from '~icons/ph/gear-six-bold';
 
 	let openWidth = $state(256);
+
+	let sidebar: HTMLElement;
 
 	const width = new Spring(256, {
 		stiffness: 0.06,
 		damping: 0.2
 	});
 	$effect(() => {
-		width.set(open ? openWidth : 52);
+		if (smallScreen) {
+			width.set(openWidth);
+			open ? sidebar.showPopover() : sidebar.hidePopover();
+		} else {
+			width.set(open ? openWidth : 52);
+		}
 	});
 
-	import SettingsIcon from '~icons/ph/gear-six-bold';
+	let windowWidth: number = $state(0);
+
+	const smallScreen = $derived(windowWidth < 1024);
+
+	function handleResize() {
+		windowWidth = window.innerWidth;
+	}
+
+	$effect(() => {
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	});
+
+	$effect(() => {
+		windowWidth = window.innerWidth;
+	});
 
 	import SidebarSpace from './sidebar-space.svelte';
 	import SearchIcon from '~icons/ph/magnifying-glass-bold';
@@ -62,11 +87,24 @@
 </script>
 
 <nav
-	class="bg-secondary group/nav fixed relative hidden h-full flex-col lg:flex"
-	style="width: {width.current}px"
+	popover={smallScreen ? 'auto' : undefined}
+	ontoggle={(e) => e.newState === 'closed' && (open = false)}
+	bind:this={sidebar}
+	class={[
+		'group/nav bg-secondary/60 h-full flex-col justify-between px-1.5 backdrop-blur-xl open:flex lg:flex',
+		smallScreen &&
+			'border-primary fixed relative top-0 left-0 m-0 -translate-x-10 border-r opacity-0 transition-all transition-discrete duration-200 open:block open:-translate-x-0 open:opacity-100 lg:flex starting:open:-translate-x-10 starting:open:opacity-0'
+	]}
+	style={`width: ${width.current}px`}
 >
-	<div class="flex h-13 items-center justify-between px-4"></div>
-	<HorizontalSeparator />
+	<div class="flex h-13 items-center justify-between px-4">
+		{#if smallScreen}
+			<button
+				class="text-secondary hover:bg-secondary rounded-lg transition-transform active:scale-90"
+				onclick={() => (open = !open)}><SidebarIcon /></button
+			>
+		{/if}
+	</div>
 
 	<SidebarSpace bind:open>
 		<Dialog>
@@ -82,7 +120,6 @@
 			{/snippet}
 		</Dialog>
 	</SidebarSpace>
-	<HorizontalSeparator />
 	<div class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
 		{#each spaces as space}
 			<SidebarSpace bind:open name={space.name}>
@@ -96,10 +133,8 @@
 					</NavItem>
 				{/each}
 			</SidebarSpace>
-			<HorizontalSeparator />
 		{/each}
 	</div>
-	<HorizontalSeparator />
 
 	<SidebarSpace bind:open>
 		<AlertDialog>
@@ -116,7 +151,9 @@
 		</AlertDialog>
 	</SidebarSpace>
 </nav>
-<div
-	onmousedown={handleMouseDown}
-	class="bg-border relative h-full w-px transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
-></div>
+{#if !smallScreen}
+	<div
+		onmousedown={handleMouseDown}
+		class="relative h-full w-0.5 transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
+	></div>
+{/if}

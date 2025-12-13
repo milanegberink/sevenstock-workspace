@@ -6,6 +6,6 @@
 </script>
 
 <Header>
-	<h1 in:fly={{ x: -10 }} class="text-xl">{name}</h1>
+	<h1 in:fly={{ x: -10 }} class="text-2xl">{name}</h1>
 	{@render children?.()}
 </Header>

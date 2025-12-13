@@ -8,7 +8,7 @@
 
 	import AccessibilityIcon from '~icons/ph/person-arms-spread';
 	import { CloseButton, Header, VerticalSeparator, Input } from '$lib/index.js';
-	import Link from './link.svelte';
+	import Link from '$lib/navigation/link.svelte';
 	import { fly } from 'svelte/transition';
 
 	let { close } = $props();
@@ -49,24 +49,25 @@
 	];
 </script>
 
-<div class="bg-primary border-primary h-[70vh] w-[70vw] overflow-hidden rounded-xl border">
-	<Header>
-		<span class="text-xl">Settings</span>
-		<CloseButton onclick={close} />
-	</Header>
+<div
+	class="bg-primary flex h-[70vh] min-w-[70vw] flex-col overflow-hidden rounded-xl
 
+"
+>
 	<div class="flex h-full">
-		<ul class="flex w-52 flex-col gap-1 p-2">
+		<ul class="bg-secondary flex h-full w-52 flex-col gap-1 p-2">
+			<li>
+				<CloseButton onclick={close} />
+			</li>
 			{#each pages as tab}
-				{@const isActive = tab.page === currentPage}
-				<Link {isActive} onclick={() => (currentPage = tab.page)} text={tab.name}>
+				{@const active = tab.page === currentPage}
+				<Link {active} onclick={() => (currentPage = tab.page)} name={tab.name}>
 					{#snippet icon()}
 						<tab.icon />
 					{/snippet}
 				</Link>
 			{/each}
 		</ul>
-		<VerticalSeparator />
 
 		<!-- Settings page content -->
 		<div class="flex-1">

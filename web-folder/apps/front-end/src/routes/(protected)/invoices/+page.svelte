@@ -169,7 +169,7 @@
 
 <Dialog bind:open>
 	{#snippet content()}
-		<div class="bg-primary border-primary h-56 w-56 rounded-2xl border">
+		<div class="bg-primary border-primary h-56 w-56 overflow-auto rounded-2xl border">
 			{#if activeInvoice}
 				<h1>{activeInvoice.name}</h1>
 			{/if}

@@ -10,7 +10,6 @@ import TrendUp from '~icons/ph/trend-up-bold';
 
 export const spaces = [
 	{
-		name: 'Home',
 		links: [
 			{ href: '/overview', icon: HouseBold, name: 'Overview' },
 			{ href: '/orders', icon: ShoppingCart, name: 'Orders' },
