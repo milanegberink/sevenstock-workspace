@@ -130,6 +130,9 @@
 						{#snippet icon()}
 							<link.icon />
 						{/snippet}
+						{#snippet end()}
+							<p>V</p>
+						{/snippet}
 					</NavItem>
 				{/each}
 			</SidebarSpace>

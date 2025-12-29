@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { onclick, href, active, name, icon, open = $bindable(true), ...props } = $props();
+	let { onclick, href, active, name, icon, open = $bindable(true), end, ...props } = $props();
 
 	const tag = href ? 'a' : 'button';
 
@@ -28,11 +28,13 @@
 		<div
 			class="flex w-10 shrink-0 items-center justify-center transition-transform group-active:scale-95"
 		>
-			{@render icon()}
+			{@render icon?.()}
 		</div>
-
 		{#if open}
-			<span class="truncate text-nowrap">{name}</span>
+			<div class="flex flex-1 justify-between pr-4">
+				<span class="truncate text-nowrap">{name}</span>
+				{@render end?.()}
+			</div>
 		{/if}
 	</svelte:element>
 </li>
@@ -41,7 +43,7 @@
 	popover="manual"
 	style:position-anchor="--anchor-nav-{id}"
 	bind:this={tooltip}
-	class="bg-primary anchored-right-center left-anchor-right border-primary text-primary left-1 hidden -translate-x-2 rounded-md border p-1 px-2 py-1 text-sm font-medium opacity-0 transition-all transition-discrete duration-100 open:block open:-translate-x-0 open:opacity-100 starting:open:-translate-x-2 starting:open:opacity-0"
+	class="bg-primary/50 anchored-right-center left-anchor-right border-primary text-primary left-1 hidden -translate-x-2 rounded-lg border p-1 px-2 py-1 text-sm font-medium opacity-0 backdrop-blur-md transition-all transition-discrete duration-100 open:block open:-translate-x-0 open:opacity-100 starting:open:-translate-x-2 starting:open:opacity-0"
 >
 	{name}
 </span>
