@@ -31,7 +31,7 @@
 			{@render icon?.()}
 		</div>
 		{#if open}
-			<div class="flex flex-1 justify-between pr-4">
+			<div class="flex flex-1 items-center justify-between pr-4">
 				<span class="truncate text-nowrap">{name}</span>
 				{@render end?.()}
 			</div>

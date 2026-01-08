@@ -1,6 +1,7 @@
 <script lang="ts">
 	import NavItem from './link.svelte';
 	import SidebarIcon from '~icons/ph/sidebar-simple-bold';
+	import CaretDown from '~icons/ph/caret-down-bold';
 
 	let { spaces, open = $bindable(false) } = $props();
 
@@ -131,7 +132,7 @@
 							<link.icon />
 						{/snippet}
 						{#snippet end()}
-							<p>V</p>
+							<CaretDown class="text-sm" />
 						{/snippet}
 					</NavItem>
 				{/each}
