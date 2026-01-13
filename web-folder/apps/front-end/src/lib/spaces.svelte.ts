@@ -11,10 +11,18 @@ import TrendUp from '~icons/ph/trend-up-bold';
 export const spaces = [
 	{
 		links: [
-			{ href: '/overview', icon: HouseBold, name: 'Overview' },
-			{ href: '/orders', icon: ShoppingCart, name: 'Orders' },
+			{
+				name: 'Overview',
+
+				icon: HouseBold,
+				links: [
+					{ href: '/overview', icon: ShoppingCart, name: 'Orders' },
+					{ href: '/products', icon: ShoppingCart, name: 'Something' },
+					{ href: '/trends', icon: ShoppingCart, name: 'trends' }
+				]
+			},
 			{ href: '/products', icon: Barcode, name: 'Products' },
-			{ href: '/purchase-orders', icon: Barcode, name: 'Purchase Orders' }
+			{ href: '/trends', icon: TrendUp, name: 'Trends' }
 		]
 	},
 	{

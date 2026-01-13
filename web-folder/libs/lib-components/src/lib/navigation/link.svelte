@@ -20,14 +20,12 @@
 		{onclick}
 		{href}
 		role={tag === 'a' ? 'link' : 'button'}
-		class="group flex h-9 w-full items-center"
+		class="flex h-9 w-full items-center"
 		onmouseenter={() => !open && tooltip.showPopover()}
 		onmouseleave={() => tooltip.hidePopover()}
 		style:anchor-name="--anchor-nav-{id}"
 	>
-		<div
-			class="flex w-10 shrink-0 items-center justify-center transition-transform group-active:scale-95"
-		>
+		<div class="flex h-full w-10 shrink-0 items-center justify-center">
 			{@render icon?.()}
 		</div>
 		{#if open}

@@ -85,6 +85,9 @@
 	}
 
 	import { page } from '$app/state';
+	import { slide } from 'svelte/transition';
+
+	let openGroups = $state({});
 </script>
 
 <nav
@@ -126,15 +129,46 @@
 			<SidebarSpace bind:open name={space.name}>
 				{#each space.links as link}
 					{@const { href, name } = link}
-					{@const active = page.url.pathname.startsWith(href)}
-					<NavItem {href} {name} {active} bind:open>
-						{#snippet icon()}
-							<link.icon />
-						{/snippet}
-						{#snippet end()}
-							<CaretDown class="text-sm" />
-						{/snippet}
-					</NavItem>
+					{@const isOpen = openGroups[href]}
+					{#if link.links}
+						<NavItem onclick={() => (openGroups[href] = !isOpen)} {name} bind:open>
+							{#snippet icon()}
+								<link.icon />
+							{/snippet}
+							{#snippet end()}
+								<CaretDown class={['text-sm  transition-transform', !isOpen && '-rotate-90']} />
+							{/snippet}
+						</NavItem>
+						{#if open && isOpen}
+							<div transition:slide={{ duration: 200 }}>
+								{#each link.links as nlink, index}
+									{@const isFirst = index === 0}
+									{@const isLast = index === link.links.length - 1}
+									{@const nAactive = page.url.pathname.startsWith(nlink.href)}
+									<NavItem href={nlink.href} name={nlink.name} active={nAactive} bind:open>
+										{#snippet icon()}
+											<div
+												class={[
+													'bg-text-secondary/60 w-0.5',
+													isFirst && 'h-2/3 self-end',
+													isLast && 'h-2/3 self-start',
+													!isLast && !isFirst && 'h-full'
+												]}
+											></div>
+										{/snippet}
+									</NavItem>
+								{/each}
+							</div>
+						{/if}
+					{:else}
+						{@const active = page.url.pathname.startsWith(href)}
+
+						<NavItem {href} {name} {active} bind:open>
+							{#snippet icon()}
+								<link.icon />
+							{/snippet}
+						</NavItem>
+					{/if}
 				{/each}
 			</SidebarSpace>
 		{/each}

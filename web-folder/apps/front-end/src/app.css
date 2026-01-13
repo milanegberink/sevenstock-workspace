@@ -9,6 +9,8 @@
 	--text-color-primary: var(--text-primary);
 	--text-color-secondary: var(--text-secondary);
 
+	--background-color-text-primary: var(--text-primary);
+	--background-color-text-secondary: var(--text-secondary);
 	--background-color-tertiary: #f0f0f0;
 	--background-color-primary: rgb(var(--bg-primary));
 	--background-color-secondary: #f9f9f9;
