@@ -20,7 +20,7 @@
 		{onclick}
 		{href}
 		role={tag === 'a' ? 'link' : 'button'}
-		class="flex h-9 w-full items-center"
+		class="flex h-8.5 w-full items-center"
 		onmouseenter={() => !open && tooltip.showPopover()}
 		onmouseleave={() => tooltip.hidePopover()}
 		style:anchor-name="--anchor-nav-{id}"

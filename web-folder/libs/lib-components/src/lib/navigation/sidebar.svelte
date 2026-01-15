@@ -2,7 +2,6 @@
 	import NavItem from './link.svelte';
 	import SidebarIcon from '~icons/ph/sidebar-simple-bold';
 	import CaretDown from '~icons/ph/caret-down-bold';
-
 	let { spaces, open = $bindable(false) } = $props();
 
 	import { HorizontalSeparator, Dialog, Settings, AlertDialog } from '$lib/index.js';
@@ -136,22 +135,22 @@
 								<link.icon />
 							{/snippet}
 							{#snippet end()}
-								<CaretDown class={['text-sm  transition-transform', !isOpen && '-rotate-90']} />
+								<CaretDown class={['text-sm transition-transform', !isOpen && '-rotate-90']} />
 							{/snippet}
 						</NavItem>
 						{#if open && isOpen}
 							<div transition:slide={{ duration: 200 }}>
-								{#each link.links as nlink, index}
+								{#each link.links as nlink, index (nlink.href)}
 									{@const isFirst = index === 0}
 									{@const isLast = index === link.links.length - 1}
-									{@const nAactive = page.url.pathname.startsWith(nlink.href)}
-									<NavItem href={nlink.href} name={nlink.name} active={nAactive} bind:open>
+									{@const nActive = page.url.pathname.startsWith(nlink.href)}
+									<NavItem href={nlink.href} name={nlink.name} active={nActive} bind:open>
 										{#snippet icon()}
 											<div
 												class={[
-													'bg-text-secondary/60 w-0.5',
-													isFirst && 'h-2/3 self-end',
-													isLast && 'h-2/3 self-start',
+													'bg-text-secondary/40 w-0.5',
+													isFirst && 'h-2/3 self-end rounded-t-full',
+													isLast && 'rounded-b-ful h-2/3 self-start',
 													!isLast && !isFirst && 'h-full'
 												]}
 											></div>
@@ -192,6 +191,6 @@
 {#if !smallScreen}
 	<div
 		onmousedown={handleMouseDown}
-		class="relative h-full w-0.5 transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
+		class="bg-border relative h-full w-px transition-all delay-150 before:absolute before:top-0 before:-right-2 before:bottom-0 before:-left-2 before:content-[''] hover:cursor-col-resize hover:bg-blue-500"
 	></div>
 {/if}

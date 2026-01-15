@@ -12,13 +12,12 @@ export const spaces = [
 	{
 		links: [
 			{
-				name: 'Overview',
-
+				name: 'Automations',
 				icon: HouseBold,
 				links: [
 					{ href: '/overview', icon: ShoppingCart, name: 'Orders' },
 					{ href: '/products', icon: ShoppingCart, name: 'Something' },
-					{ href: '/trends', icon: ShoppingCart, name: 'trends' }
+					{ href: '/trends', icon: ShoppingCart, name: 'Trends' }
 				]
 			},
 			{ href: '/products', icon: Barcode, name: 'Products' },
