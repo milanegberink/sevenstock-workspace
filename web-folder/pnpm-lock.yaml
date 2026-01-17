@@ -42,6 +42,9 @@ importers:
       '@lib/core':
         specifier: workspace:*
         version: link:../../libs/lib-core
+      jose:
+        specifier: ^6.1.2
+        version: 6.1.2
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^6.1.1

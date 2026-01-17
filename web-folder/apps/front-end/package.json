@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@lib/components": "workspace:*",
-		"@lib/core": "workspace:*"
+		"@lib/core": "workspace:*",
+		"jose": "^6.1.2"
 	}
 }

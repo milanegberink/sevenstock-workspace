@@ -49,34 +49,28 @@
 	];
 </script>
 
-<div class="h-[70vh] min-w-[70vw] rounded-4xl shadow-2xl">
-	<div
-		class="bg-primary/70 border-primary flex h-full w-full flex-col overflow-hidden rounded-4xl border backdrop-blur-lg"
-	>
-		<div class="flex h-full">
-			<ul class="bg-secondary flex h-full w-52 flex-col gap-1 p-2">
-				<li>
-					<CloseButton onclick={close} />
-				</li>
-				{#each pages as tab}
-					{@const active = tab.page === currentPage}
-					<Link {active} onclick={() => (currentPage = tab.page)} name={tab.name}>
-						{#snippet icon()}
-							<tab.icon />
-						{/snippet}
-					</Link>
-				{/each}
-			</ul>
+<div class="bg-primary flex h-full w-full backdrop-blur-lg">
+	<ul class="bg-secondary flex h-full w-52 flex-col gap-1 p-2">
+		<li>
+			<CloseButton onclick={close} />
+		</li>
+		{#each pages as tab}
+			{@const active = tab.page === currentPage}
+			<Link {active} onclick={() => (currentPage = tab.page)} name={tab.name}>
+				{#snippet icon()}
+					<tab.icon />
+				{/snippet}
+			</Link>
+		{/each}
+	</ul>
 
-			<!-- Settings page content -->
-			<div class="flex-1">
-				{#key currentPage}
-					<div in:fly={{ y: 10, duration: 100 }} class="flex flex-1 flex-col p-4">
-						{@render currentPage()}
-					</div>
-				{/key}
+	<!-- Settings page content -->
+	<div class="flex-1">
+		{#key currentPage}
+			<div in:fly={{ y: 10, duration: 100 }} class="flex flex-1 flex-col p-4">
+				{@render currentPage()}
 			</div>
-		</div>
+		{/key}
 	</div>
 </div>
 {#snippet account()}

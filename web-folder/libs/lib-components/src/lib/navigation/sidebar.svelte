@@ -174,7 +174,9 @@
 	</div>
 
 	<SidebarSpace bind:open>
-		<AlertDialog>
+		<AlertDialog
+			class="border-primary flex h-[70vh] min-w-[70vw] flex-col overflow-hidden rounded-4xl border shadow-xl"
+		>
 			{#snippet trigger({ onclick, open: settingsModalOpen })}
 				<NavItem {onclick} name="Settings" active={settingsModalOpen} bind:open>
 					{#snippet icon()}
