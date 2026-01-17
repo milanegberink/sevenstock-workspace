@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import QRCode from 'qrcode';
 
 	let { url, ...props } = $props();
@@ -20,4 +20,4 @@
 	});
 </script>
 
-<div class={props.class}>{@html svg}</div>
+<div class={props.class}>{@html svg}</div> -->

@@ -1,4 +1,3 @@
-import { decodeJwt } from 'jose';
 import { type SWRequest, SWReqType } from './request.ts';
 import { err, ok, type Result, type PromiseResult } from './result.js';
 // import { user } from '$lib/schemas/index.js';

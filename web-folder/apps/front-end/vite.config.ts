@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import Icons from 'unplugin-icons/vite';
 
 export default defineConfig({
+	optimizeDeps: { include: ['jose'] },
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
